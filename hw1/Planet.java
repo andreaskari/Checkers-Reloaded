@@ -13,7 +13,7 @@ public class Planet {
 	public double xAccel;
 	public double yAccel;
 
-	public static double G = 6.67 * Math.pow(10, -11);
+	public static final double G = 6.67 * Math.pow(10, -11);
 
 	public Planet(double xP, double yP, double xV, double yV, double m, String i) {
 		x = xP;
@@ -65,8 +65,8 @@ public class Planet {
 	}
 
 	public void update(double dt) {
-		double xAccel = xNetForce / mass;
-		double yAccel = yNetForce / mass;
+		xAccel = xNetForce / mass;
+		yAccel = yNetForce / mass;
 		xVelocity += dt * xAccel;
 		yVelocity += dt * yAccel;
 		x += dt * xVelocity;

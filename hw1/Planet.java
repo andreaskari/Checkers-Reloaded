@@ -1,4 +1,6 @@
 public class Planet {
+	// Planet class
+	
 	public double x;
 	public double y;
 	public double xVelocity;

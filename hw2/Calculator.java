@@ -2,6 +2,7 @@ import list.EquationList;
 
 public class Calculator {
     // YOU MAY WISH TO ADD SOME FIELDS
+    private EquationList history;
 
     /**
      * TASK 2: ADDING WITH BIT OPERATIONS
@@ -12,8 +13,14 @@ public class Calculator {
      * @return the sum of x and y
      **/
     public int add(int x, int y) {
-        // YOUR CODE HERE
-        return -1;
+        int common = x & y;
+        int remaining = x ^ y;
+        while (common != 0) {
+            int commonCarried = common << 1;
+            common = remaining & commonCarried;
+            remaining = remaining ^ commonCarried;
+        }
+        return remaining;
     }
 
     /**
@@ -25,8 +32,25 @@ public class Calculator {
      * @return the product of x and y
      **/
     public int multiply(int x, int y) {
-        // YOUR CODE HERE
-        return -1;
+        boolean negative = x > 0 && y < 0 || x < 0 && y > 0;
+        if (x < 0) {
+            x = add(~x, 1);
+        }
+        if (y < 0) {
+            y = add(~y, 1);
+        }
+        int sum = 0;
+        while (y > 0) {
+            if ((y & 1) != 0) {
+                sum = add(x, sum);
+            }
+            x = x << 1;
+            y = y >> 1;
+        }
+        if (negative) {
+            return add(~sum, 1);
+        }
+        return sum;
     }
 
     /**
@@ -39,7 +63,8 @@ public class Calculator {
      * @param result is an integer corresponding to the result of the equation
      **/
     public void saveEquation(String equation, int result) {
-        // YOUR CODE HERE
+        // YOUR CODE HERE -- DONE
+        history = new EquationList(equation, result, history);
     }
 
     /**
@@ -50,7 +75,12 @@ public class Calculator {
      * Ex   "1 + 2 = 3"
      **/
     public void printAllHistory() {
-        // YOUR CODE HERE
+        // YOUR CODE HERE -- DONE
+        EquationList historyMarker = history;
+        while (historyMarker != null) {
+            System.out.println(historyMarker.equation + " = " + historyMarker.result);
+            historyMarker = historyMarker.next;
+        }
     }
 
     /**
@@ -61,7 +91,15 @@ public class Calculator {
      * Ex   "1 + 2 = 3"
      **/
     public void printHistory(int n) {
-        // YOUR CODE HERE
+        // YOUR CODE HERE -- DONE
+        EquationList historyMarker = history;
+        for (int i = 0; i < n; i++) {
+            if (historyMarker == null) {
+                return;
+            }
+            System.out.println(historyMarker.equation + " = " + historyMarker.result);
+            historyMarker = historyMarker.next;
+        }
     }    
 
     /**
@@ -69,7 +107,8 @@ public class Calculator {
      * undoEquation() removes the most recent equation we saved to our history.
     **/
     public void undoEquation() {
-        // YOUR CODE HERE
+        // YOUR CODE  -- DONE
+        history = history.next;
     }
 
     /**
@@ -77,7 +116,8 @@ public class Calculator {
      * clearHistory() removes all entries in our history.
      **/
     public void clearHistory() {
-        // YOUR CODE HERE
+        // YOUR CODE HERE -- DONE
+        history = null;
     }
 
     /**
@@ -87,8 +127,17 @@ public class Calculator {
      * @return the sum of all of the results in history
      **/
     public int cumulativeSum() {
-        // YOUR CODE HERE
-        return -1;
+        // YOUR CODE HERE -- DONE
+        if (history == null) {
+            return 0;
+        }
+        int sum = 0;
+        EquationList historyMarker = history;
+        while (historyMarker != null) {
+            sum = add(sum, historyMarker.result);
+            historyMarker = historyMarker.next;
+        }
+        return sum;
     }
 
     /**
@@ -98,7 +147,16 @@ public class Calculator {
      * @return the product of all of the results in history
      **/
     public int cumulativeProduct() {
-        // YOUR CODE HERE
-        return -1;
+        // YOUR CODE HERE -- DONE
+        if (history == null) {
+            return 1;
+        }
+        int product = 1;
+        EquationList historyMarker = history;
+        while (historyMarker != null) {
+            product = multiply(product, historyMarker.result);
+            historyMarker = historyMarker.next;
+        }
+        return product;
     }
 }

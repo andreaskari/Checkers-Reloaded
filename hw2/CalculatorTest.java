@@ -25,13 +25,16 @@ public class CalculatorTest {
     @Test
     public void testAdd() {
         assertEquals(6, tester.add(0, 6));
+        assertEquals(11, tester.add(5, 6));
         assertEquals(-4, tester.add(-10, 6));
+        assertEquals(53, tester.add(54, -1));
         assertEquals(-26, tester.add(-20, -6));
     }
 
     @Test
     public void testMultiply() {
         assertEquals(0, tester.multiply(0, 6));
+        assertEquals(30, tester.multiply(5, 6));
         assertEquals(-60, tester.multiply(10, -6));
         assertEquals(-54, tester.multiply(54, -1));
         assertEquals(120, tester.multiply(-20, -6));

@@ -1,7 +1,7 @@
 public class Flik {
 
 
-	static boolean isSameNumber (Integer a, Integer b) {
+	static boolean isSameNumber (int a, int b) {
 		return a == b;
 	}
 

@@ -1,0 +1,2 @@
+The isSameNumber method takes in two Integers (which are wrapper classes for ints).
+Integers can only store values 0 - 127 and therefore when we wrap 128 in an Integer, it returns null. Null == Null so therefore the incrememnt of 128 beraks the loop.

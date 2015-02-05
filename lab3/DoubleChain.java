@@ -40,8 +40,12 @@ public class DoubleChain {
 	  * This is an extra challenge problem. */
 	public DNode deleteBack() {
 		/* your code here */
+		if (head == null) {
+			return null;
+		}
 		DNode originalBack = getBack();
 		originalBack.prev.next = null;
+		originalBack.prev = null;
 		return originalBack;
 	}
 	

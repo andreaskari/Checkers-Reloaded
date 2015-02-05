@@ -51,7 +51,7 @@ public class TestDoubleChain {
         d.insertBack(7);
         assertEquals(7, d.deleteBack().val, 1e-11);
         assertEquals(5, d.deleteBack().val, 1e-11);
-
+        assertEquals(null, d.deleteBack().prev, 1e-11);
     }
 
     public static void main(String[] args) {

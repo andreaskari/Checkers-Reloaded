@@ -44,6 +44,16 @@ public class TestDoubleChain {
         assertEquals("<[1.0, 2.0, 5.0, 7.0, 8.0]>", d.toString());
     }
 
+    @Test 
+    public void testDeleteBack() {
+        DoubleChain d = new DoubleChain(5);
+        d.insertFront(1);
+        d.insertBack(7);
+        assertEquals(7, d.deleteBack().val, 1e-11);
+        assertEquals(5, d.deleteBack().val, 1e-11);
+
+    }
+
     public static void main(String[] args) {
         jh61b.junit.textui.runClasses(TestDoubleChain.class);
     }

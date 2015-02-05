@@ -40,7 +40,9 @@ public class DoubleChain {
 	  * This is an extra challenge problem. */
 	public DNode deleteBack() {
 		/* your code here */
-		return null;
+		DNode originalBack = getBack();
+		originalBack.prev.next = null;
+		return originalBack;
 	}
 	
 	/** Returns a string representation of the DoubleChain. 

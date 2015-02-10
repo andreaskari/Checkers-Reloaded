@@ -1,12 +1,14 @@
 import java.lang.Math;
 
 public class Board {
+
 	private Piece[][] boardPieces;
 
 	private boolean firesTurn;
 	private boolean madeMove;
-	private Piece selectedPiece;
 
+	private int xSelected;
+	private int ySelected;
 
 	public static void main(String[] args) {
 		// Missing Code
@@ -27,7 +29,8 @@ public class Board {
 
 		this.firesTurn = true;
 		this.madeMove = false;
-		this.selectedPiece = null;
+		this.xSelected = -1;
+		this.ySelected = -1;
 	}
 
 	private void placeTypePiecesAtTypeIndexes(String piece, boolean suit, int startingIndex, int y) {
@@ -43,25 +46,49 @@ public class Board {
 	}
 
 	public boolean canSelect(int x, int y) {
-		// Missing Code
-		Piece p = this.pieceAt(x,y);
-		if (p == null) {
-			if (validMove)
-		}
-		if (p.isFire() != this.firesTurn) {
+		Piece wantToSelect = this.pieceAt(x,y);
+		if (wantToSelect == null) {
+			if (xSelected < 0) {
+				return false;
+			} else if (this.validMove(xSelected, ySelected, x, y)) {
+				return true;
+			}
+		} else if (wantToSelect.isFire() != this.firesTurn) {
+			return false;
+		} else {
+			if (xSelected < 0) {
+				return true;
+			} else if (!this.madeMove) {
+				return true;
+			}
 			return false;
 		}
-		return true;
 	}
 
 	private boolean validMove(int xi, int yi, int xf, int yf) {
 		// Missing Code
-		return true;
+		Piece selected = this.pieceAt(xi, yi);
+		if (selected.isKing() || selected.isFire() && yf - yi > 0 || !selected.isFire() && yf - yi < 0) {
+			int dx = abs(xf - xi);
+			if (dx == 2) {
+				Piece captured = this.pieceAt((xi + xf) / 2, (yi + yf) / 2);
+				if (selected.isFire() == !captured.isFire()) {
+					return true;
+				}
+				return false;
+			} else if (dx == 1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	public void select(int x, int y) {
 		// Missing Code
-
+		this.madeMove = true;
+		// How to know whether piece capured?
 	}
 
 	public void place(Piece p, int x, int y) {
@@ -98,7 +125,8 @@ public class Board {
 		}
 		this.firesTurn = !this.firesTurn;
 		this.madeMove = false;
-		this.selectedPiece = null;
+		this.xSelected = -1;
+		this.ySelected = -1;
 	}
 
 	public String winner() {

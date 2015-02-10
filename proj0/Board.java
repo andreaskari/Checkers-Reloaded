@@ -55,24 +55,22 @@ public class Board {
 			}
 		} else if (wantToSelect.isFire() != this.firesTurn) {
 			return false;
-		} else {
-			if (xSelected < 0) {
-				return true;
-			} else if (!this.madeMove) {
-				return true;
-			}
-			return false;
 		}
+		if (xSelected < 0) {
+			return true;
+		} else if (!this.madeMove) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean validMove(int xi, int yi, int xf, int yf) {
-		// Missing Code
 		Piece selected = this.pieceAt(xi, yi);
 		if (selected.isKing() || selected.isFire() && yf - yi > 0 || !selected.isFire() && yf - yi < 0) {
-			int dx = abs(xf - xi);
+			int dx = Math.abs(xf - xi);
 			if (dx == 2) {
 				Piece captured = this.pieceAt((xi + xf) / 2, (yi + yf) / 2);
-				if (selected.isFire() == !captured.isFire()) {
+				if (captured != null && selected.isFire() != captured.isFire()) {
 					return true;
 				}
 				return false;
@@ -86,13 +84,25 @@ public class Board {
 	}
 
 	public void select(int x, int y) {
-		// Missing Code
-		this.madeMove = true;
-		// How to know whether piece capured?
+		// Implement special moves
+		if (this.canSelect(x, y)) {
+			if (xSelected >= 0 && this.pieceAt(x,y) == null) {
+				Piece selected = this.remove(xSelected, ySelected);
+				this.place(selected, x, y);
+				this.madeMove = true;
+			}
+			xSelected = x;
+			ySelected = y;
+
+			// Select square via color
+		}
 	}
 
 	public void place(Piece p, int x, int y) {
 		this.boardPieces[x][y] = p;
+		if (p != null) {
+			p.move(x, y);
+		}
 	}
 
 	public Piece remove(int x, int y) {
@@ -104,7 +114,7 @@ public class Board {
 	public boolean canEndTurn() {
 		for (Piece[] rowPieces: this.boardPieces) {
 			for (Piece p: rowPieces) {
-				if (p.hasCaptured()) {
+				if (p != null && p.hasCaptured()) {
 					return true;
 				}
 			}
@@ -112,13 +122,13 @@ public class Board {
 		return madeMove;
 	}
 
-	public void endturn() {
+	public void endTurn() {
 		if (!canEndTurn()) {
 			return;
 		}
 		for (Piece[] rowPieces: this.boardPieces) {
 			for (Piece p: rowPieces) {
-				if (this.firesTurn == p.isFire()) {
+				if (p != null && this.firesTurn == p.isFire()) {
 					p.doneCapturing();
 				}
 			}

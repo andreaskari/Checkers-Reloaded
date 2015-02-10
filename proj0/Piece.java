@@ -49,7 +49,7 @@ public class Piece {
 			int yCaptured = (this.y + y) / 2;
 			board.remove(xCaptured, yCaptured);
 		}
-		if (this.side() * 7 == y) {
+		if (Math.abs(this.side() - 1) * 7 == y) {
 			this.isCrowned = true;
 		}
 		this.x = x;

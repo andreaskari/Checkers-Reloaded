@@ -80,9 +80,11 @@ public class TestBoard {
 		board.place(shieldFire,  1, 1);
 		board.place(bombFire,    2, 2);
 
+		assertEquals(false, board.canSelect(1, 0));
 		assertEquals(true, board.canSelect(0, 0));
 		board.select(0, 0);
 		assertEquals(true, board.canSelect(1, 1));
+		assertEquals(false, board.canSelect(1, 2));
 		board.select(1, 1);
 		assertEquals(true, board.canSelect(2, 2));
 		board.select(2, 2);
@@ -124,14 +126,46 @@ public class TestBoard {
 		assertEquals(true, board.pieceAt(3, 3) == bombFire);
 		assertEquals(null, board.pieceAt(1, 1));
 		assertEquals(null, board.pieceAt(2, 2));
+
+		// Test whether can move to (x + y) % 2 != 0 spot
 	}
 
-	// @Test
-	// public void testCpat
+	@Test
+	public void testMultipleCaptures() {
+		Board board = new Board(true);
+
+		Piece rF  = new Piece(true,  board, 0, 0, "Regular-Type");
+		Piece rW1 = new Piece(false, board, 1, 1, "Regular-Type");
+		Piece rW2 = new Piece(false, board, 1, 3, "Regular-Type");
+		Piece rW3 = new Piece(false, board, 1, 5, "Regular-Type");
+
+		board.place(rF,  0, 0);
+		board.place(rW1, 1, 1);
+		board.place(rW2, 1, 3);
+		board.place(rW3, 1, 5);
+
+		assertEquals(true, board.pieceAt(1, 1) == rW1);
+		assertEquals(true, board.pieceAt(1, 3) == rW2);
+		assertEquals(true, board.pieceAt(1, 5) == rW3);
+		assertEquals(true, board.pieceAt(0, 0) == rF);
+
+		board.select(0, 0);
+		board.select(2, 2);
+		board.select(0, 4);
+		board.select(2, 6);
+
+		assertEquals(null, board.pieceAt(1, 1));
+		assertEquals(null, board.pieceAt(1, 3));
+		assertEquals(null, board.pieceAt(1, 5));
+		assertEquals(true, board.pieceAt(2, 6) == rF);
+
+		assertEquals(false, board.canSelect(3, 7));
+	}
 
 	@Test
 	public void testPlace() {
 		Board board = new Board(true);
+
 		Piece regularFire = new Piece(true, board, 1, 2, "Regular-Type");
 		Piece shieldFire  = new Piece(true, board, 3, 4, "Shield-Type");
 		Piece bombFire    = new Piece(true, board, 5, 6, "Bomb-Type");
@@ -191,6 +225,39 @@ public class TestBoard {
 		assertEquals(false, bW.isShield());
 		assertEquals(true,  bW.isBomb());
 		assertEquals(null,  board.pieceAt(6, 5));
+	}
+
+	@Test
+	public void testKingPieces() {
+		Board board = new Board(true);
+		Piece regularFire  = new Piece(true,  board, 2, 6, "Regular-Type");
+		Piece regularWater = new Piece(false, board, 5, 7, "Regular-Type");
+
+		board.place(regularFire,  2, 6);
+		board.place(regularWater, 5, 7);
+
+		assertEquals(false, regularFire.isKing());
+
+		board.select(2, 6);
+
+		assertEquals(false, board.canSelect(1, 5));
+
+		board.select(3, 7);
+
+		assertEquals(true, regularFire.isKing());
+
+		board.endTurn();
+
+		board.select(5, 7);
+		board.select(4, 6);
+
+		board.endTurn();
+
+		board.select(3, 7);
+		board.select(5, 5);
+
+		assertEquals(null, board.pieceAt(4, 6));
+		assertEquals(true, board.pieceAt(5, 5) == regularFire);
 	}
 
 	@Test

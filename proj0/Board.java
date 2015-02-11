@@ -12,7 +12,9 @@ public class Board {
 
 	public static void main(String[] args) {
 		// Missing Code
-		// StdDrawPlus.init();
+		StdDrawPlus.init();
+
+		// Check if any available captures after first capture automatically and then stop turn?
 	}
 
 	public Board(boolean shouldBeEmpty) {
@@ -46,6 +48,9 @@ public class Board {
 	}
 
 	public boolean canSelect(int x, int y) {
+		if ((x + y) % 2 != 0) {
+			return false;
+		}
 		Piece wantToSelect = this.pieceAt(x,y);
 		if (wantToSelect == null) {
 			if (xSelected < 0) {
@@ -55,8 +60,7 @@ public class Board {
 			}
 		} else if (wantToSelect.isFire() != this.firesTurn) {
 			return false;
-		}
-		if (xSelected < 0) {
+		} else if (xSelected < 0) {
 			return true;
 		} else if (!this.madeMove) {
 			return true;
@@ -66,7 +70,7 @@ public class Board {
 
 	private boolean validMove(int xi, int yi, int xf, int yf) {
 		Piece selected = this.pieceAt(xi, yi);
-		if (selected.isKing() || selected.isFire() && yf - yi > 0 || !selected.isFire() && yf - yi < 0) {
+		if (selected.isKing() || (selected.isFire() && yf > yi) || (!selected.isFire() && yf < yi)) {
 			int dx = Math.abs(xf - xi);
 			if (dx == 2) {
 				Piece captured = this.pieceAt((xi + xf) / 2, (yi + yf) / 2);
@@ -75,6 +79,9 @@ public class Board {
 				}
 				return false;
 			} else if (dx == 1) {
+				if (selected.hasCaptured()) {
+					return false;
+				}
 				return true;
 			} else {
 				return false;
@@ -93,6 +100,8 @@ public class Board {
 			}
 			xSelected = x;
 			ySelected = y;
+
+			// Check if any pieces available to hit?
 
 			// Select square via color
 		}

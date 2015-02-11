@@ -11,11 +11,65 @@ public class Board {
 	private int ySelected;
 
 	public static void main(String[] args) {
-		// Missing Code
-		StdDrawPlus.init();
+		Board board = new Board(false);
+		board.initBoard();
 
-		// Check if any available captures after first capture automatically and then stop turn?
+		while(true) {
+			board.drawBoard();
+			if (StdDrawPlus.mousePressed()) {
+                double x = StdDrawPlus.mouseX();
+                double y = StdDrawPlus.mouseY();
+                System.out.println((int) x + " " + (int) y);
+                board.select((int) x, (int) y);
+            }
+            if (StdDrawPlus.isSpacePressed()) {
+            	if (board.canEndTurn()) {
+            		board.endTurn();
+            		System.out.println("Ended turn");
+            	} else {
+            		System.out.println("Can't end turn");
+            	}
+
+            }
+            StdDrawPlus.show(50);
+		}
 	}
+
+	private void initBoard() {
+		StdDrawPlus.setXscale(0, 8);
+        StdDrawPlus.setYscale(0, 8);
+	}
+
+	private void drawBoard() {
+		for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if ((i + j) % 2 == 0) StdDrawPlus.setPenColor(StdDrawPlus.GRAY);
+                else                  StdDrawPlus.setPenColor(StdDrawPlus.RED);
+                StdDrawPlus.filledSquare(i + .5, j + .5, .5);
+                StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
+                if (boardPieces[i][j] != null) {
+                	String img = "img/";
+                	if (boardPieces[i][j].isShield()) {
+                		img = img + "shield-";
+                	} else if (boardPieces[i][j].isBomb()) {
+                		img = img + "bomb-";
+                	} else {
+                		img = img + "pawn-";
+                	}
+                	if (boardPieces[i][j].isFire()) {
+                		img = img + "fire";
+                	} else {
+                		img = img + "water";
+                	}
+                	if (boardPieces[i][j].isKing()) {
+                		img = img + "-crowned";
+                	}
+                	img = img + ".png";
+                    StdDrawPlus.picture(i + .5, j + .5, img, 1, 1);
+                }
+            }
+        }
+    }
 
 	public Board(boolean shouldBeEmpty) {
 		this.boardPieces = new Piece[8][8];
@@ -48,6 +102,9 @@ public class Board {
 	}
 
 	public boolean canSelect(int x, int y) {
+		if (x > 7 || y > 7 || x < 0 || y < 0) {
+			return false;
+		}
 		if ((x + y) % 2 != 0) {
 			return false;
 		}
@@ -69,15 +126,28 @@ public class Board {
 	}
 
 	private boolean validMove(int xi, int yi, int xf, int yf) {
+		if (xf - xi == 0 || yf - yi == 0) {
+			return false;
+		}
 		Piece selected = this.pieceAt(xi, yi);
 		if (selected.isKing() || (selected.isFire() && yf > yi) || (!selected.isFire() && yf < yi)) {
 			int dx = Math.abs(xf - xi);
 			if (dx == 2) {
 				Piece captured = this.pieceAt((xi + xf) / 2, (yi + yf) / 2);
-				if (captured != null && selected.isFire() != captured.isFire()) {
+				if (captured != null && selected.isFire() != captured.isFire() ||
+					 selected.isKing() && captured == null) {
 					return true;
 				}
 				return false;
+			} else if (selected.isKing() && !selected.hasCaptured()) {
+				int incX = (xf - xi) / Math.abs(xf - xi);
+				int incY = (yf - yi) / Math.abs(yf - yi);
+				for (int i = xi + incX, j = yi + incY; i <= xf; i += incX, j += incY) {
+					if (this.pieceAt(i, j) != null) {
+						return false;
+					}
+				}
+				return true;
 			} else if (dx == 1) {
 				if (selected.hasCaptured()) {
 					return false;
@@ -92,11 +162,13 @@ public class Board {
 
 	public void select(int x, int y) {
 		// Implement special moves
-		if (this.canSelect(x, y)) {
+		if (!this.madeMove && this.canSelect(x, y)) {
 			if (xSelected >= 0 && this.pieceAt(x,y) == null) {
 				Piece selected = this.remove(xSelected, ySelected);
 				this.place(selected, x, y);
-				this.madeMove = true;
+				if (!selected.hasCaptured()) {
+					this.madeMove = true;
+				}
 			}
 			xSelected = x;
 			ySelected = y;
@@ -105,6 +177,32 @@ public class Board {
 
 			// Select square via color
 		}
+	}
+
+	private boolean checkForCaptures(int x, int y) {
+		// pieces checked may be outside borders
+		Piece active = this.pieceAt(x, y);
+		if (active.isFire() || active.isKing()) {
+			Piece topRight = this.pieceAt(x + 1, y + 1);
+			Piece topLeft  = this.pieceAt(x - 1, y + 1);
+			Piece rightEmpty = this.pieceAt(x + 2, y + 2);
+			Piece leftEmpty  = this.pieceAt(x - 2, y + 2);
+			if (topRight.isFire() != active.isFire() && rightEmpty == null || 
+				 topLeft.isFire() != active.isFire() && leftEmpty == null) {
+				return true;
+			}
+		}
+		if (!active.isFire() || active.isKing()) {
+			Piece bottomRight = this.pieceAt(x + 1, y - 1);
+			Piece bottomLeft  = this.pieceAt(x - 1, y - 1);
+			Piece rightEmpty = this.pieceAt(x + 2, y - 2);
+			Piece leftEmpty  = this.pieceAt(x - 2, y - 2);
+			if (bottomRight.isFire() != active.isFire() && rightEmpty == null || 
+				 bottomLeft.isFire() != active.isFire() && leftEmpty == null) {
+				return true;
+			}
+		} 
+		return false;
 	}
 
 	public void place(Piece p, int x, int y) {
@@ -132,9 +230,6 @@ public class Board {
 	}
 
 	public void endTurn() {
-		if (!canEndTurn()) {
-			return;
-		}
 		for (Piece[] rowPieces: this.boardPieces) {
 			for (Piece p: rowPieces) {
 				if (p != null && this.firesTurn == p.isFire()) {

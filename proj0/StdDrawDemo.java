@@ -13,8 +13,10 @@ public class StdDrawDemo {
     private static void drawBoard(int N) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if ((i + j) % 2 == 0) StdDrawPlus.setPenColor(StdDrawPlus.GRAY);
-                else                  StdDrawPlus.setPenColor(StdDrawPlus.RED);
+                if ((i + j) % 2 == 0) 
+                    StdDrawPlus.setPenColor(StdDrawPlus.GRAY);
+                else                  
+                    StdDrawPlus.setPenColor(StdDrawPlus.RED);
                 StdDrawPlus.filledSquare(i + .5, j + .5, .5);
                 StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
                 if (pieces[i][j]) {

@@ -126,8 +126,6 @@ public class TestBoard {
 		assertEquals(true, board.pieceAt(3, 3) == bombFire);
 		assertEquals(null, board.pieceAt(1, 1));
 		assertEquals(null, board.pieceAt(2, 2));
-
-		// Test whether can move to (x + y) % 2 != 0 spot
 	}
 
 	@Test

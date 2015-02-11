@@ -3,7 +3,6 @@ import org.junit.Test;
 
 public class TestPiece {
 	/* Missing Proper Tests for:
-		- isKing() 
 		- hasCaptured()
 		- doneCapturing()
 	*/

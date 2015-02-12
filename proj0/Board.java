@@ -29,7 +29,9 @@ public class Board {
             	} else {
             		System.out.println("Can't end turn");
             	}
-
+            }
+            if (board.winner() != null) {
+            	break;
             }
             StdDrawPlus.show(50);
 		}
@@ -126,7 +128,11 @@ public class Board {
 	}
 
 	private boolean validMove(int xi, int yi, int xf, int yf) {
+		System.out.println("Checking whether valid");
 		if (xf - xi == 0 || yf - yi == 0) {
+			return false;
+		}
+		if (Math.abs(xf - xi) != Math.abs(yf - yi)) {
 			return false;
 		}
 		Piece selected = this.pieceAt(xi, yi);
@@ -135,22 +141,35 @@ public class Board {
 			if (dx == 2) {
 				Piece captured = this.pieceAt((xi + xf) / 2, (yi + yf) / 2);
 				if (captured != null && selected.isFire() != captured.isFire() ||
-					 selected.isKing() && captured == null) {
+					 selected.isKing() && captured == null && !selected.hasCaptured() ||
+					 selected.isKing() && captured != null && selected.isFire() != captured.isFire()) {
 					return true;
 				}
 				return false;
-			} else if (selected.isKing() && !selected.hasCaptured()) {
-				int incX = (xf - xi) / Math.abs(xf - xi);
-				int incY = (yf - yi) / Math.abs(yf - yi);
-				for (int i = xi + incX, j = yi + incY; i <= xf; i += incX, j += incY) {
-					if (this.pieceAt(i, j) != null) {
-						return false;
-					}
-				}
-				return true;
 			} else if (dx == 1) {
 				if (selected.hasCaptured()) {
 					return false;
+				}
+				return true;
+			} else if (selected.isKing() && !selected.hasCaptured()) {
+				System.out.println("Checking King move");
+				int incX, incY;
+				if (xf > xi) 
+					incX = 1;
+				else 
+					incX = -1;
+				if (yf > yi) 
+					incY = 1;
+				else 
+					incY = -1;
+				int x = xi + incX, y = yi + incY;
+				for (int r = 0; r < Math.abs(xf - xi) - 1; r++) {
+					System.out.println("Checking " + x + " " + y);
+					if (this.pieceAt(x, y) != null) {
+						return false;
+					}
+					x += incX;
+					y += incY;
 				}
 				return true;
 			} else {

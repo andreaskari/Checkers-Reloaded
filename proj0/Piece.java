@@ -52,6 +52,9 @@ public class Piece {
 		if (Math.abs(this.side() - 1) * 7 == y) {
 			this.isCrowned = true;
 		}
+		if (this.isCrowned) {
+			System.out.println("KING!");
+		}
 		this.x = x;
 		this.y = y;
 	}
@@ -63,6 +66,7 @@ public class Piece {
 	public void doneCapturing() {
 		if (this.hasCaptured) {
 			this.hasCaptured = false;
+			System.out.println(x + " " + y + " done capturing");
 		}
 	}
 }

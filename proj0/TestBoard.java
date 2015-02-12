@@ -228,13 +228,19 @@ public class TestBoard {
 	@Test
 	public void testKingPieces() {
 		Board board = new Board(true);
-		Piece regularFire  = new Piece(true,  board, 2, 6, "Regular-Type");
-		Piece regularWater = new Piece(false, board, 5, 7, "Regular-Type");
+		Piece king1  = new Piece(true,  board, 2, 6, "Regular-Type");
+		Piece king2  = new Piece(true,  board, 3, 5, "Regular-Type");
+		Piece fire1  = new Piece(true,  board, 1, 3, "Regular-Type");
+		Piece water1 = new Piece(false, board, 5, 7, "Regular-Type");
+		Piece water2 = new Piece(false, board, 6, 6, "Regular-Type");
 
-		board.place(regularFire,  2, 6);
-		board.place(regularWater, 5, 7);
+		board.place(king1,  2, 6);
+		board.place(king2,  3, 5);
+		board.place(fire1,  1, 3);
+		board.place(water1, 5, 7);
+		board.place(water2, 6, 6);
 
-		assertEquals(false, regularFire.isKing());
+		assertEquals(false, king1.isKing());
 
 		board.select(2, 6);
 
@@ -242,7 +248,7 @@ public class TestBoard {
 
 		board.select(3, 7);
 
-		assertEquals(true, regularFire.isKing());
+		assertEquals(true, king1.isKing());
 
 		board.endTurn();
 
@@ -251,11 +257,45 @@ public class TestBoard {
 
 		board.endTurn();
 
-		board.select(3, 7);
-		board.select(5, 5);
+		assertEquals(false, king2.isKing());
 
+		board.select(3, 5);
+		board.select(5, 7);
+
+		assertEquals(true,  king2.isKing());
+		assertEquals(false, board.canSelect(4, 6));
+		assertEquals(false, board.canSelect(3, 5));
+		assertEquals(false, board.canSelect(2, 4));
+		assertEquals(false, board.canSelect(0, 2));
+		assertEquals(true,  board.canSelect(7, 5));
+
+		board.endTurn();
+
+		board.select(6, 6);
+		board.select(7, 5);
+
+		board.endTurn();
+
+		board.select(5, 7);
+
+		assertEquals(true,  board.canSelect(4, 6));
+		assertEquals(true,  board.canSelect(3, 5));
+		assertEquals(true,  board.canSelect(2, 4));
+		assertEquals(true,  board.pieceAt(1, 3) != null);
+		assertEquals(false, board.canSelect(0, 2));
+
+		board.select(3, 7);
+
+		assertEquals(true,  board.canSelect(5, 5));
+		assertEquals(true, board.canSelect(6, 4));
+		assertEquals(true, board.canSelect(7, 3));
+
+		board.endTurn();
+
+		assertEquals(true, board.pieceAt(5, 7) == king2);
+		assertEquals(true, board.pieceAt(3, 7) == king1);
 		assertEquals(null, board.pieceAt(4, 6));
-		assertEquals(true, board.pieceAt(5, 5) == regularFire);
+		assertEquals(null, board.pieceAt(6, 6));
 	}
 
 	@Test

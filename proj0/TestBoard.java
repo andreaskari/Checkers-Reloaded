@@ -161,6 +161,57 @@ public class TestBoard {
 	}
 
 	@Test
+	public void testBomb1() {
+		Board board = new Board(true);
+
+		Piece bombFire    = new Piece(true, board, 1, 1, "Bomb-Type");
+
+		Piece dumbyWater  = new Piece(false, board, 2, 4, "Regular-Type");
+		Piece shieldFire  = new Piece(true,  board, 2, 2, "Shield-Type");
+		Piece regularWater = new Piece(false, board, 4, 4, "Regular-Type");
+		Piece shieldWater  = new Piece(false, board, 4, 2, "Shield-Type");
+
+		board.place(bombFire,     1, 1);
+		board.place(dumbyWater,   2, 2);
+		board.place(shieldFire,   2, 4);
+		board.place(regularWater, 4, 4);
+		board.place(shieldWater,  4, 2);
+
+		board.select(1, 1);
+		board.select(3, 3);
+
+		assertEquals(true, board.pieceAt(3, 3) == bombFire);
+		assertEquals(true, board.pieceAt(2, 4) == shieldFire);
+		assertEquals(true, board.pieceAt(4, 2) == shieldWater);
+		assertEquals(null, board.pieceAt(2, 2));
+		assertEquals(null, board.pieceAt(4, 4));
+	}
+
+	@Test
+	public void testBomb2() {
+		Board board = new Board(true);
+
+		Piece bombFire    = new Piece(true, board, 2, 2, "Bomb-Type");
+
+		Piece shieldFire  = new Piece(true, board, 2, 4, "Shield-Type");
+		Piece regularWater = new Piece(false, board, 4, 4, "Regular-Type");
+		Piece shieldWater  = new Piece(false, board, 4, 2, "Shield-Type");
+
+		board.place(bombFire,  2, 2);
+		board.place(shieldFire,   2, 4);
+		board.place(regularWater, 4, 4);
+		board.place(shieldWater,  4, 2);
+
+		board.select(2, 2);
+		board.select(3, 3);
+
+		assertEquals(true, board.pieceAt(3, 3) == bombFire);
+		assertEquals(true, board.pieceAt(4, 4) == regularWater);
+		assertEquals(true, board.pieceAt(2, 4) == shieldFire);
+		assertEquals(true, board.pieceAt(4, 2) == shieldWater);
+	}
+
+	@Test
 	public void testPlace() {
 		Board board = new Board(true);
 

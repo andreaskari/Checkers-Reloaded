@@ -48,6 +48,9 @@ public class Piece {
 			int xCaptured = (this.x + x) / 2;
 			int yCaptured = (this.y + y) / 2;
 			board.remove(xCaptured, yCaptured);
+			if (this.isBomb()) {
+				this.checkForBombCaptures(x, y);
+			}
 		}
 		if (Math.abs(this.side() - 1) * 7 == y) {
 			this.isCrowned = true;
@@ -57,6 +60,33 @@ public class Piece {
 		}
 		this.x = x;
 		this.y = y;
+	}
+
+	private void checkForBombCaptures(int x, int y) {
+		int[][] xyToCheck = new int[4][2];
+		if (x < 7) {
+			if (y < 7) {
+				xyToCheck[0][0] = x + 1;
+				xyToCheck[0][1] = y + 1;
+			} else if (y > 0) {
+				xyToCheck[1][0] = x + 1;
+				xyToCheck[1][1] = y - 1;
+			}
+		} else if (x > 0) {
+			if (y < 7) {
+				xyToCheck[2][0] = x - 1;
+				xyToCheck[2][1] = y + 1;
+			} else if (y > 0) {
+				xyToCheck[3][0] = x - 1;
+				xyToCheck[3][1] = y - 1;
+			}
+		}
+		for (int[] xy: xyToCheck) {
+			Piece p = board.pieceAt(xy[0], xy[1]);
+			if (p != null && this.isFire() != p.isFire() && !p.isShield()) {
+				board.remove(xy[0], xy[1]);
+			}
+		}
 	}
 
 	public boolean hasCaptured() {

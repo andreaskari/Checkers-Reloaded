@@ -121,8 +121,8 @@ public class Board {
 			}
 		} else if (wantToSelect.isFire() != this.firesTurn) {
 			return false;
-		} else if (xSelected < 0) {
-			return true;
+		// } else if (xSelected < 0) {
+		// 	return true;
 		} else if (!this.madeMove) {
 			return true;
 		}
@@ -183,12 +183,10 @@ public class Board {
 
 	public void select(int x, int y) {
 		// Implement special moves
-		if (xSelected >= 0 && this.pieceAt(x,y) == null) {
+		if (xSelected >= 0 && this.pieceAt(x,y) == null && (!this.madeMove || this.madeMove && this.pieceAt(xSelected, ySelected).hasCaptured())) {
 			Piece selected = this.remove(xSelected, ySelected);
 			selected.move(x, y);
-			if (!selected.hasCaptured()) {
-				this.madeMove = true;
-			}
+			this.madeMove = true;
 		}
 		xSelected = x;
 		ySelected = y;
@@ -198,31 +196,31 @@ public class Board {
 		// Select square via color
 	}
 
-	private boolean checkForCaptures(int x, int y) {
-		// pieces checked may be outside borders
-		Piece active = this.pieceAt(x, y);
-		if (active.isFire() || active.isKing()) {
-			Piece topRight = this.pieceAt(x + 1, y + 1);
-			Piece topLeft  = this.pieceAt(x - 1, y + 1);
-			Piece rightEmpty = this.pieceAt(x + 2, y + 2);
-			Piece leftEmpty  = this.pieceAt(x - 2, y + 2);
-			if (topRight.isFire() != active.isFire() && rightEmpty == null || 
-				 topLeft.isFire() != active.isFire() && leftEmpty == null) {
-				return true;
-			}
-		}
-		if (!active.isFire() || active.isKing()) {
-			Piece bottomRight = this.pieceAt(x + 1, y - 1);
-			Piece bottomLeft  = this.pieceAt(x - 1, y - 1);
-			Piece rightEmpty = this.pieceAt(x + 2, y - 2);
-			Piece leftEmpty  = this.pieceAt(x - 2, y - 2);
-			if (bottomRight.isFire() != active.isFire() && rightEmpty == null || 
-				 bottomLeft.isFire() != active.isFire() && leftEmpty == null) {
-				return true;
-			}
-		} 
-		return false;
-	}
+	// private boolean checkForCaptures(int x, int y) {
+	// 	// pieces checked may be outside borders
+	// 	Piece active = this.pieceAt(x, y);
+	// 	if (active.isFire() || active.isKing()) {
+	// 		Piece topRight = this.pieceAt(x + 1, y + 1);
+	// 		Piece topLeft  = this.pieceAt(x - 1, y + 1);
+	// 		Piece rightEmpty = this.pieceAt(x + 2, y + 2);
+	// 		Piece leftEmpty  = this.pieceAt(x - 2, y + 2);
+	// 		if (topRight.isFire() != active.isFire() && rightEmpty == null || 
+	// 			 topLeft.isFire() != active.isFire() && leftEmpty == null) {
+	// 			return true;
+	// 		}
+	// 	}
+	// 	if (!active.isFire() || active.isKing()) {
+	// 		Piece bottomRight = this.pieceAt(x + 1, y - 1);
+	// 		Piece bottomLeft  = this.pieceAt(x - 1, y - 1);
+	// 		Piece rightEmpty = this.pieceAt(x + 2, y - 2);
+	// 		Piece leftEmpty  = this.pieceAt(x - 2, y - 2);
+	// 		if (bottomRight.isFire() != active.isFire() && rightEmpty == null || 
+	// 			 bottomLeft.isFire() != active.isFire() && leftEmpty == null) {
+	// 			return true;
+	// 		}
+	// 	} 
+	// 	return false;
+	// }
 
 	public void place(Piece p, int x, int y) {
 		this.boardPieces[x][y] = p;
@@ -245,7 +243,7 @@ public class Board {
 				}
 			}
 		}
-		return madeMove;
+		return this.madeMove;
 	}
 
 	public void endTurn() {

@@ -148,8 +148,11 @@ public class TestBoard {
 		assertEquals(true, board.pieceAt(0, 0) == rF);
 
 		board.select(0, 0);
+		assertEquals(true, board.canSelect(2, 2));
 		board.select(2, 2);
+		assertEquals(true, board.canSelect(0, 4));
 		board.select(0, 4);
+		assertEquals(true, board.canSelect(2, 6));
 		board.select(2, 6);
 
 		assertEquals(null, board.pieceAt(1, 1));

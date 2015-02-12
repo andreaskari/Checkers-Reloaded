@@ -121,8 +121,6 @@ public class Board {
 			}
 		} else if (wantToSelect.isFire() != this.firesTurn) {
 			return false;
-		// } else if (xSelected < 0) {
-		// 	return true;
 		} else if (!this.madeMove) {
 			return true;
 		}
@@ -191,8 +189,6 @@ public class Board {
 		xSelected = x;
 		ySelected = y;
 
-		// Check if any pieces available to hit?
-
 		// Select square via color
 	}
 
@@ -224,9 +220,6 @@ public class Board {
 
 	public void place(Piece p, int x, int y) {
 		this.boardPieces[x][y] = p;
-		// if (p != null) {
-		// 	p.move(x, y);
-		// }
 	}
 
 	public Piece remove(int x, int y) {

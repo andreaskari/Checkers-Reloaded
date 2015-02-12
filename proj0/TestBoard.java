@@ -180,10 +180,10 @@ public class TestBoard {
 		board.select(1, 1);
 		board.select(3, 3);
 
-		assertEquals(true, board.pieceAt(3, 3) == bombFire);
 		assertEquals(true, board.pieceAt(2, 4) == shieldFire);
 		assertEquals(true, board.pieceAt(4, 2) == shieldWater);
 		assertEquals(null, board.pieceAt(2, 2));
+		assertEquals(null, board.pieceAt(3, 3));
 		assertEquals(null, board.pieceAt(4, 4));
 	}
 

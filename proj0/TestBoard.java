@@ -72,9 +72,9 @@ public class TestBoard {
 	@Test
 	public void testSelectMethods() {
 		Board board = new Board(true);
-		Piece regularFire = new Piece(true, board, 0, 0, "Regular-Type");
-		Piece shieldFire  = new Piece(true, board, 1, 1, "Shield-Type");
-		Piece bombFire    = new Piece(true, board, 2, 2, "Bomb-Type");
+		Piece regularFire = new Piece(true, board, 0, 0, "pawn");
+		Piece shieldFire  = new Piece(true, board, 1, 1, "shield");
+		Piece bombFire    = new Piece(true, board, 2, 2, "bomb");
 
 		board.place(regularFire, 0, 0);
 		board.place(shieldFire,  1, 1);
@@ -101,8 +101,8 @@ public class TestBoard {
 
 		assertEquals(false, board.canSelect(0, 0));
 
-		Piece regularWater = new Piece(false, board, 0, 2, "Regular-Type");
-		Piece shieldWater  = new Piece(false, board, 1, 3, "Shield-Type");
+		Piece regularWater = new Piece(false, board, 0, 2, "pawn");
+		Piece shieldWater  = new Piece(false, board, 1, 3, "shield");
 
 		board.place(regularWater, 0, 2);
 		board.place(shieldWater,  1, 3);
@@ -132,10 +132,10 @@ public class TestBoard {
 	public void testMultipleCaptures() {
 		Board board = new Board(true);
 
-		Piece rF  = new Piece(true,  board, 0, 0, "Regular-Type");
-		Piece rW1 = new Piece(false, board, 1, 1, "Regular-Type");
-		Piece rW2 = new Piece(false, board, 1, 3, "Regular-Type");
-		Piece rW3 = new Piece(false, board, 1, 5, "Regular-Type");
+		Piece rF  = new Piece(true,  board, 0, 0, "pawn");
+		Piece rW1 = new Piece(false, board, 1, 1, "pawn");
+		Piece rW2 = new Piece(false, board, 1, 3, "pawn");
+		Piece rW3 = new Piece(false, board, 1, 5, "pawn");
 
 		board.place(rF,  0, 0);
 		board.place(rW1, 1, 1);
@@ -164,12 +164,12 @@ public class TestBoard {
 	public void testBomb1() {
 		Board board = new Board(true);
 
-		Piece bombFire    = new Piece(true, board, 1, 1, "Bomb-Type");
+		Piece bombFire    = new Piece(true, board, 1, 1, "bomb");
 
-		Piece dumbyWater  = new Piece(false, board, 2, 4, "Regular-Type");
-		Piece shieldFire  = new Piece(true,  board, 2, 2, "Shield-Type");
-		Piece regularWater = new Piece(false, board, 4, 4, "Regular-Type");
-		Piece shieldWater  = new Piece(false, board, 4, 2, "Shield-Type");
+		Piece dumbyWater  = new Piece(false, board, 2, 4, "pawn");
+		Piece shieldFire  = new Piece(true,  board, 2, 2, "shield");
+		Piece regularWater = new Piece(false, board, 4, 4, "pawn");
+		Piece shieldWater  = new Piece(false, board, 4, 2, "shield");
 
 		board.place(bombFire,     1, 1);
 		board.place(dumbyWater,   2, 2);
@@ -191,11 +191,11 @@ public class TestBoard {
 	public void testBomb2() {
 		Board board = new Board(true);
 
-		Piece bombFire    = new Piece(true, board, 2, 2, "Bomb-Type");
+		Piece bombFire    = new Piece(true, board, 2, 2, "bomb");
 
-		Piece shieldFire  = new Piece(true, board, 2, 4, "Shield-Type");
-		Piece regularWater = new Piece(false, board, 4, 4, "Regular-Type");
-		Piece shieldWater  = new Piece(false, board, 4, 2, "Shield-Type");
+		Piece shieldFire  = new Piece(true, board, 2, 4, "shield");
+		Piece regularWater = new Piece(false, board, 4, 4, "pawn");
+		Piece shieldWater  = new Piece(false, board, 4, 2, "shield");
 
 		board.place(bombFire,  2, 2);
 		board.place(shieldFire,   2, 4);
@@ -215,13 +215,13 @@ public class TestBoard {
 	public void testPlace() {
 		Board board = new Board(true);
 
-		Piece regularFire = new Piece(true, board, 1, 2, "Regular-Type");
-		Piece shieldFire  = new Piece(true, board, 3, 4, "Shield-Type");
-		Piece bombFire    = new Piece(true, board, 5, 6, "Bomb-Type");
+		Piece regularFire = new Piece(true, board, 1, 2, "pawn");
+		Piece shieldFire  = new Piece(true, board, 3, 4, "shield");
+		Piece bombFire    = new Piece(true, board, 5, 6, "bomb");
 
-		Piece regularWater = new Piece(false, board, 2, 1, "Regular-Type");
-		Piece shieldWater  = new Piece(false, board, 4, 3, "Shield-Type");
-		Piece bombWater    = new Piece(false, board, 6, 5, "Bomb-Type");
+		Piece regularWater = new Piece(false, board, 2, 1, "pawn");
+		Piece shieldWater  = new Piece(false, board, 4, 3, "shield");
+		Piece bombWater    = new Piece(false, board, 6, 5, "bomb");
 
 		board.place(regularFire, 1, 2);
 		board.place(shieldFire,  3, 4);
@@ -246,13 +246,13 @@ public class TestBoard {
 	@Test
 	public void testRemove() {
 		Board board = new Board(true);
-		Piece regularFire = new Piece(true, board, 1, 2, "Regular-Type");
-		Piece shieldFire  = new Piece(true, board, 3, 4, "Shield-Type");
-		Piece bombFire    = new Piece(true, board, 5, 6, "Bomb-Type");
+		Piece regularFire = new Piece(true, board, 1, 2, "pawn");
+		Piece shieldFire  = new Piece(true, board, 3, 4, "shield");
+		Piece bombFire    = new Piece(true, board, 5, 6, "bomb");
 
-		Piece regularWater = new Piece(false, board, 2, 1, "Regular-Type");
-		Piece shieldWater  = new Piece(false, board, 4, 3, "Shield-Type");
-		Piece bombWater    = new Piece(false, board, 6, 5, "Bomb-Type");
+		Piece regularWater = new Piece(false, board, 2, 1, "pawn");
+		Piece shieldWater  = new Piece(false, board, 4, 3, "shield");
+		Piece bombWater    = new Piece(false, board, 6, 5, "bomb");
 
 		board.place(regularFire, 1, 2);
 		board.place(shieldFire,  3, 4);
@@ -279,11 +279,11 @@ public class TestBoard {
 	@Test
 	public void testKingPieces() {
 		Board board = new Board(true);
-		Piece king1  = new Piece(true,  board, 2, 6, "Regular-Type");
-		Piece king2  = new Piece(true,  board, 3, 5, "Regular-Type");
-		Piece fire1  = new Piece(true,  board, 1, 3, "Regular-Type");
-		Piece water1 = new Piece(false, board, 5, 7, "Regular-Type");
-		Piece water2 = new Piece(false, board, 6, 6, "Regular-Type");
+		Piece king1  = new Piece(true,  board, 2, 6, "pawn");
+		Piece king2  = new Piece(true,  board, 3, 5, "pawn");
+		Piece fire1  = new Piece(true,  board, 1, 3, "pawn");
+		Piece water1 = new Piece(false, board, 5, 7, "pawn");
+		Piece water2 = new Piece(false, board, 6, 6, "pawn");
 
 		board.place(king1,  2, 6);
 		board.place(king2,  3, 5);
@@ -354,8 +354,8 @@ public class TestBoard {
 		Board board = new Board(true);
 		assertEquals("No one", board.winner());
 
-		Piece regularFire  = new Piece(true,  board, 1, 2, "Regular-Type");
-		Piece regularWater = new Piece(false, board, 2, 1, "Regular-Type");
+		Piece regularFire  = new Piece(true,  board, 1, 2, "pawn");
+		Piece regularWater = new Piece(false, board, 2, 1, "pawn");
 
 		board.place(regularFire, 1, 1);
 		assertEquals("Fire", board.winner());

@@ -35,14 +35,15 @@ public class Piece {
 	}
 
 	public boolean isBomb() {
-		return this.type.equals("Bomb-Type");
+		return this.type.equals("bomb");
 	}
 
 	public boolean isShield() {
-		return this.type.equals("Shield-Type");
+		return this.type.equals("shield");
 	}
 
 	public void move(int x, int y) {
+		boolean bombCaptured = false;
 		if (Math.abs(this.x - x) == 2) {
 			this.hasCaptured = true;
 			int xCaptured = (this.x + x) / 2;
@@ -50,7 +51,7 @@ public class Piece {
 			board.remove(xCaptured, yCaptured);
 			if (this.isBomb()) {
 				this.checkForBombCaptures(x, y);
-				board.remove(x, y);
+				bombCaptured = true;
 			}
 		}
 		if (Math.abs(this.side() - 1) * 7 == y) {
@@ -58,6 +59,11 @@ public class Piece {
 		}
 		if (this.isCrowned) {
 			System.out.println("KING!");
+		}
+		if (!bombCaptured) {
+			board.place(this, x, y);
+		} else {
+			board.remove(this.x, this.y);
 		}
 		this.x = x;
 		this.y = y;

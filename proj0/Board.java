@@ -20,7 +20,9 @@ public class Board {
                 double x = StdDrawPlus.mouseX();
                 double y = StdDrawPlus.mouseY();
                 System.out.println((int) x + " " + (int) y);
-                board.select((int) x, (int) y);
+                if (!board.madeMove && board.canSelect((int) x, (int) y)) {
+                	board.select((int) x, (int) y);
+                }
             }
             if (StdDrawPlus.isSpacePressed()) {
             	if (board.canEndTurn()) {
@@ -77,7 +79,7 @@ public class Board {
 		this.boardPieces = new Piece[8][8];
 		
 		if (!shouldBeEmpty) {
-			String[] pieceTypes = {"Regular-Type", "Shield-Type", "Bomb-Type"};
+			String[] pieceTypes = {"pawn", "shield", "bomb"};
 			boolean[] suitTypes = {true, false};
 
 			for (int i = 0; i < 6; i++) {
@@ -181,21 +183,19 @@ public class Board {
 
 	public void select(int x, int y) {
 		// Implement special moves
-		if (!this.madeMove && this.canSelect(x, y)) {
-			if (xSelected >= 0 && this.pieceAt(x,y) == null) {
-				Piece selected = this.remove(xSelected, ySelected);
-				this.place(selected, x, y);
-				if (!selected.hasCaptured()) {
-					this.madeMove = true;
-				}
+		if (xSelected >= 0 && this.pieceAt(x,y) == null) {
+			Piece selected = this.remove(xSelected, ySelected);
+			selected.move(x, y);
+			if (!selected.hasCaptured()) {
+				this.madeMove = true;
 			}
-			xSelected = x;
-			ySelected = y;
-
-			// Check if any pieces available to hit?
-
-			// Select square via color
 		}
+		xSelected = x;
+		ySelected = y;
+
+		// Check if any pieces available to hit?
+
+		// Select square via color
 	}
 
 	private boolean checkForCaptures(int x, int y) {
@@ -226,9 +226,9 @@ public class Board {
 
 	public void place(Piece p, int x, int y) {
 		this.boardPieces[x][y] = p;
-		if (p != null) {
-			p.move(x, y);
-		}
+		// if (p != null) {
+		// 	p.move(x, y);
+		// }
 	}
 
 	public Piece remove(int x, int y) {

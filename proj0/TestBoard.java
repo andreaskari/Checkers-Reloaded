@@ -340,7 +340,7 @@ public class TestBoard {
 
 		board.select(3, 7);
 
-		assertEquals(true,  board.canSelect(5, 5));
+		assertEquals(true, board.canSelect(5, 5));
 		assertEquals(true, board.canSelect(6, 4));
 		assertEquals(true, board.canSelect(7, 3));
 
@@ -357,14 +357,17 @@ public class TestBoard {
 		Board board = new Board(true);
 		Piece king1  = new Piece(true,  board, 2, 6, "pawn");
 
-		board.place(king1,  2, 6);
+		board.place(king1, 2, 6);
 
 		board.select(2, 6);
 		board.select(3, 7);
 
-		assertEquals(false, board.canSelect(2, 6));
-		assertEquals(false, board.canSelect(1, 5));
+		assertEquals(null, board.pieceAt(2, 6));
+		assertEquals(true, board.pieceAt(3, 7).isKing());
+
 		assertEquals(false, board.canSelect(0, 4));
+		assertEquals(false, board.canSelect(1, 5));
+		assertEquals(false, board.canSelect(2, 6));
 		assertEquals(false, board.canSelect(4, 6));
 		assertEquals(false, board.canSelect(5, 5));
 		assertEquals(false, board.canSelect(6, 4));

@@ -62,9 +62,10 @@ public class Piece {
 		}
 		if (!bombCaptured) {
 			board.place(this, x, y);
-		} else {
-			board.remove(this.x, this.y);
 		}
+		// } else {
+		// 	board.remove(this.x, this.y);
+		// }
 		this.x = x;
 		this.y = y;
 	}

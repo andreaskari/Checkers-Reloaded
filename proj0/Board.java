@@ -20,7 +20,8 @@ public class Board {
                 double x = StdDrawPlus.mouseX();
                 double y = StdDrawPlus.mouseY();
                 System.out.println((int) x + " " + (int) y);
-                if (!board.madeMove && board.canSelect((int) x, (int) y)) {
+                if (board.canSelect((int) x, (int) y)) {
+                	// !board.madeMove && 
                 	board.select((int) x, (int) y);
                 }
             }
@@ -141,17 +142,17 @@ public class Board {
 			if (dx == 2) {
 				Piece captured = this.pieceAt((xi + xf) / 2, (yi + yf) / 2);
 				if (captured != null && selected.isFire() != captured.isFire() ||
-					 selected.isKing() && captured == null && !selected.hasCaptured() ||
+					 selected.isKing() && captured == null && !this.madeMove ||
 					 selected.isKing() && captured != null && selected.isFire() != captured.isFire()) {
 					return true;
 				}
 				return false;
 			} else if (dx == 1) {
-				if (selected.hasCaptured()) {
+				if (selected.hasCaptured() || this.madeMove) {
 					return false;
 				}
 				return true;
-			} else if (selected.isKing() && !selected.hasCaptured()) {
+			} else if (selected.isKing() && !selected.hasCaptured() && !this.madeMove) {
 				System.out.println("Checking King move");
 				int incX, incY;
 				if (xf > xi) 
@@ -191,32 +192,6 @@ public class Board {
 
 		// Select square via color
 	}
-
-	// private boolean checkForCaptures(int x, int y) {
-	// 	// pieces checked may be outside borders
-	// 	Piece active = this.pieceAt(x, y);
-	// 	if (active.isFire() || active.isKing()) {
-	// 		Piece topRight = this.pieceAt(x + 1, y + 1);
-	// 		Piece topLeft  = this.pieceAt(x - 1, y + 1);
-	// 		Piece rightEmpty = this.pieceAt(x + 2, y + 2);
-	// 		Piece leftEmpty  = this.pieceAt(x - 2, y + 2);
-	// 		if (topRight.isFire() != active.isFire() && rightEmpty == null || 
-	// 			 topLeft.isFire() != active.isFire() && leftEmpty == null) {
-	// 			return true;
-	// 		}
-	// 	}
-	// 	if (!active.isFire() || active.isKing()) {
-	// 		Piece bottomRight = this.pieceAt(x + 1, y - 1);
-	// 		Piece bottomLeft  = this.pieceAt(x - 1, y - 1);
-	// 		Piece rightEmpty = this.pieceAt(x + 2, y - 2);
-	// 		Piece leftEmpty  = this.pieceAt(x - 2, y - 2);
-	// 		if (bottomRight.isFire() != active.isFire() && rightEmpty == null || 
-	// 			 bottomLeft.isFire() != active.isFire() && leftEmpty == null) {
-	// 			return true;
-	// 		}
-	// 	} 
-	// 	return false;
-	// }
 
 	public void place(Piece p, int x, int y) {
 		this.boardPieces[x][y] = p;

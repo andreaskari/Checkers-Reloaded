@@ -2,10 +2,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class TestBoard {
-	/* Missing Proper Tests for:
-		- Double capturing
-		- Bomb capture
-	*/
 
 	@Test
 	public void testCreateBoardEmpty() {
@@ -215,6 +211,86 @@ public class TestBoard {
 	}
 
 	@Test
+	public void testBomb3() {
+		Board board = new Board(true);
+
+		Piece bombWater = new Piece(false, board, 5, 5, "bomb");
+
+		Piece shieldFire = new Piece(true, board, 4, 4, "shield");
+		Piece pawnFire1  = new Piece(true, board, 1, 1, "pawn");
+		Piece pawnFire2  = new Piece(true, board, 4, 2, "pawn");
+		Piece pawnFire3  = new Piece(true, board, 2, 4, "pawn");
+
+		board.place(bombWater,  5, 5);
+		board.place(shieldFire, 4, 4);
+		board.place(pawnFire1,  1, 1);
+		board.place(pawnFire2,  4, 2);
+		board.place(pawnFire3,  2, 4);
+
+		board.select(1, 1);
+		board.select(2, 2);
+
+		assertEquals(true, board.pieceAt(2, 2) == pawnFire1);
+
+		board.endTurn();
+
+		board.select(5, 5);
+		board.select(3, 3);
+
+		assertEquals(null, board.pieceAt(3, 3));
+		assertEquals(null, board.pieceAt(2, 2));
+		assertEquals(null, board.pieceAt(2, 4));
+		assertEquals(null, board.pieceAt(4, 2));
+		assertEquals(null, board.pieceAt(4, 4));
+	}
+
+	@Test
+	public void testBomb4() {
+		Board board = new Board(true);
+
+		Piece bombFire  = new Piece(true,  board, 0, 2, "bomb");
+		Piece bombWater = new Piece(false, board, 1, 1, "bomb");
+
+		board.place(bombFire,  0, 2);
+		board.place(bombWater, 1, 1);
+
+		board.select(0, 2);
+		board.select(2, 0);
+
+		assertEquals(null, board.pieceAt(0, 2));
+		assertEquals(null, board.pieceAt(1, 1));
+		assertEquals(null, board.pieceAt(2, 0));		
+	}
+
+	@Test
+	public void testBomb5() {
+		Board board = new Board(true);
+
+		Piece bombFire = new Piece(true, board, 3, 1, "bomb");
+
+		Piece shieldWater1 = new Piece(false, board, 0, 2, "shield");
+		Piece shieldWater2 = new Piece(false, board, 2, 2, "shield");
+		Piece shieldWater3 = new Piece(false, board, 0, 4, "shield");
+		Piece shieldWater4 = new Piece(false, board, 2, 4, "shield");
+
+		board.place(bombFire, 3, 1);
+		board.place(shieldWater1, 0, 2);
+		board.place(shieldWater2, 2, 2);
+		board.place(shieldWater3, 0, 4);
+		board.place(shieldWater4, 2, 4);
+
+		board.select(3, 1);
+		board.select(1, 3);
+
+		assertEquals(null, board.pieceAt(1, 3));
+		assertEquals(null, board.pieceAt(3, 1));
+		assertEquals(null, board.pieceAt(2, 2));
+		assertEquals(true, board.pieceAt(0, 2) == shieldWater1);
+		assertEquals(true, board.pieceAt(0, 4) == shieldWater3);
+		assertEquals(true, board.pieceAt(2, 4) == shieldWater4);		
+	}
+
+	@Test
 	public void testPlace() {
 		Board board = new Board(true);
 
@@ -372,6 +448,28 @@ public class TestBoard {
 		assertEquals(false, board.canSelect(5, 5));
 		assertEquals(false, board.canSelect(6, 4));
 		assertEquals(false, board.canSelect(7, 3));
+	}
+
+	@Test
+	public void testHasCapturedAndDoneCapturing() {
+		Board board = new Board(true);
+
+		Piece regularFire = new Piece(true, board, 1, 1, "pawn");
+		Piece regularWater = new Piece(false, board, 2, 2, "pawn");
+
+		board.place(regularFire, 1, 1);
+		board.place(regularWater, 2, 2);
+
+		assertEquals(false, regularFire.hasCaptured());
+
+		board.select(1, 1);
+		board.select(3, 3);
+
+		assertEquals(true, regularFire.hasCaptured());
+
+		board.endTurn();
+
+		assertEquals(false, regularFire.hasCaptured());	
 	}
 
 	@Test

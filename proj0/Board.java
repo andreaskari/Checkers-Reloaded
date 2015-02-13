@@ -21,7 +21,6 @@ public class Board {
                 double y = StdDrawPlus.mouseY();
                 System.out.println((int) x + " " + (int) y);
                 if (board.canSelect((int) x, (int) y)) {
-                	// !board.madeMove && 
                 	board.select((int) x, (int) y);
                 }
             }
@@ -103,6 +102,9 @@ public class Board {
 	}
 
 	public Piece pieceAt(int x, int y) {
+		if (x < 0 || x > 7 || y < 0 || y > 7) {
+			return null;
+		}
 		return this.boardPieces[x][y];
 	}
 
@@ -153,7 +155,6 @@ public class Board {
 				}
 				return true;
 			} else if (selected.isKing() && !selected.hasCaptured() && !this.madeMove) {
-				System.out.println("Checking King move");
 				int incX, incY;
 				if (xf > xi) 
 					incX = 1;
@@ -165,7 +166,6 @@ public class Board {
 					incY = -1;
 				int x = xi + incX, y = yi + incY;
 				for (int r = 0; r < Math.abs(xf - xi) - 1; r++) {
-					System.out.println("Checking " + x + " " + y);
 					if (this.pieceAt(x, y) != null) {
 						return false;
 					}
@@ -194,7 +194,9 @@ public class Board {
 	}
 
 	public void place(Piece p, int x, int y) {
-		this.boardPieces[x][y] = p;
+		if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+			this.boardPieces[x][y] = p;
+		}
 	}
 
 	public Piece remove(int x, int y) {

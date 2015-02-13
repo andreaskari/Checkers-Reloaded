@@ -2,11 +2,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class TestPiece {
-	/* Missing Proper Tests for:
-		- hasCaptured()
-		- doneCapturing()
-	*/
-
+	
 	@Test
 	public void testRegularPiece() {
 		Piece regularFire = new Piece(true, null, 1, 1, "pawn");

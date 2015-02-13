@@ -50,6 +50,7 @@ public class Piece {
 			int yCaptured = (this.y + y) / 2;
 			board.remove(xCaptured, yCaptured);
 			if (this.isBomb()) {
+				board.remove(this.x, this.y);
 				this.checkForBombCaptures(x, y);
 				bombCaptured = true;
 			}
@@ -59,7 +60,7 @@ public class Piece {
 		}
 		if (!bombCaptured) {
 			board.place(this, x, y);
-		}
+		} 
 		this.x = x;
 		this.y = y;
 	}

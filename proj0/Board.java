@@ -182,13 +182,19 @@ public class Board {
 
 	public void select(int x, int y) {
 		// Implement special moves
+		Piece selected = null;
 		if (xSelected >= 0 && this.pieceAt(x,y) == null && (!this.madeMove || this.madeMove && this.pieceAt(xSelected, ySelected).hasCaptured())) {
-			Piece selected = this.remove(xSelected, ySelected);
+			selected = this.remove(xSelected, ySelected);
 			selected.move(x, y);
 			this.madeMove = true;
 		}
-		xSelected = x;
-		ySelected = y;
+		if (selected != null && selected.isBomb() && selected.hasCaptured()) {
+			xSelected = -1;
+			ySelected = -1;
+		} else {
+			xSelected = x;
+			ySelected = y;
+		}
 
 		// Select square via color
 	}

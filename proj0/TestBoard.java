@@ -290,6 +290,28 @@ public class TestBoard {
 		assertEquals(true, board.pieceAt(2, 4) == shieldWater4);		
 	}
 
+
+	@Test
+	public void testAdjacentMoveAfterBomb() {
+		Board board = new Board(true);
+
+		Piece bombFire  = new Piece(true,  board, 0, 2, "bomb");
+		Piece bombWater = new Piece(false, board, 1, 3, "bomb");
+
+		board.place(bombFire,  0, 2);
+		board.place(bombWater, 1, 3);
+
+		board.select(0, 2);
+		board.select(2, 4);
+
+		assertEquals(false, board.canSelect(3, 5));
+
+		assertEquals(null, board.pieceAt(0, 2));
+		assertEquals(null, board.pieceAt(1, 1));
+		assertEquals(null, board.pieceAt(2, 0));
+
+	}
+
 	@Test
 	public void testPlace() {
 		Board board = new Board(true);

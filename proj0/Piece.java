@@ -87,7 +87,6 @@ public class Piece {
 	private void explodeIfNotShield(int x, int y) {
 		Piece p = board.pieceAt(x, y);
 		if (p != null && this.isFire() != p.isFire() && !p.isShield()) {
-			System.out.println("Bombing " + x + " " + y);
 			board.remove(x, y);
 		}
 	}

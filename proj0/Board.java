@@ -131,7 +131,6 @@ public class Board {
 	}
 
 	private boolean validMove(int xi, int yi, int xf, int yf) {
-		System.out.println("Checking whether valid");
 		if (xf - xi == 0 || yf - yi == 0) {
 			return false;
 		}

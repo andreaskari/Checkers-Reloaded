@@ -25,7 +25,7 @@ public class SortedComparableList {
     /** Inserts Comparable c into its correct location in this list. */
     public void insert(Comparable c) {
       if (head.compareTo(c) >= 0) {
-        this = new SortedComparableList(c, this);
+        this.tail = new SortedComparableList(c, this);
       }
       SortedComparableList pointer = this;
       while (pointer.tail.head.compareTo(c) < 0) {

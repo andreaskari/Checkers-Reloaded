@@ -3,7 +3,7 @@ import java.util.Comparator;
 
 /**
  * MaxPlanet.java
- */
+ */ 
 
 public class MaxPlanet {
 

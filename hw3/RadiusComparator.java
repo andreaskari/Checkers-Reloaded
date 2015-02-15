@@ -1,23 +1,19 @@
 import java.util.Comparator;
 import java.lang.Math;
 
-/**
- * MassComparator.java
- */
+public class RadiusComparator implements Comparator<Planet> {
 
-public class MassComparator implements Comparator<Planet> {
-
-    public MassComparator() {
+    public RadiusComparator() {
     }
 
     /** Returns the difference in mass as an int.
      *  Round after calculating the difference. */
     public int compare(Planet planet1, Planet planet2) {
-    	double m1 = planet1.getMass();
-    	double m2 = planet2.getMass();
-    	if (m1 > m2) {
+    	double r1 = planet1.getRadius();
+    	double r2 = planet2.getRadius();
+    	if (r1 > r2) {
     		return 1;
-    	} else if (m1 < m2) {
+    	} else if (r1 < r2) {
     		return -1;
     	}
     	return 0;

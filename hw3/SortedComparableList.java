@@ -94,7 +94,7 @@ public class SortedComparableList {
     /** Removes items from L at position len+1 and later. */
     public static void expungeTail(SortedComparableList L, int len) {
         SortedComparableList pointer = L;
-        for (int i = 0; i < len - 1; i++) {
+        for (int i = 0; i < len; i++) {
           pointer = pointer.tail;
         }
         pointer.tail = null;

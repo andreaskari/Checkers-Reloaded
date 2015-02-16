@@ -113,6 +113,7 @@ public class SortedComparableList {
         SortedComparableList pointer = this;
         while (pointer.tail != null) {
           if (pointer.head.compareTo(pointer.tail.head) == 0) {
+            pointer.head = pointer.tail.head;
             pointer.tail = pointer.tail.tail;
           }
           pointer = pointer.tail;
@@ -130,11 +131,9 @@ public class SortedComparableList {
      *  duplicate.
      **/
     public void twin() {
-      SortedComparableList pointer = this;
-      while (pointer.tail != null) {
-        pointer.tail = new SortedComparableList(pointer.head, pointer);
-        pointer = pointer.tail.tail;
-      }
+      this.extend(this);
+      this.head = this.tail.head;
+      this.tail = this.tail.tail;
     }
 
     /** Returns NULL if no cycle exists, else returns cycle location. */

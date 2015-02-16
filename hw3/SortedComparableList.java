@@ -24,14 +24,13 @@ public class SortedComparableList {
 
     /** Inserts Comparable c into its correct location in this list. */
     public void insert(Comparable c) {
-      if (head.compareTo(c) >= 0) {
-        this.tail = new SortedComparableList(c, this);
+      if (this.head.compareTo(c) > 0) {
+        this.tail = new SortedComparableList(this.head, this.tail);
+        this.head = c;
+        return;
       }
       SortedComparableList pointer = this;
-      while (pointer.tail.head.compareTo(c) < 0) {
-        if (pointer.tail == null) {
-          break;
-        }
+      while (pointer.tail != null && pointer.tail.head.compareTo(c) < 0) {
         pointer = pointer.tail;
       }
       pointer.tail = new SortedComparableList(c, pointer.tail);

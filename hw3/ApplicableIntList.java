@@ -24,14 +24,13 @@ public class ApplicableIntList{
 
     /** Inserts int i into its correct location, doesn't handle cycles. */
     public void insert(int i) {
-        if (head >= i) {
-            this.tail = new ApplicableIntList(i, this);
+        if (i < head) {
+            this.tail = new ApplicableIntList(this.head, this.tail);
+            this.head = i;
+            return;
         }
         ApplicableIntList pointer = this;
-        while (pointer.tail.head < i) {
-            if (pointer.tail == null) {
-                break;
-            }
+        while (pointer.tail != null && pointer.tail.head < i) {
             pointer = pointer.tail;
         }
         pointer.tail = new ApplicableIntList(i, pointer.tail);
@@ -51,7 +50,7 @@ public class ApplicableIntList{
     /** Applies the function f to every item in this list. */
     public void apply(IntUnaryFunction f) {
         ApplicableIntList pointer = this;
-        while (pointer.tail != null) {
+        while (pointer != null) {
             pointer.head = f.apply(pointer.head);
             pointer = pointer.tail;
         }

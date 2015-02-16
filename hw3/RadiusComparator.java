@@ -8,7 +8,7 @@ public class RadiusComparator implements Comparator<Planet> {
 
     /** Returns the difference in mass as an int.
      *  Round after calculating the difference. */
-    public int compare(Planet planet1, Planet planet2) {
+    public int compare(Planet planet1, Planet planet2) { 
     	double r1 = planet1.getRadius();
     	double r2 = planet2.getRadius();
     	if (r1 > r2) {

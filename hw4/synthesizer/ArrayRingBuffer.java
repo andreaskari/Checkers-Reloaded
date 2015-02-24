@@ -62,6 +62,9 @@ public class ArrayRingBuffer extends AbstractBoundedQueue {
   /** Return oldest item, but don't remove it. */
   public double peek() {
     // TODO: Return the first item. None of your instance variables should change.
+    if (isEmpty()) {
+      throw new RuntimeException("Ring buffer underflow");
+    }
     return rb[first];
   }
 

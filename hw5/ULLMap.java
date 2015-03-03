@@ -9,7 +9,7 @@ import java.util.Iterator;
  *  For simplicity, you may assume that nobody ever inserts a null key or value
  *  into your map.
  */ 
-public class ULLMap<Key, Value> implements Map61B<Key, Value>, Iterable {
+public class ULLMap<Key, Value> implements Map61B<Key, Value>, Iterable<Key> {
     /** Keys and values are stored in a linked list of Entry objects.
       * This variable stores the first pair in this linked list. You may
       * point this at a sentinel node, or use it as a the actual front item

@@ -1,6 +1,8 @@
 /** Provides examples of using the YearlyRecord class.
  *  @author Josh Hug
  */
+package demos;
+
 import ngordnet.YearlyRecord;
 import java.util.Collection;
 import java.util.HashMap;

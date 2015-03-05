@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 public class YearlyRecord {
     private TreeMap<String, CountAndRank> recordMap;
-    int numEntries;
+    private int numEntries;
 
     /** Creates a new empty YearlyRecord. */
     public YearlyRecord() {

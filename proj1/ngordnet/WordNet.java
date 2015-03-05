@@ -97,9 +97,4 @@ public class WordNet {
     	allHyponyms.add(word);
     	return allHyponyms;
     }
-
-    public static void main(String[] args) {
-    	In synsetInput = new In("./wordnet/synsets11.txt");
-    	System.out.println(synsetInput.readString());
-    }
 }

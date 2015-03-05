@@ -21,6 +21,25 @@ public class WordNetTest {
         assertEquals(12, numNouns);
 	}
 
+    @Test
+    public void wordNetSum() {
+        WordNet wn = new WordNet("./wordnet/synsets14.txt", "./wordnet/hyponyms14.txt");
+
+        int sum = 0;
+        for (String h : wn.hyponyms("event")) {
+            System.out.println(h);
+            sum += 1;
+        }
+        assertEquals(22, sum);
+
+        sum = 0;
+        for (String h : wn.hyponyms("adjustment")) {
+            System.out.println(h);
+            sum += 1;
+        }
+        assertEquals(5, sum);
+    }
+
 	@Test
 	public void wordNetViceroy() {
 		WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");

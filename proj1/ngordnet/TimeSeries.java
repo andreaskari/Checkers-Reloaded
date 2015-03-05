@@ -1,6 +1,8 @@
 package ngordnet;
 
-import java.util.*;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Collection;
 
 public class TimeSeries<T extends Number> extends TreeMap<Integer, T> {    
     /** Constructs a new empty TimeSeries. */

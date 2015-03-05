@@ -30,11 +30,18 @@ public class WordNet {
     	while (hyponymInput.hasNextLine()) {
     		String[] segments =  hyponymInput.readLine().split(",");
 			Integer index = new Integer(segments[0]);
-			TreeSet<Integer> hyponymIndexes = new TreeSet<Integer>();
-			for (int i = 1; i < segments.length; i++) {
-    			hyponymIndexes.add(new Integer(segments[i]));
-    		}
-    		hyponymMap.put(index, hyponymIndexes);
+            if (hyponymMap.get(index) == null) {
+                TreeSet<Integer> hyponymIndexes = new TreeSet<Integer>();
+                for (int i = 1; i < segments.length; i++) {
+                    hyponymIndexes.add(new Integer(segments[i]));
+                }
+                hyponymMap.put(index, hyponymIndexes);
+            } else {
+                TreeSet<Integer> existingHyponymIndexes = hyponymMap.get(index);
+                for (int i = 1; i < segments.length; i++) {
+                    existingHyponymIndexes.add(new Integer(segments[i]));
+                }
+            }
     	}
     }
 

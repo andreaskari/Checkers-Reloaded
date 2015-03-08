@@ -16,7 +16,8 @@ public class WordNet {
 
         while (synsetInput.hasNextLine()) {
             String[] segments =  synsetInput.readLine().split(",");
-            Integer index = Integer.parseInt(segments[0]);
+            Integer index = new Integer(segments[0]);
+
             TreeSet<String> synset = new TreeSet<String>();
             for (String synonym: segments[1].split(" ")) {
                 synset.add(synonym);
@@ -30,6 +31,7 @@ public class WordNet {
         while (hyponymInput.hasNextLine()) {
             String[] segments =  hyponymInput.readLine().split(",");
             Integer index = new Integer(segments[0]);
+            
             if (hyponymMap.get(index) == null) {
                 TreeSet<Integer> hyponymIndexes = new TreeSet<Integer>();
                 for (int i = 1; i < segments.length; i++) {

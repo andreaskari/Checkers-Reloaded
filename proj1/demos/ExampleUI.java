@@ -14,6 +14,8 @@
 /** An example of a UI.
  *  @author Josh Hug
  */
+package demos;
+
 public class ExampleUI {
 
     public static void main(String[] args) {

@@ -2,6 +2,7 @@
  *  and run straight out of the box. 
  *  @author Josh Hug
  */
+package demos;
 
 import java.util.ArrayList;
 import com.xeiam.xchart.Chart;

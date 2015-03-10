@@ -30,7 +30,9 @@ public class NgordnetUI {
         helpPrompt += "\nhypohist [words...]: plots rel. frequency of hyponyms of [words] from start to end.";
 
         /* Command Line Attributes */
+        System.out.println("Reading " + wordFile + " and " + countFile);
         NGramMap ngMap = new NGramMap(wordFile, countFile);
+        System.out.println("Reading " + synsetFile + " and " + hyponymFile);
         WordNet wNet = new WordNet(synsetFile, hyponymFile);
 
         int startYear = Collections.min(ngMap.totalCountHistory().keySet());

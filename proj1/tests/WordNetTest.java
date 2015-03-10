@@ -26,6 +26,7 @@ public class WordNetTest {
         WordNet wn = new WordNet("./wordnet/synsets14.txt", "./wordnet/hyponyms14.txt");
 
         int sum = 0;
+        System.out.println();
         for (String h : wn.hyponyms("event")) {
             System.out.println(h);
             sum += 1;
@@ -33,10 +34,12 @@ public class WordNetTest {
         assertEquals(22, sum);
 
         sum = 0;
+        System.out.println();
         for (String h : wn.hyponyms("adjustment")) {
             System.out.println(h);
             sum += 1;
         }
+        System.out.println();
         assertEquals(5, sum);
     }
 
@@ -44,19 +47,34 @@ public class WordNetTest {
 	public void wordNetViceroy() {
 		WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");
 
+        System.out.println();
         for (String h : wn.hyponyms("viceroy")) {
             System.out.println(h);
         }
+        System.out.println();
 	}
 
 	@Test
 	public void wordNetDinosaur() {
 		WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");
 
+        System.out.println();
         for (String h : wn.hyponyms("dinosaur")) {
             System.out.println(h);
         }
+        System.out.println();
 	}
+
+    @Test
+    public void wordNetWhiteMatter() {
+        WordNet wn = new WordNet("./wordnet/synsets1000-subgraph.txt", "./wordnet/hyponyms1000-subgraph.txt");
+
+        System.out.println();
+        for (String h : wn.hyponyms("white_matter")) {
+            System.out.println(h);
+        }
+        System.out.println();
+    }
 
 	public static void main(String... args) {
         jh61b.junit.textui.runClasses(WordNetTest.class);

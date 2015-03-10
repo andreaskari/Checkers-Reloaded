@@ -1,6 +1,5 @@
 package ngordnet;
 
-
 import com.xeiam.xchart.Chart;
 import com.xeiam.xchart.QuickChart;
 import com.xeiam.xchart.SwingWrapper;
@@ -47,11 +46,11 @@ public class Plotter {
 
     /** Creates a plot of the processed history from STARTYEAR to ENDYEAR, using
       * NGM as a data source, and the YRP as a yearly record processor. */
-    // public static void plotProcessedHistory(NGramMap ngm, int startYear, int endYear,
-    //                                         YearlyRecordProcessor yrp) {
-    //     TimeSeries wordWeights = ngm.processedHistory(startYear, endYear, yrp);
-    //     plotTS(wordWeights, "Word Length", "year", "avg. length", "word length");
-    // }
+    public static void plotProcessedHistory(NGramMap ngm, int startYear, int endYear,
+                                            YearlyRecordProcessor yrp) {
+        TimeSeries wordWeights = ngm.processedHistory(startYear, endYear, yrp);
+        plotTS(wordWeights, "Word Length", "year", "avg. length", "word length");
+    }
 
     /** Creates a plot of the total normalized count of every word that is a hyponym
       * of CATEGORYLABEL from STARTYEAR to ENDYEAR using NGM and WN as data sources. */

@@ -20,15 +20,7 @@ public class NgordnetUI {
                            + wordFile + ", " + countFile + ", " + synsetFile 
                            + ", and " + hyponymFile + ".");
 
-        String helpPrompt = "Acceptible Commands:";
-        helpPrompt += "\nquit:                Program exits";
-        helpPrompt += "\nhelp:                Provides a list of acceptible commands.";
-        helpPrompt += "\nrange [start] [end]: resets the start and end years.";
-        helpPrompt += "\ncount [word] [year]: print the count of [word] in the given year";
-        helpPrompt += "\nhyponyms [word]:     prints all hyponyms of [word].";
-        helpPrompt += "\nhistory [words...]:  plots rel. frequency of [words] from start to end.";
-        helpPrompt += "\nhypohist [words...]: plots rel. frequency of hyponyms of [words] ";
-        helpPrompt += "from start to end.";
+        String helpPrompt = helpString();
 
         /* Command Line Attributes */
         System.out.println("Reading " + wordFile + " and " + countFile);
@@ -97,5 +89,18 @@ public class NgordnetUI {
                 System.out.println("Invalid command.");  
             }
         }
+    }
+
+    public static String helpString() {
+        String help = "Acceptible Commands:";
+        help += "\nquit:                Program exits";
+        help += "\nhelp:                Provides a list of acceptible commands.";
+        help += "\nrange [start] [end]: resets the start and end years.";
+        help += "\ncount [word] [year]: print the count of [word] in the given year";
+        help += "\nhyponyms [word]:     prints all hyponyms of [word].";
+        help += "\nhistory [words...]:  plots rel. frequency of [words] from start to end.";
+        help += "\nhypohist [words...]: plots rel. frequency of hyponyms of [words] ";
+        help += "from start to end.";
+        return help;
     }
 } 

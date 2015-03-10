@@ -6,11 +6,11 @@ import org.junit.Test;
 
 public class WordNetTest {
 
-	@Test
-	public void wordNetBasic() {
-		WordNet wn = new WordNet("./wordnet/synsets11.txt", "./wordnet/hyponyms11.txt");
+    @Test
+    public void wordNetBasic() {
+        WordNet wn = new WordNet("./wordnet/synsets11.txt", "./wordnet/hyponyms11.txt");
 
-		assertTrue(wn.isNoun("jump"));
+        assertTrue(wn.isNoun("jump"));
         assertTrue(wn.isNoun("leap"));
         assertTrue(wn.isNoun("nasal_decongestant"));
 
@@ -19,7 +19,7 @@ public class WordNetTest {
             numNouns += 1;
         }
         assertEquals(12, numNouns);
-	}
+    }
 
     @Test
     public void wordNetSum() {
@@ -43,40 +43,34 @@ public class WordNetTest {
         assertEquals(5, sum);
     }
 
-	@Test
-	public void wordNetViceroy() {
-		WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");
+    @Test
+    public void wordNetViceroy() {
+        WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");
 
         System.out.println();
         for (String h : wn.hyponyms("viceroy")) {
             System.out.println(h);
         }
         System.out.println();
-	}
+    }
 
-	@Test
-	public void wordNetDinosaur() {
-		WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");
+    @Test
+    public void wordNetDinosaurAndWhiteMatter() {
+        WordNet wn = new WordNet("./wordnet/synsets.txt", "./wordnet/hyponyms.txt");
+
+        System.out.println();
+        for (String h : wn.hyponyms("white_matter")) {
+            System.out.println(h);
+        }
 
         System.out.println();
         for (String h : wn.hyponyms("dinosaur")) {
             System.out.println(h);
         }
         System.out.println();
-	}
-
-    @Test
-    public void wordNetWhiteMatter() {
-        WordNet wn = new WordNet("./wordnet/synsets1000-subgraph.txt", "./wordnet/hyponyms1000-subgraph.txt");
-
-        System.out.println();
-        for (String h : wn.hyponyms("white_matter")) {
-            System.out.println(h);
-        }
-        System.out.println();
     }
 
-	public static void main(String... args) {
+    public static void main(String... args) {
         jh61b.junit.textui.runClasses(WordNetTest.class);
     } 
 }

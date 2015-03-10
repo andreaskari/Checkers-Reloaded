@@ -70,33 +70,27 @@ public class WordNet {
       */
     public Set<String> hyponyms(String word) {
         Set<String> allHyponyms = new TreeSet<String>();
-        for (String hyponym: childrenOfHyponyms(word)) {
-            allHyponyms.add(hyponym);
+        for (Integer hyponymKey: hyponymMap.keySet()) {
+            if (synsetMap.get(hyponymKey).contains(word)) {
+                allHyponyms.addAll(childrenOfHyponyms(hyponymKey));
+            }
         }
         for (TreeSet<String> synset: synsetMap.values()) {
             if (synset.contains(word)) {
-                for (String synonym: synset) {
-                    allHyponyms.add(synonym);
-                }
+                allHyponyms.addAll(synset);
             }
         }
         return allHyponyms;
     }
 
-    private Set<String> childrenOfHyponyms(String word) {
+    private Set<String> childrenOfHyponyms(Integer hyponymIndex) {
         Set<String> allHyponyms = new TreeSet<String>();
-        for (Integer synsetKey: hyponymMap.keySet()) {
-            if (synsetMap.get(synsetKey).contains(word)) {
-                for (Integer index: hyponymMap.get(synsetKey)) {
-                    for (String hyponym: synsetMap.get(index)) {
-                        for (String child: childrenOfHyponyms(hyponym)) {
-                            allHyponyms.add(child);
-                        }
-                    }
-                }
+        if (hyponymMap.get(hyponymIndex) != null) {
+            for (Integer index: hyponymMap.get(hyponymIndex)) {
+                allHyponyms.addAll(synsetMap.get(index));
+                allHyponyms.addAll(childrenOfHyponyms(index));
             }
         }
-        allHyponyms.add(word);
         return allHyponyms;
     }
 }

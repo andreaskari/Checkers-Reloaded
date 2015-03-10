@@ -90,27 +90,26 @@ public class Plotter {
     }
 
     /** Returns the numbers from max to 1, inclusive in decreasing order. */
-    // private static Collection downRange(int max) {
-    //     ArrayList ranks = new ArrayList();
-    //     for (int i = max; i >= 1; i -= 1) {
-    //         ranks.add(i);
-    //     }
-    //     return ranks;
-    // }
+    private static Collection downRange(int max) {
+        ArrayList ranks = new ArrayList();
+        for (int i = max; i >= 1; i -= 1) {
+            ranks.add(i);
+        }
+        return ranks;
+    }
 
     /** Plots the normalized count of every word against the rank of every word on a
       * log-log plot. Uses data from YEAR, using NGM as a data source. */
-    // public static void plotZipfsLaw(NGramMap ngm, int year) {
-    //     YearlyRecord yr = ngm.getRecord(year);
-    //     Collection counts = yr.counts();
-    //     Collection ranks = downRange(counts.size()); 
+    public static void plotZipfsLaw(NGramMap ngm, int year) {
+        YearlyRecord yr = ngm.getRecord(year);
+        Collection counts = yr.counts();
+        Collection ranks = downRange(counts.size()); 
 
-    //     Chart chart = new ChartBuilder().width(800).height(600).xAxisTitle("rank").yAxisTitle("count").build();
-    //     chart.getStyleManager().setYAxisLogarithmic(true);
-    //     chart.getStyleManager().setXAxisLogarithmic(true);
+        Chart chart = new ChartBuilder().width(800).height(600).xAxisTitle("rank").yAxisTitle("count").build();
+        chart.getStyleManager().setYAxisLogarithmic(true);
+        chart.getStyleManager().setXAxisLogarithmic(true);
         
-    //     chart.addSeries("zipf", ranks, counts);
-    //     new SwingWrapper(chart).displayChart();
-    // }
-
+        chart.addSeries("zipf", ranks, counts);
+        new SwingWrapper(chart).displayChart();
+    }
 }

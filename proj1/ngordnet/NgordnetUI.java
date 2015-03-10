@@ -85,6 +85,15 @@ public class NgordnetUI {
                 } catch (Exception e) {
                     System.out.println("Invalid 'hypohist' command.");  
                 }
+            } else if (command.equals("wordlength")) {
+                Plotter.plotProcessedHistory(ngMap, startYear, endYear, new WordLengthProcessor());
+            } else if (command.equals("zipf")) {
+                try {
+                    int year = Integer.parseInt(arguments[0]);
+                    Plotter.plotZipfsLaw(ngMap, year);
+                } catch (Exception e) {
+                    System.out.println("Invalid 'zipf' command.");  
+                }
             } else {
                 System.out.println("Invalid command.");  
             }
@@ -101,6 +110,8 @@ public class NgordnetUI {
         help += "\nhistory [words...]:  plots rel. frequency of [words] from start to end.";
         help += "\nhypohist [words...]: plots rel. frequency of hyponyms of [words] ";
         help += "from start to end.";
+        help += "\nwordlength:          plots the length of the average word from start to end.";
+        help += "\nzipf year:           plots the count of every word vs. its rank on a log log plot.";
         return help;
     }
 } 

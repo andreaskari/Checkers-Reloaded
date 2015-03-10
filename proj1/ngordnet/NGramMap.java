@@ -14,32 +14,37 @@ public class NGramMap {
         In wordsInput = new In(wordsFilename);
         wordsCountsRanksPerYear = new TreeMap<Integer, YearlyRecord>();
 
-        while (wordsInput.hasNextLine()) {
-            String[] segments =  wordsInput.readLine().split("\\t");
+        String[] segments;
+        String word;
+        Integer year;
+        Integer count;
 
-            String word = segments[0];
-            Integer year = new Integer(segments[1]);
-            Integer count = new Integer(segments[2]);
+        while (wordsInput.hasNextLine()) {
+            segments =  wordsInput.readLine().split("\\t");
+
+            word = segments[0];
+            year = new Integer(segments[1]);
+            count = new Integer(segments[2]);
 
             if (wordsCountsRanksPerYear.get(year) == null) {
                 wordsCountsRanksPerYear.put(year, new YearlyRecord());
             }
 
             wordsCountsRanksPerYear.get(year).put(word, count);
-            System.out.println(word + " " + year);
         }
 
         In countsInput = new In(countsFilename);
         totalWordsPerYear = new TimeSeries<Long>();
 
-        while (countsInput.hasNextLine()) {
-            String[] segments =  countsInput.readLine().split(",");
+        Long totalCount;
 
-            Integer year = new Integer(segments[0]);
-            Long totalCount = new Long(segments[1]);
+        while (countsInput.hasNextLine()) {
+            segments =  countsInput.readLine().split(",");
+
+            year = new Integer(segments[0]);
+            totalCount = new Long(segments[1]);
 
             totalWordsPerYear.put(year, totalCount);
-            System.out.println(totalCount + " " + year);
         }
     }
     

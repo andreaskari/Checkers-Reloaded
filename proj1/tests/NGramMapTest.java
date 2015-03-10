@@ -11,7 +11,7 @@ public class NGramMapTest {
 
 	@Test
 	public void nGramMapBasic() {
-        NGramMap ngm = new NGramMap("./ngrams/words_that_start_with_q.csv", 
+        NGramMap ngm = new NGramMap("./ngrams/all_words.csv", 
                                     "./ngrams/total_counts.csv");
 
 

@@ -64,7 +64,7 @@ public class NgordnetUI {
                 if (arguments.length > 1) {
                     Plotter.plotAllWords(ngMap, arguments, startYear, endYear);
                 } else {
-                    Plotter.plotCountHistory(ngMap, arguments[0], startYear, endYear);
+                    Plotter.plotWeightHistory(ngMap, arguments[0], startYear, endYear);
                 }
             } else if (command.equals("hypohist")) {
                 if (arguments.length > 1) {

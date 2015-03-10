@@ -51,7 +51,8 @@ public class NGramMap {
     /** Returns the absolute count of WORD in the given YEAR. If the word
       * did not appear in the given year, return 0. */
     public int countInYear(String word, int year) {
-        if (wordsCountsRanksPerYear.get(year) != null && wordsCountsRanksPerYear.get(year).words().contains(word)) {
+        if (wordsCountsRanksPerYear.get(year) != null 
+            && wordsCountsRanksPerYear.get(year).words().contains(word)) {
             return wordsCountsRanksPerYear.get(year).count(word);
         }
         return 0;

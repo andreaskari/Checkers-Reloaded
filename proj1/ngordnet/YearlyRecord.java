@@ -11,11 +11,14 @@ import java.util.Iterator;
 
 public class YearlyRecord {
     private TreeMap<String, Integer> recordMap;
+    private Comparator<String> stringComparator;
+    private Comparator<Number> countComparator;
     private List<String> cachedWords;
     private List<Number> cachedCount;
     private boolean cacheWordsUpdated;
     private boolean cacheCountUpdated;
     private int numEntries;
+
 
     /** Creates a new empty YearlyRecord. */
     public YearlyRecord() {
@@ -25,6 +28,20 @@ public class YearlyRecord {
         cacheCountUpdated = false;
         cachedWords = new ArrayList<String>();
         cachedCount = new ArrayList<Number>();
+
+        stringComparator = new Comparator<String>() {
+            public int compare(String string1, String string2) {
+                double myc1 = recordMap.get(string1).doubleValue();
+                double myc2 = recordMap.get(string2).doubleValue();
+                return (int) (myc1 - myc2);
+            }
+        };
+
+        countComparator = new Comparator<Number>() {
+            public int compare(Number count1, Number count2) {
+                return (int) (count1.doubleValue() - count2.doubleValue());
+            }
+        };
     }
 
     /** Creates a YearlyRecord using the given data. */
@@ -69,15 +86,7 @@ public class YearlyRecord {
             return cachedWords;
         }
 
-        Comparator<String> stringComparator = new Comparator<String>() {
-            public int compare(String string1, String string2) {
-                double myc1 = recordMap.get(string1).doubleValue();
-                double myc2 = recordMap.get(string2).doubleValue();
-                return (int) (myc1 - myc2);
-            }
-        };
-
-        cachedWords = new ArrayList(recordMap.keySet());
+        // cachedWords = new ArrayList(recordMap.keySet());
         Collections.sort(cachedWords, stringComparator);
         cacheWordsUpdated = true;
         return cachedWords;
@@ -89,13 +98,7 @@ public class YearlyRecord {
             return cachedCount;
         }
 
-        Comparator<Number> countComparator = new Comparator<Number>() {
-            public int compare(Number count1, Number count2) {
-                return (int) (count1.doubleValue() - count2.doubleValue());
-            }
-        };
-
-        cachedCount = new ArrayList(recordMap.values());
+        // cachedCount = new ArrayList(recordMap.values());
         Collections.sort(cachedCount, countComparator);
         cacheCountUpdated = true;
         return cachedCount;

@@ -42,7 +42,9 @@ public class NgordnetUI {
             String[] arguments = new String[rawTokens.length - 1];
             System.arraycopy(rawTokens, 1, arguments, 0, rawTokens.length - 1);
 
-            if (command.equals("quit") || commandErrorHandling(command, arguments)) {
+            if (commandErrorHandling(command, arguments)) {
+                
+            } else if (command.equals("quit")) {
                 break;
             } else if (command.equals("help")) {
                 System.out.println(helpPrompt);

@@ -117,10 +117,10 @@ public class YearlyRecord {
 
         rankMap = new TreeMap<String, Integer>();
 
-        int rank = 1;
+        int rank = numEntries;
         for (String word: cachedWords) {
             rankMap.put(word, rank);
-            rank += 1;
+            rank -= 1;
         }
         
         rankMapUpdated = true;
@@ -132,6 +132,6 @@ public class YearlyRecord {
       */
     public int rank(String word) {
         updateRankMap();
-        return numEntries - rankMap.get(word).intValue() + 1;    
+        return rankMap.get(word).intValue();    
     }
 }

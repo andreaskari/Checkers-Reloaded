@@ -10,29 +10,33 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class YearlyRecord {
-    private TreeMap<String, Integer> recordMap;
+    private TreeMap<String, Integer> countMap;
+    private TreeMap<String, Integer> rankMap;
     private Comparator<String> stringComparator;
     private Comparator<Number> countComparator;
     private List<String> cachedWords;
     private List<Number> cachedCount;
     private boolean cacheWordsUpdated;
     private boolean cacheCountUpdated;
+    private boolean rankMapUpdated;
     private int numEntries;
 
 
     /** Creates a new empty YearlyRecord. */
     public YearlyRecord() {
-        recordMap = new TreeMap<String, Integer>();
+        countMap = new TreeMap<String, Integer>();
+        rankMap = new TreeMap<String, Integer>();
         numEntries = 0;
         cacheWordsUpdated = false;
         cacheCountUpdated = false;
+        rankMapUpdated = false;
         cachedWords = new ArrayList<String>();
         cachedCount = new ArrayList<Number>();
 
         stringComparator = new Comparator<String>() {
             public int compare(String string1, String string2) {
-                double myc1 = recordMap.get(string1).doubleValue();
-                double myc2 = recordMap.get(string2).doubleValue();
+                double myc1 = countMap.get(string1).doubleValue();
+                double myc2 = countMap.get(string2).doubleValue();
                 return (int) (myc1 - myc2);
             }
         };
@@ -56,23 +60,25 @@ public class YearlyRecord {
 
     /** Returns the number of times WORD appeared in this year. */
     public int count(String word) {
-        if (recordMap.containsKey(word)) {
-            return recordMap.get(word);
+        if (countMap.containsKey(word)) {
+            return countMap.get(word);
         }
         return 0;
     }
 
     /** Records that WORD occurred COUNT times in this year. */
     public void put(String word, int count) {
-        if (!recordMap.containsKey(word)) {
+        if (!countMap.containsKey(word)) {
             numEntries += 1;
         }
 
-        recordMap.put(word, count);
+        countMap.put(word, count);
+
         cachedWords.add(word);
         cachedCount.add(count);
         cacheWordsUpdated = false;
         cacheCountUpdated = false;
+        rankMapUpdated = false;
     }
 
     /** Returns the number of words recorded this year. */
@@ -102,13 +108,30 @@ public class YearlyRecord {
         return cachedCount;
     }
 
+    public void updateRankMap() {
+        if (rankMapUpdated) {
+            return;
+        }
+        counts();
+        words();
+
+        rankMap = new TreeMap<String, Integer>();
+
+        int rank = 1;
+        for (String word: cachedWords) {
+            rankMap.put(word, rank);
+            rank += 1;
+        }
+        
+        rankMapUpdated = true;
+    }
+
     /** Returns rank of WORD. Most common word is rank 1. 
       * If two words have the same rank, break ties arbitrarily. 
       * No two words should have the same rank.
       */
     public int rank(String word) {
-        counts();
-        words();
-        return numEntries - cachedWords.indexOf(word);    
+        updateRankMap();
+        return numEntries - rankMap.get(word).intValue() + 1;    
     }
 }

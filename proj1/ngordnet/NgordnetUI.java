@@ -2,7 +2,6 @@ package ngordnet;
 
 import edu.princeton.cs.introcs.StdIn;
 import edu.princeton.cs.introcs.In;
-import java.util.Scanner;
 import java.util.Collections;
 
 /** Provides a simple user interface for exploring WordNet and NGram data.
@@ -43,75 +42,46 @@ public class NgordnetUI {
             String[] arguments = new String[rawTokens.length - 1];
             System.arraycopy(rawTokens, 1, arguments, 0, rawTokens.length - 1);
 
-            if (command.equals("quit")) {
+            if (command.equals("quit") || commandErrorHandling(command, arguments)) {
                 break;
             } else if (command.equals("help")) {
                 System.out.println(helpPrompt);
             } else if (command.equals("range")) {
-                if (arguments.length < 2 || !isInteger(arguments[0]) 
-                    || !isInteger(arguments[1])) {
-                    System.out.println("Invalid 'range' command");
-                } else {
-                    startYear = Integer.parseInt(arguments[0]);
-                    endYear = Integer.parseInt(arguments[1]);
-                }
+                startYear = Integer.parseInt(arguments[0]);
+                endYear = Integer.parseInt(arguments[1]);
             } else if (command.equals("count")) {
-                if (arguments.length < 2 || !isInteger(arguments[1])) {
-                    System.out.println("Invalid 'count' command");
-                } else {
-                    String word = arguments[0];
-                    int year = Integer.parseInt(arguments[1]);
-                    System.out.println(ngMap.countInYear(word, year));
-                }
+                String word = arguments[0];
+                int year = Integer.parseInt(arguments[1]);
+                System.out.println(ngMap.countInYear(word, year));
             } else if (command.equals("hyponyms")) {
-                if (arguments.length < 1) {
-                    System.out.println("Invalid 'hyponyms' command");
-                } else {
-                    String word = arguments[0];
-                    System.out.println(wNet.hyponyms(word));
-                }
+                String word = arguments[0];
+                System.out.println(wNet.hyponyms(word));
             } else if (command.equals("history")) {
-                if (arguments.length < 1) {
-                    System.out.println("Invalid 'history' command");
-                } else {
-                    if (arguments.length > 1) {
-                        String[] words = wordsAreInNGMap(ngMap, arguments);
-                        if (words.length > 0) {
-                            Plotter.plotAllWords(ngMap, words, startYear, endYear);
-                        }
-                    } else {
-                        if (wordIsInNGMap(ngMap, arguments[0])) {
-                            Plotter.plotWeightHistory(ngMap, arguments[0], startYear, endYear);
-                        }
+                if (arguments.length > 1) {
+                    String[] words = wordsAreInNGMap(ngMap, arguments);
+                    if (words.length > 0) {
+                        Plotter.plotAllWords(ngMap, words, startYear, endYear);
                     }
+                } else if (wordIsInNGMap(ngMap, arguments[0])) {
+                    Plotter.plotWeightHistory(ngMap, arguments[0], startYear, endYear);
                 }
             } else if (command.equals("hypohist")) {
-                if (arguments.length < 1) {
-                    System.out.println("Invalid 'hypohist' command");
-                } else {
-                    if (arguments.length > 1) {
-                        String[] words = wordsAreInNGMap(ngMap, arguments);
-                        if (words.length > 0) {
-                            Plotter.plotCategoryWeights(ngMap, wNet, words, startYear, endYear);
-                        }
-                    } else {
-                        if (wordIsInNGMap(ngMap, arguments[0])) {
-                            Plotter.plotCategoryWeights(ngMap, wNet, arguments[0], startYear, endYear);
-                        }
+                if (arguments.length > 1) {
+                    String[] words = wordsAreInNGMap(ngMap, arguments);
+                    if (words.length > 0) {
+                        Plotter.plotCategoryWeights(ngMap, wNet, words, startYear, endYear);
                     }
+                } else if (wordIsInNGMap(ngMap, arguments[0])) {
+                    Plotter.plotCategoryWeights(ngMap, wNet, arguments[0], startYear, endYear);
                 }
             } else if (command.equals("wordlength")) {
                 Plotter.plotProcessedHistory(ngMap, startYear, endYear, new WordLengthProcessor());
             } else if (command.equals("zipf")) {
-                if (arguments.length < 1 || !isInteger(arguments[0])) {
-                    System.out.println("Invalid 'zipf' command");
+                int year = Integer.parseInt(arguments[0]);
+                if (minYear <= year && year <= maxYear) {
+                    Plotter.plotZipfsLaw(ngMap, year);
                 } else {
-                    int year = Integer.parseInt(arguments[0]);
-                    if (minYear <= year && year <= maxYear) {
-                        Plotter.plotZipfsLaw(ngMap, year);
-                    } else {
-                        System.out.println(year + " is not in stored data.");
-                    }
+                    System.out.println(year + " is not in stored data.");
                 }
             } else {
                 System.out.println("Invalid command.");  
@@ -127,15 +97,18 @@ public class NgordnetUI {
         help += "\ncount [word] [year]: print the count of [word] in the given year";
         help += "\nhyponyms [word]:     prints all hyponyms of [word].";
         help += "\nhistory [words...]:  plots rel. frequency of [words] from start to end.";
-        help += "\nhypohist [words...]: plots rel. frequency of hyponyms of [words] ";
-        help += "from start to end.";
+        help += "\nhypohist [words...]: plots rel. frequency of hyponyms of [words] from start ";
+        help += "to end.";
         help += "\nwordlength:          plots the length of the average word from start to end.";
-        help += "\nzipf year:           plots the count of every word vs. its rank on a log log plot.";
+        help += "\nzipf year:           plots the count of every word vs. its rank on a log log"; 
+        help += "plot.";
         return help;
     }
 
     private static boolean isInteger(String s) {
-        if (s == null || s.isEmpty()) return false;
+        if (s == null || s.isEmpty()) {
+            return false;
+        }
         for (int x = 0; x < s.length(); x++) {
             char c = s.charAt(x);
             if ((c < '0') || (c > '9')) {
@@ -165,5 +138,40 @@ public class NgordnetUI {
         String[] correctSize = new String[numAvailable];
         System.arraycopy(availableWords, 0, correctSize, 0, numAvailable);
         return correctSize;
+    }
+
+    private static boolean commandErrorHandling(String command, String[] arguments) {
+        if (command.equals("range")) {
+            if (arguments.length < 2 || !isInteger(arguments[0]) || !isInteger(arguments[1])) {
+                System.out.println("Invalid 'range' command");
+                return true;
+            }
+        } else if (command.equals("count")) {
+            if (arguments.length < 2 || !isInteger(arguments[1])) {
+                System.out.println("Invalid 'count' command");
+                return true;
+            }
+        } else if (command.equals("hyponyms")) {
+            if (arguments.length < 1) {
+                System.out.println("Invalid 'hyponyms' command");
+                return true;
+            }
+        } else if (command.equals("history")) {
+            if (arguments.length < 1) {
+                System.out.println("Invalid 'history' command");
+                return true;
+            }
+        } else if (command.equals("hypohist")) {
+            if (arguments.length < 1) {
+                System.out.println("Invalid 'hypohist' command");
+                return true;
+            }
+        } else if (command.equals("zipf")) {
+            if (arguments.length < 1 || !isInteger(arguments[0])) {
+                System.out.println("Invalid 'zipf' command");
+                return true;
+            }
+        }
+        return false;
     }
 } 

@@ -65,6 +65,20 @@ public class YearlyRecordTest {
         assertEquals(6, yr2.rank("wariness"));
 	}
 
+    @Test
+    public void yearlyRecordPut() {
+        YearlyRecord yr = new YearlyRecord();
+
+        yr.put("something", 10);
+        yr.put("nothing", 30);
+
+        assertEquals(2, yr.rank("something"));
+
+        yr.put("something", 100);
+
+        assertEquals(1, yr.rank("something"));
+    }
+
 	public static void main(String... args) {
         jh61b.junit.textui.runClasses(YearlyRecordTest.class);
     }

@@ -74,8 +74,6 @@ public class YearlyRecord {
 
         countMap.put(word, count);
 
-        cachedWords.add(word);
-        cachedCount.add(count);
         cacheWordsUpdated = false;
         cacheCountUpdated = false;
         rankMapUpdated = false;
@@ -92,6 +90,7 @@ public class YearlyRecord {
             return cachedWords;
         }
 
+        cachedWords = new ArrayList(countMap.keySet());
         Collections.sort(cachedWords, stringComparator);
         cacheWordsUpdated = true;
         return cachedWords;
@@ -103,6 +102,7 @@ public class YearlyRecord {
             return cachedCount;
         }
 
+        cachedCount = new ArrayList(countMap.values());
         Collections.sort(cachedCount, countComparator);
         cacheCountUpdated = true;
         return cachedCount;

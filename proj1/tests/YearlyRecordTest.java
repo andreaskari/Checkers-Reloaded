@@ -53,6 +53,16 @@ public class YearlyRecordTest {
         assertEquals(1290, yr2.count("berry"));
         assertEquals(6, yr2.count("auscultating"));
         assertEquals(191, yr2.count("puppetry"));
+
+        yr2.put("wariness", 3);
+        yr2.put("drowsiness", 23);
+        
+        assertEquals(1, yr2.rank("berry"));
+        assertEquals(2, yr2.rank("puppetry"));
+        assertEquals(3, yr2.rank("drowsiness"));
+        assertEquals(4, yr2.rank("temporariness"));
+        assertEquals(5, yr2.rank("auscultating"));
+        assertEquals(6, yr2.rank("wariness"));
 	}
 
 	public static void main(String... args) {

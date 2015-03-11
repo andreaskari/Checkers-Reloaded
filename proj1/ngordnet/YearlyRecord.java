@@ -108,7 +108,7 @@ public class YearlyRecord {
         return cachedCount;
     }
 
-    public void updateRankMap() {
+    private void updateRankMap() {
         if (rankMapUpdated) {
             return;
         }

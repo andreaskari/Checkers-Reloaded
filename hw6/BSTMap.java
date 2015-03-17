@@ -93,11 +93,11 @@ public class BSTMap<Key extends Comparable, Value> implements Map61B<Key, Value>
         private Value value;
         private Node left, right;
 
-        public Node(Key key, Value value) {
-            this.key = key;
-            this.value = value;
-            this.left = null;
-            this.right = null;
+        public Node(Key k, Value v) {
+            key = k;
+            value = v;
+            left = null;
+            right = null;
         }
 
         public Key key() {

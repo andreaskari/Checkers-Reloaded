@@ -25,11 +25,11 @@ public class BSTMap<Key extends Comparable, Value> implements Map61B<Key, Value>
         if (pointer == null) {
             return null;
         }
-        int indexer = key.compareTo(pointer.key);
-        if (indexer > 1) {
-            return findInTree(pointer.right, key);
-        } else if (indexer < 1) {
-            return findInTree(pointer.left, key);
+        int indexer = key.compareTo(pointer.key());
+        if (indexer > 0) {
+            return findInTree(pointer.right(), key);
+        } else if (indexer < 0) {
+            return findInTree(pointer.left(), key);
         }
         return pointer.value;
     }
@@ -52,13 +52,13 @@ public class BSTMap<Key extends Comparable, Value> implements Map61B<Key, Value>
             size += 1;
             return new Node(key, value);
         }
-        int indexer = key.compareTo(pointer.key);
-        if (indexer > 1) {
-            pointer.right = augmentTree(pointer.right, key, value);
-        } else if (indexer < 1) {
-            pointer.left = augmentTree(pointer.left, key, value);
+        int indexer = key.compareTo(pointer.key());
+        if (indexer > 0) {
+            pointer.setRight(augmentTree(pointer.right(), key, value));
+        } else if (indexer < 0) {
+            pointer.setLeft(augmentTree(pointer.left(), key, value));
         } else {
-            pointer.value = value;
+            pointer.setValue(value);
         }
         return pointer;
     }
@@ -83,21 +83,45 @@ public class BSTMap<Key extends Comparable, Value> implements Map61B<Key, Value>
     }
 
     private void printNode(Node pointer) {
-        printNode(pointer.left);
-        System.out.println(pointer.key);
-        printNode(pointer.right);
+        printNode(pointer.left());
+        System.out.println(pointer.key());
+        printNode(pointer.right());
     }
  
     private class Node {
-        public Key key;
-        public Value value;
-        public Node left, right;
+        private Key key;
+        private Value value;
+        private Node left, right;
 
         public Node(Key key, Value value) {
             this.key = key;
             this.value = value;
             this.left = null;
             this.right = null;
+        }
+
+        public Key key() {
+            return key;
+        }
+
+        public void setValue(Value v) {
+            value = v;
+        }
+
+        public Node left() {
+            return left;
+        }
+
+        public Node right() {
+            return right;
+        }
+
+        public void setLeft(Node l) {
+            left = l;
+        }
+
+        public void setRight(Node r) {
+            right = r;
         }
     }
 }

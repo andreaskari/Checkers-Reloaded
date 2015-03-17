@@ -1,3 +1,3 @@
 The BSTMap and TreeMap were much much faster when handling large numbers of Strings compared to ULLMap. ULLMap overflowed in some cases while BSTMap and TreeMap didn't.
 
-Even when inserting in order, BSTMap and TreeMap are much faster than ULLMap but are generally slower compared to when Strings are inputted randomly.
+When inserting in order, BSTMap dramatically slower however compared to TreeMap but still much faster that ULLMap.

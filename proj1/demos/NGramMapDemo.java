@@ -1,6 +1,8 @@
 /** Provides examples of using the NGramMap class.
  *  @author Josh Hug
  */
+package demos;
+
 import ngordnet.NGramMap;
 import ngordnet.YearlyRecord;
 import ngordnet.TimeSeries;

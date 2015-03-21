@@ -1,3 +1,5 @@
+package demos;
+
 import ngordnet.TimeSeries;
 import java.util.Collection;
 

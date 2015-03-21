@@ -30,5 +30,5 @@ public interface Map61B<K, V> {
     public V remove(K key, V value);
 
     /* Returns a Set view of the keys contained in this map. Not required for HW5. */
-    public Set<K> keySet();    
+    public Set<K> keySet();
 }

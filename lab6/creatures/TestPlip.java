@@ -32,10 +32,20 @@ public class TestPlip {
 
     @Test
     public void testReplicate() {
-
+        Plip p = new Plip(2);
+        assertEquals(2, p.energy(), 0.01);
+        Plip offspring = p.replicate();
+        assertEquals(1, p.energy(), 0.01);
+        assertEquals(1, offspring.energy(), 0.01);
+        Plip grandPlip = offspring.replicate();
+        assertEquals(1, p.energy(), 0.01);
+        assertEquals(0.5, offspring.energy(), 0.01);
+        assertEquals(0.5, grandPlip.energy(), 0.01);
+        assertNotSame(p, offspring);
+        assertNotSame(offspring, grandPlip);
     }
 
-    //@Test
+    @Test
     public void testChoose() {
         Plip p = new Plip(1.2);
         HashMap<Direction, Occupant> surrounded = new HashMap<Direction, Occupant>();
@@ -49,6 +59,36 @@ public class TestPlip {
         //Sorry!  
 
         Action actual = p.chooseAction(surrounded);
+        Action expected = new Action(Action.ActionType.STAY);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testChoose2() {
+        Plip p = new Plip(1.2);
+        HashMap<Direction, Occupant> nearlySurrounded = new HashMap<Direction, Occupant>();
+        nearlySurrounded.put(Direction.TOP, new Empty());
+        nearlySurrounded.put(Direction.BOTTOM, new Impassible());
+        nearlySurrounded.put(Direction.LEFT, new Impassible());
+        nearlySurrounded.put(Direction.RIGHT, new Impassible());
+
+        Action actual = p.chooseAction(nearlySurrounded);
+        Action expected = new Action(Action.ActionType.REPLICATE, Direction.TOP);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testChoose3() {
+        Plip p = new Plip(0.6);
+        HashMap<Direction, Occupant> nearlySurrounded = new HashMap<Direction, Occupant>();
+        nearlySurrounded.put(Direction.TOP, new Empty());
+        nearlySurrounded.put(Direction.BOTTOM, new Impassible());
+        nearlySurrounded.put(Direction.LEFT, new Impassible());
+        nearlySurrounded.put(Direction.RIGHT, new Impassible());
+
+        Action actual = p.chooseAction(nearlySurrounded);
         Action expected = new Action(Action.ActionType.STAY);
 
         assertEquals(expected, actual);

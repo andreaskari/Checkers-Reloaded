@@ -1,0 +1,8 @@
+1 F lower bound is bounded by constant * log(N)
+2 T BSTs are optimized to work in log(N) on average
+3 F lower bound is bounded by constant * log(N)
+4 T Worst case is a spindle tree with N runtime.
+5 T Worst case has N runtime which is less than N^2.
+6 T The average number of comparisons is log(N) for both processes.
+7 F Best case runtime is big-Omega(1)
+8 O(1) z is almost always greater than 1

@@ -21,13 +21,21 @@ public class Triangle {
       return "At least one length is less than 0!";
     }
 
+    String type;
+
     // Check for side length
     if ((s1 + s2 <= s3) || (s1 + s3 <= s2) || (s2 + s3 <= s1)) {
       return "The lengths of the triangles do not form a valid triangle!";
-    }  
+    } else if (s1 == s2 && s2 == s3) {
+      type = "Equilateral";
+    } else if (s1 == s2 || s2 == s3 || s1 == s3) {
+      type = "Isosceles";
+    } else {
+      type = "Scalene";
+    }
 
     // Return triangle type
     //TODO:  return either "Equilateral", "Isosceles", or "Scalene"
-    return null; //REPLACE THIS LINE
+    return type;
   }
 }

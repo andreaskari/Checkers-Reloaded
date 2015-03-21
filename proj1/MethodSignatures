@@ -46,7 +46,7 @@ public class TimeSeries<T extends Number> extends TreeMap<Integer, T> {
 
     /** Returns all data for this time series. 
       * Must be in the same order as years(). */
-    public Collection<Number> data() 
+    public Collection<Number> data()
 }
 
 public class YearlyRecord {

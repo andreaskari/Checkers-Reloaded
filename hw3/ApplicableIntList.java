@@ -12,29 +12,48 @@ public class ApplicableIntList{
 
     /** A list with head HEAD0 and tail TAIL0. */
     public ApplicableIntList(int head0, ApplicableIntList tail0) {
-        // REPLACE THIS LINE WITH YOUR SOLUTION
+        head = head0;
+        tail = tail0;
     }
 
     /** A list with null tail, and head = 0. */
     public ApplicableIntList() {
-        // REPLACE THIS LINE WITH YOUR SOLUTION
+        head = 0;
+        tail = null;
     }
 
     /** Inserts int i into its correct location, doesn't handle cycles. */
     public void insert(int i) {
-        // REPLACE THIS LINE WITH YOUR SOLUTION
+        if (i < head) {
+            this.tail = new ApplicableIntList(this.head, this.tail);
+            this.head = i;
+            return;
+        }
+        ApplicableIntList pointer = this;
+        while (pointer.tail != null && pointer.tail.head < i) {
+            pointer = pointer.tail;
+        }
+        pointer.tail = new ApplicableIntList(i, pointer.tail);
     }
 
     /** Returns the i-th int in this list.
      *  The first element, which is in location 0, is the 0th element.
      *  Assume i takes on the values [0, length of list - 1]. */
     public int get(int i) {
-        // REPLACE THIS LINE WITH YOUR SOLUTION
+        ApplicableIntList pointer = this;
+        for (int x = 0; x < i; x++) {
+            pointer = pointer.tail;
+        }
+        return pointer.head;
     }
 
     /** Applies the function f to every item in this list. */
     public void apply(IntUnaryFunction f) {
-        // REPLACE THIS LINE WITH YOUR SOLUTION
+        ApplicableIntList pointer = this;
+        while (pointer != null) {
+            pointer.head = f.apply(pointer.head);
+            pointer = pointer.tail;
+        }
     }
 
     /** Returns NULL if no cycle exists, else returns cycle location. */

@@ -1,4 +1,5 @@
 import java.util.HashSet;
+import java.util.Date;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,6 +10,7 @@ import java.lang.ClassNotFoundException;
 public class Commit implements Serializable {
     private int commitID;
     private String commitMessage;
+    private String commitDateString;
     private HashSet<String> commitedFiles;
     private HashSet<String> removedFiles;
     private HashSet<Commit> commitChildren;
@@ -16,6 +18,7 @@ public class Commit implements Serializable {
     public Commit(int newID, String newMessage) {
         commitID = newID;
         commitMessage = newMessage;
+        commitDateString = (new Date()).toString();
         commitChildren = new HashSet<Commit>();
     }
 
@@ -45,15 +48,15 @@ public class Commit implements Serializable {
         return commitChildren;
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    // private void writeObject(ObjectOutputStream out) throws IOException {
 
-    }
+    // }
  
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    // private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         
-    }
+    // }
 
-    private void readObjectNoData() throws ObjectStreamException {
+    // private void readObjectNoData() throws ObjectStreamException {
         
-    }
+    // }
 }

@@ -1,4 +1,9 @@
 import java.io.File;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.ObjectOutput;
 import java.io.FileOutputStream;
@@ -9,14 +14,15 @@ import java.io.IOException;
 public class Gitlet {
     private static final String GITLET_DIRECTORY_PATH = ".gitlet/";
     private static final String STAGE_FILE_PATH = ".gitlet/Stage.ser";
-    private static final String BRANCHES_FILE_PATH = ".gitlet/Branches.ser";
+    private static final String BRANCHSET_FILE_PATH = ".gitlet/Branches.ser";
+    private static final String SNAPSHOT_DIRECTORY_PATH = ".gitlet/Snapshots/";
 
     public static void main(String[] args) {
         String command = args[0];
         if (command.equals("init")) {
             initializeCommand();
         } else if (command.equals("add")) {
-            addCommand();
+            addCommand(args[1]);
         } else if (command.equals("commit")) {
             commitCommand();
         } else if (command.equals("rm")) {
@@ -48,13 +54,13 @@ public class Gitlet {
 
     /**  General Helper Methods  */ 
 
-    private static void writeToStageFile(Stage newStageFile) {
+    private static void writeToObjectFile(Object newObject, String filePath) {
         try {
-            OutputStream file = new FileOutputStream(STAGE_FILE_PATH);
+            OutputStream file = new FileOutputStream(filePath);
             OutputStream buffer = new BufferedOutputStream(file);
             ObjectOutput output = new ObjectOutputStream(buffer);
             try {
-                output.writeObject(newStageFile);
+                output.writeObject(newObject);
             }
             finally {
                 output.close();
@@ -64,37 +70,84 @@ public class Gitlet {
         }
     }
 
-    private static void writeToBranchesFile(BranchSet newBranchSet) {
+    private static void writeToStageFile(Stage newStage) {
+        writeToObjectFile(newStage, STAGE_FILE_PATH);
+    }
+
+    private static void writeToBranchSetFile(BranchSet newBranchSet) {
+        writeToObjectFile(newBranchSet, BRANCHSET_FILE_PATH);
+    }
+
+    private static Object getObjectFromFile(String filePath) {
+        Object obj = null;
         try {
-            OutputStream file = new FileOutputStream(BRANCHES_FILE_PATH);
-            OutputStream buffer = new BufferedOutputStream(file);
-            ObjectOutput output = new ObjectOutputStream(buffer);
+            InputStream file = new FileInputStream(filePath);
+            InputStream buffer = new BufferedInputStream(file);
+            ObjectInput input = new ObjectInputStream (buffer);
             try {
-                output.writeObject(newBranchSet);
+                obj = input.readObject();
             }
             finally {
-                output.close();
+                input.close();
             }
-        } catch (IOException ex) {
+        } catch (ClassNotFoundException ex) {
 
+        } catch(IOException ex){
+            
         }
+        return obj;
+    }
+
+    private static Stage getStageFromFilePath() {
+        return (Stage) getObjectFromFile(STAGE_FILE_PATH);
+    }
+
+    private static BranchSet getBranchSetFromFilePath() {
+        return (BranchSet) getObjectFromFile(BRANCHSET_FILE_PATH);
     }
 
     /**  Command Execution Methods  */
 
     private static void initializeCommand() {
         File gitletDirectory = new File(GITLET_DIRECTORY_PATH);
+        File snapshotDirectory = new File(SNAPSHOT_DIRECTORY_PATH);
         if (!gitletDirectory.exists()) {
             gitletDirectory.mkdir();
+            snapshotDirectory.mkdir();
             writeToStageFile(new Stage());
-            writeToBranchesFile(new BranchSet());
+            writeToBranchSetFile(new BranchSet());
         } else {
             System.out.println("A gitlet version control system already exists in the current directory.");
         }
     }
 
-    private static void addCommand() {
-
+    private static void addCommand(String filePath) {
+        // Add check to see if file has already been staged?
+        File addedFile = new File(filePath);
+        if (addedFile.exists()) {
+            Stage currentStage = getStageFromFilePath();
+            BranchSet currentBranchSet = getBranchSetFromFilePath();
+            Branch currentBranch = currentBranchSet.currentBranch();
+            // filePath may need previous processing for directories
+            if (currentBranch.fileHasBeenCommitted(filePath)) {
+                String previousPath = currentBranch.getSnapshotPath(filePath);
+                File previousFile = new File(previousPath);
+                if (previousFile.equals(addedFile)) {
+                    System.out.println("File has not been modified since the last commit.");
+                } else {
+                    if (currentStage.isMarkedForRemoval(filePath)) {
+                        currentStage.removeMarkForRemoval(filePath);
+                    }
+                    currentStage.addToStage(filePath);
+                    writeToStageFile(currentStage);
+                }
+            } else {
+                currentStage.addToStage(filePath);
+                writeToStageFile(currentStage);
+            }
+        } else {
+            System.out.println("File does not exist.");
+        }
     }
 
     private static void commitCommand() {

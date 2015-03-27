@@ -7,9 +7,9 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 
 public class Gitlet {
-    private static final String GITLET_DIRECTORY_PATH = "./.gitlet/";
-    private static final String STAGE_FILE_PATH = "./.gitlet/Stage.ser";
-    private static final String BRANCHES_FILE_PATH = "./.gitlet/Branches.ser";
+    private static final String GITLET_DIRECTORY_PATH = ".gitlet/";
+    private static final String STAGE_FILE_PATH = ".gitlet/Stage.ser";
+    private static final String BRANCHES_FILE_PATH = ".gitlet/Branches.ser";
 
     public static void main(String[] args) {
         String command = args[0];
@@ -46,6 +46,24 @@ public class Gitlet {
         }
     }
 
+    /**  General Helper Methods  */ 
+
+    private static void writeToStageFile(Stage newStageFile) {
+        try {
+            OutputStream file = new FileOutputStream(STAGE_FILE_PATH);
+            OutputStream buffer = new BufferedOutputStream(file);
+            ObjectOutput output = new ObjectOutputStream(buffer);
+            try {
+                output.writeObject(newStageFile);
+            }
+            finally {
+                output.close();
+            }
+        } catch (IOException ex) {
+            
+        }
+    }
+
     private static void writeToBranchesFile(BranchSet newBranchSet) {
         try {
             OutputStream file = new FileOutputStream(BRANCHES_FILE_PATH);
@@ -62,33 +80,18 @@ public class Gitlet {
         }
     }
 
-    // private static void writeToStageFile(Stage newStageFile) {
-    //     try {
-    //         OutputStream file = new FileOutputStream(STAGE_FILE_PATH);
-    //         OutputStream buffer = new BufferedOutputStream(file);
-    //         ObjectOutput output = new ObjectOutputStream(buffer);
-    //         try {
-    //             output.writeObject(newStageFile);
-    //         }
-    //         finally {
-    //             output.close();
-    //         }
-    //     } catch (IOException ex) {
-            
-    //     }
-    // }
+    /**  Command Execution Methods  */
 
     private static void initializeCommand() {
         File gitletDirectory = new File(GITLET_DIRECTORY_PATH);
         if (!gitletDirectory.exists()) {
             gitletDirectory.mkdir();
-            BranchSet initialBranchSet = new BranchSet();
-            writeToBranchesFile(initialBranchSet);
+            writeToStageFile(new Stage());
+            writeToBranchesFile(new BranchSet());
         } else {
             System.out.println("A gitlet version control system already exists in the current directory.");
         }
     }
-
 
     private static void addCommand() {
 

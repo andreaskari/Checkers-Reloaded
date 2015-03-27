@@ -9,12 +9,20 @@ import java.lang.ClassNotFoundException;
 public class Commit implements Serializable {
     private int commitID;
     private String commitMessage;
+    private HashSet<String> commitedFiles;
+    private HashSet<String> removedFiles;
     private HashSet<Commit> commitChildren;
 
     public Commit(int newID, String newMessage) {
         commitID = newID;
         commitMessage = newMessage;
         commitChildren = new HashSet<Commit>();
+    }
+
+    public Commit(int newID, String newMessage, Stage currentStage) {
+        this(newID, newMessage);
+        commitedFiles = currentStage.stagedFiles();
+        removedFiles = currentStage.markedForRemoval();
     }
 
     public int id() {

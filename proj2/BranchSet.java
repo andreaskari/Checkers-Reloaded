@@ -9,4 +9,5 @@ public class BranchSet extends HashSet<Branch> {
 		currentBranch = master;
 		add(master);
 	}
+
 }

@@ -36,12 +36,22 @@ public class Bin15 {
     
     @Override
     public boolean equals(Object o) {
-        return false; // YOUR CODE HERE
+        if (o instanceof Bin15) {
+            return this.hashCode() == ((Bin15) o).hashCode();
+        }
+        return false;
     }
     
     @Override
     public int hashCode() {
-        return -1; // YOUR CODE HERE
+        int hash = 0;
+        for (int count = 0; count < 15; count++) {
+            char c = myBinStr.charAt(count);
+            if (c == '1') {
+                hash += (int) Math.pow(2, count);
+            }
+        }
+        return hash;
     }
 
     /* DO THIS LAST, AFTER IMPLEMENTING EVERYTHING
@@ -61,6 +71,13 @@ public class Bin15 {
         // 1 means 1 in decimal
         // 0b01 means 01 or 1 in binary
         System.out.println("Note to self: Answer follow-up question!");
+
+        Bin15 a = new Bin15("101010101010101");
+        Bin15 b = new Bin15("101010101010101");
+        Bin15 x = new Bin15("101010101010111");
+
+        System.out.println("Must be true: " + a.equals(b));
+        System.out.println("Must be false: " + a.equals(x));
     }
 }
 

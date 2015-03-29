@@ -22,11 +22,28 @@ public class Board {
 
 	@Override
 	public boolean equals(Object o) {
-        return true; // YOUR CODE HERE
+        if (o instanceof Board) {
+            return this.hashCode() == ((Board) o).hashCode();
+        }
+        return false;
 	}
 
     @Override
     public int hashCode() {
-        return 6; // YOUR CODE HERE
+        int hash = 0;
+        for (int x = 0; x < SIZE; x++) {
+            for (int y = 0; y < SIZE; y++) {
+                Piece p = pieces[x][y];
+                if (p == null) {
+                    hash += x * 64 + y * 512 + 2048;
+                } else {
+                    hash += p.hashCode();
+                }
+            }
+        }
+        if (isFireTurn) {
+            hash += 4096;
+        }
+        return hash;
     }
 }

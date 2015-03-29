@@ -61,12 +61,34 @@ public class Piece {
 
     @Override
     public boolean equals(Object o) {
-        return false; // YOUR CODE HERE
+        if (o instanceof Piece) {
+            return this.hashCode() == ((Piece) o).hashCode();
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return 5; // YOUR CODE HERE
+        int hash = 0;
+        if (isKing()) {
+            hash += 1;
+        }
+        if (hasCaptured) {
+            hash += 2;
+        }
+        if (isFire()) {
+            hash += 4;
+        }
+        if (isBomb()) {
+            hash += 1 * 8;
+        } else if (isShield()) {
+            hash += 2 * 8;
+        } else {
+            hash += 3 * 8;
+        }
+        hash += x * 64;
+        hash += y * 512;
+        return hash; 
     }
 
     public static void main(String[] args) {

@@ -146,7 +146,7 @@ public class Nana {
     /************************ Question #1.3 ***********************/
 
     public static final String worst2Best() {
-        return "B, C, D, A"; // REPLACE THIS LINE WITH YOUR ANSWER 
+        return "A, D, C, B"; // REPLACE THIS LINE WITH YOUR ANSWER 
     }
 
     /**************************************************************/

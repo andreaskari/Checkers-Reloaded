@@ -1,5 +1,5 @@
 // import java.util.HashMap;
-// import java.util.TreeMap;
+import java.util.TreeMap;
 // import java.util.Map;
 // We don't need these! We made our own!
 
@@ -8,22 +8,35 @@ public class MapRace {
     /* Tests the put action the specified number of times. */
     private static long timePuts61B(Map61B<Integer, Integer> map, 
                 int num_puts, int key_range, int val_range) {
-        // YOUR CODE HERE
-        return 0;
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < num_puts; i++) {
+            int key = (int) (key_range * Math.random());
+            int value = (int) (val_range * Math.random());
+            map.put(key, value);
+        }
+        return System.currentTimeMillis() - startTime;
     }
 
     /* Tests the get action the specified number of times. */
     private static long timeGets61B(Map61B<Integer, Integer> map, 
                 int num_gets, int key_range) {
-        // YOUR CODE HERE
-        return 0;
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < num_gets; i++) {
+            int key = (int) (key_range * Math.random());
+            map.get(key);
+        }
+        return System.currentTimeMillis() - startTime;
     }
 
-    /* Tests the get action the specified number of times. */
+    /* Tests the remove action the specified number of times. */
     private static long timeRemove61B(Map61B<Integer, Integer> map, 
                 int num_removes, int key_range) {
-        // YOUR CODE HERE
-        return 0;
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < num_removes; i++) {
+            int key = (int) (key_range * Math.random());
+            map.remove(key);
+        }
+        return System.currentTimeMillis() - startTime;
     }
 
     /* Warms up Java to get the cache hot and ready. If you don't warm up, 
@@ -77,8 +90,8 @@ public class MapRace {
 
     public static final String followUp() {
         // YOUR ANSWER HERE
-        String answer = "yes, because I done it ";
-        answer += "yuh huh I did";
+        String answer = "HashMaps are generally stronger, because their data";
+        answer += " is generally more distributed.";
         return answer;
     }
 

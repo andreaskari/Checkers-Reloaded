@@ -14,16 +14,16 @@ public class Commit implements Serializable {
     private String commitMessage;
     private String commitDateString;
     private Commit commitParent;
-    private HashSet<String> commitedFiles;
-    private HashSet<String> removedFiles;
-    private HashSet<Commit> commitChildren;
+    private HashSet commitedFiles;
+    private HashSet removedFiles;
+    private HashSet commitChildren;
 
     public Commit(int newID, String newMessage) {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
         commitParent = null;
-        commitChildren = new HashSet<Commit>();
+        commitChildren = new HashSet();
         commitedFiles = null;
         removedFiles = null;       
     }
@@ -33,10 +33,10 @@ public class Commit implements Serializable {
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
         commitParent = parent;
-        commitParent.addChild(this);
-        commitChildren = new HashSet<Commit>();
+        commitChildren = new HashSet();
         commitedFiles = currentStage.stagedFiles();
         removedFiles = currentStage.markedForRemoval();
+        commitParent.addChild(this);
     }
 
     public int id() {
@@ -56,7 +56,7 @@ public class Commit implements Serializable {
     }
 
     public HashSet<Commit> children() {
-        return commitChildren;
+        return (HashSet<Commit>) commitChildren;
     }
 
     public Commit parent() {
@@ -66,16 +66,4 @@ public class Commit implements Serializable {
     public String date() {
         return commitDateString;
     }
-
-    // private void writeObject(ObjectOutputStream out) throws IOException {
-
-    // }
- 
-    // private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        
-    // }
-
-    // private void readObjectNoData() throws ObjectStreamException {
-        
-    // }
 }

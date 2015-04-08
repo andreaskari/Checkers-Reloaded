@@ -1,20 +1,23 @@
-import java.util.HashSet;
+import java.util.HashMap;
 import java.io.Serializable;
 
-public class BranchSet extends HashSet<Branch> implements Serializable {
+public class BranchMap extends HashMap<String, Branch> implements Serializable {
     private static final long serialVersionUID = -45447344955473426L;
 
     private Branch currentBranch;
 
-    public BranchSet() {
+    public BranchMap() {
         super();
         Branch master = new Branch();
         currentBranch = master;
-        add(master);
+        put("master", master);
     }
 
     public Branch currentBranch() {
         return currentBranch;
     }
 
+    public void setCurrentBranch(String branchName) {
+        currentBranch = get(branchName);
+    }
 }

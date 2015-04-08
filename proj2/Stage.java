@@ -4,8 +4,8 @@ import java.io.Serializable;
 public class Stage implements Serializable {
     private static final long serialVersionUID = 3L;
 
-    HashSet<String> stagedFiles;
-    HashSet<String> markedForRemoval;
+    HashSet stagedFiles;
+    HashSet markedForRemoval;
 
     public Stage() {
         stagedFiles = new HashSet<String>();
@@ -25,7 +25,7 @@ public class Stage implements Serializable {
     }
 
     public HashSet<String> stagedFiles() {
-        return stagedFiles;
+        return (HashSet<String>) stagedFiles;
     }
 
     public boolean isMarkedForRemoval(String path) {
@@ -41,6 +41,6 @@ public class Stage implements Serializable {
     }
 
     public HashSet<String> markedForRemoval() {
-        return markedForRemoval;
+        return (HashSet<String>) markedForRemoval;
     }
 }

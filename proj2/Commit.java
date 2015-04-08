@@ -8,8 +8,8 @@ import java.io.ObjectStreamException;
 import java.lang.ClassNotFoundException;
 
 public class Commit implements Serializable {
-    private static final long serialVersionUID = 7526472295622776147L;
-    
+    private static final long serialVersionUID = 2L;
+
     private int commitID;
     private String commitMessage;
     private String commitDateString;
@@ -33,6 +33,7 @@ public class Commit implements Serializable {
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
         commitParent = parent;
+        commitParent.addChild(this);
         commitChildren = new HashSet<Commit>();
         commitedFiles = currentStage.stagedFiles();
         removedFiles = currentStage.markedForRemoval();

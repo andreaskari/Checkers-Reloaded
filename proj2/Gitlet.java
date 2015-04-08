@@ -24,7 +24,7 @@ public class Gitlet {
         } else if (command.equals("add")) {
             addCommand(args[1]);
         } else if (command.equals("commit")) {
-            commitCommand();
+            commitCommand(args[1]);
         } else if (command.equals("rm")) {
             removeCommand();
         } else if (command.equals("log")) {
@@ -95,7 +95,6 @@ public class Gitlet {
         } catch(IOException ex){
             System.out.println(ex);
         }
-        System.out.println(obj);
         return obj;
     }
 
@@ -151,8 +150,18 @@ public class Gitlet {
         }
     }
 
-    private static void commitCommand() {
+    private static void commitCommand(String commitMessage) {
+        Stage currentStage = getStageFromFilePath();
+        BranchSet currentBranchSet = getBranchSetFromFilePath();
+        Branch currentBranch = currentBranchSet.currentBranch();
+        Commit currentHead = currentBranch.head();
 
+        int commitID = currentBranch.size();
+        Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentHead, currentStage);
+        currentBranch.setHead(newlyCreatedCommit);
+        
+        writeToBranchSetFile(currentBranchSet);
+        writeToStageFile(new Stage());
     }
 
     private static void removeCommand() {
@@ -160,13 +169,11 @@ public class Gitlet {
     }
 
     private static void logCommand() {
-            Stage currentStage = getStageFromFilePath();
             BranchSet currentBranchSet = getBranchSetFromFilePath();
-            Branch currentBranch = currentBranchSet.currentBranch();
-            Commit pointer = currentBranch.head();
+            Commit pointer = currentBranchSet.currentBranch().head();
             String log = "";
             while (pointer != null) {
-                log += "====\n" + pointer.date() + "\n" + pointer.message();
+                log += "====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message();
                 pointer = pointer.parent();
                 if (pointer != null) {
                     log += "\n";

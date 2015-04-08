@@ -2,12 +2,13 @@ import java.util.HashMap;
 import java.io.Serializable;
 
 public class Branch implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static final String FILE_SNAPSHOT_DIRECTORY_PATH = ".gitlet/Snapshots/";
 
     private String branchName;
     private Commit branchInitialCommit;
     private Commit branchHead;
-    private HashMap<String, Integer> trackedFilePaths;
+    private HashMap trackedFilePaths;
     private int branchSize;
 
     public Branch() {
@@ -31,6 +32,10 @@ public class Branch implements Serializable {
 
     public Commit initialCommit() {
         return branchInitialCommit;
+    }
+
+    public void setHead(Commit newHead) {
+        branchHead = newHead;
     }
 
     public Commit head() {

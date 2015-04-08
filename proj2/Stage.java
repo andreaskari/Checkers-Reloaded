@@ -1,6 +1,9 @@
 import java.util.HashSet;
+import java.io.Serializable;
 
-public class Stage {
+public class Stage implements Serializable {
+    private static final long serialVersionUID = 3L;
+
     HashSet<String> stagedFiles;
     HashSet<String> markedForRemoval;
 

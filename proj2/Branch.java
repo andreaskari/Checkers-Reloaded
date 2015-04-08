@@ -1,6 +1,7 @@
 import java.util.HashMap;
+import java.io.Serializable;
 
-public class Branch {
+public class Branch implements Serializable {
     private static final String FILE_SNAPSHOT_DIRECTORY_PATH = ".gitlet/Snapshots/";
 
     private String branchName;

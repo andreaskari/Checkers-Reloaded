@@ -91,10 +91,11 @@ public class Gitlet {
                 input.close();
             }
         } catch (ClassNotFoundException ex) {
-
+            System.out.println(ex);
         } catch(IOException ex){
-            
+            System.out.println(ex);
         }
+        System.out.println(obj);
         return obj;
     }
 
@@ -159,7 +160,19 @@ public class Gitlet {
     }
 
     private static void logCommand() {
-
+            Stage currentStage = getStageFromFilePath();
+            BranchSet currentBranchSet = getBranchSetFromFilePath();
+            Branch currentBranch = currentBranchSet.currentBranch();
+            Commit pointer = currentBranch.head();
+            String log = "";
+            while (pointer != null) {
+                log += "====\n" + pointer.date() + "\n" + pointer.message();
+                pointer = pointer.parent();
+                if (pointer != null) {
+                    log += "\n";
+                }
+            }
+            System.out.println(log);
     }
 
     private static void globalLogCommand() {

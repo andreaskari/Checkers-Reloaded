@@ -8,9 +8,12 @@ import java.io.ObjectStreamException;
 import java.lang.ClassNotFoundException;
 
 public class Commit implements Serializable {
+    private static final long serialVersionUID = 7526472295622776147L;
+    
     private int commitID;
     private String commitMessage;
     private String commitDateString;
+    private Commit commitParent;
     private HashSet<String> commitedFiles;
     private HashSet<String> removedFiles;
     private HashSet<Commit> commitChildren;
@@ -19,11 +22,18 @@ public class Commit implements Serializable {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
+        commitParent = null;
         commitChildren = new HashSet<Commit>();
+        commitedFiles = null;
+        removedFiles = null;       
     }
 
-    public Commit(int newID, String newMessage, Stage currentStage) {
-        this(newID, newMessage);
+    public Commit(int newID, String newMessage, Commit parent, Stage currentStage) {
+        commitID = newID;
+        commitMessage = newMessage;
+        commitDateString = (new Date()).toString();
+        commitParent = parent;
+        commitChildren = new HashSet<Commit>();
         commitedFiles = currentStage.stagedFiles();
         removedFiles = currentStage.markedForRemoval();
     }
@@ -46,6 +56,14 @@ public class Commit implements Serializable {
 
     public HashSet<Commit> children() {
         return commitChildren;
+    }
+
+    public Commit parent() {
+        return commitParent;
+    }
+
+    public String date() {
+        return commitDateString;
     }
 
     // private void writeObject(ObjectOutputStream out) throws IOException {

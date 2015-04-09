@@ -32,7 +32,7 @@ public class Gitlet {
         } else if (command.equals("global-log")) {
             globalLogCommand();
         } else if (command.equals("find")) {
-            findCommand();
+            findCommand(args[1]);
         } else if (command.equals("status")) {
             statusCommand();
         } else if (command.equals("checkout")) {
@@ -129,6 +129,8 @@ public class Gitlet {
             Branch currentBranch = currentBranchSet.currentBranch();
 
             // filePath may need previous processing for directories
+
+
             if (currentBranch.fileHasBeenCommitted(filePath)) {
                 String previousPath = currentBranch.getSnapshotPath(filePath);
                 File previousFile = new File(previousPath);
@@ -158,7 +160,7 @@ public class Gitlet {
 
         int commitID = currentBranch.size();
         Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentHead, currentStage);
-        currentBranch.setHead(newlyCreatedCommit);
+        currentBranch.addNewCommit(newlyCreatedCommit);
         
         writeToBranchSetFile(currentBranchSet);
         writeToStageFile(new Stage());
@@ -187,12 +189,14 @@ public class Gitlet {
             for (Commit child: pointer.children()) {
                 printCommitAndChildren(child);
             }            
-        System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
+            System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
         }
     }
 
-    private static void findCommand() {
-
+    private static void findCommand(String message) {
+        // Can't find messages that are "stringed together" in Terminal
+        BranchMap currentBranchSet = getBranchSetFromFilePath();
+        currentBranchSet.currentBranch().printCommitsWithMessage(message);
     }
 
     private static void statusCommand() {

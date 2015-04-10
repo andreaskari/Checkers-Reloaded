@@ -1,11 +1,12 @@
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Date;
 import java.io.Serializable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.lang.ClassNotFoundException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class Commit implements Serializable {
     private static final long serialVersionUID = 2L;
@@ -14,9 +15,9 @@ public class Commit implements Serializable {
     private String commitMessage;
     private String commitDateString;
     private Commit commitParent;
-    private HashSet commitedFiles;
     private HashSet removedFiles;
     private HashSet commitChildren;
+    private HashMap committedFilesToPaths;
 
     public Commit(int newID, String newMessage) {
         commitID = newID;
@@ -24,19 +25,39 @@ public class Commit implements Serializable {
         commitDateString = (new Date()).toString();
         commitParent = null;
         commitChildren = new HashSet();
-        commitedFiles = null;
-        removedFiles = null;       
+        removedFiles = null;    
+        committedFilesToPaths = new HashMap<String, String>();
     }
 
-    public Commit(int newID, String newMessage, Commit parent, Stage currentStage) {
+    public Commit(int newID, String newMessage, Commit parent, Stage currentStage, String snapshot_directory_path) {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
         commitParent = parent;
         commitChildren = new HashSet();
-        commitedFiles = currentStage.stagedFiles();
         removedFiles = currentStage.markedForRemoval();
         commitParent.addChild(this);
+        committedFilesToPaths = new HashMap<String, String>();
+
+        String commitSnapshotDirectory = snapshot_directory_path + newID + "/";
+        File commitSnapshotFile = new File(commitSnapshotDirectory);
+        commitSnapshotFile.mkdir();
+        for (String filePath: currentStage.stagedFiles()) {
+            String fileSnapshotPath = commitSnapshotFile + "/" + filePath;
+            File snapshotFile = new File(fileSnapshotPath);
+            snapshotFile.getParentFile().mkdirs();
+            try {
+                byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
+                Files.write(Paths.get(fileSnapshotPath), fileBytes, StandardOpenOption.CREATE);
+            } catch (IOException ex) {
+
+            }
+            committedFilesToPaths.put(filePath, fileSnapshotPath);
+        }
+        for (String filePath: currentStage.markedForRemoval()) {
+            committedFilesToPaths.remove(filePath);
+        }
+        System.out.println(committedFilesToPaths); // NEEDS TO BE REMOVED LATER
     }
 
     public int id() {
@@ -65,5 +86,17 @@ public class Commit implements Serializable {
 
     public String date() {
         return commitDateString;
+    }
+
+    public boolean fileHasBeenCommitted(String filePath) {
+        return committedFilesToPaths.containsKey(filePath);
+    }
+
+    public String getSnapshotPath(String filePath) {
+        return (String) committedFilesToPaths.get(filePath);
+    }
+
+    public boolean filePathIsTracked(String filePath) {
+        return committedFilesToPaths.containsKey(filePath);
     }
 }

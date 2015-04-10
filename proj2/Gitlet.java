@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInput;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
@@ -10,9 +11,12 @@ import java.io.ObjectOutput;
 import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class Gitlet {
     private static final String GITLET_DIRECTORY_PATH = ".gitlet/";
@@ -27,9 +31,13 @@ public class Gitlet {
         } else if (command.equals("add")) {
             addCommand(args[1]);
         } else if (command.equals("commit")) {
-            commitCommand(args[1]);
+            if (args.length < 2) {
+                System.out.println("Please enter a commit message.");
+            } else {
+                commitCommand(args[1]);
+            }
         } else if (command.equals("rm")) {
-            removeCommand();
+            removeCommand(args[1]);
         } else if (command.equals("log")) {
             logCommand();
         } else if (command.equals("global-log")) {
@@ -39,9 +47,15 @@ public class Gitlet {
         } else if (command.equals("status")) {
             statusCommand();
         } else if (command.equals("checkout")) {
-            checkoutCommand();
+            if (dangerousCommandIsOK()) {
+                if (args.length > 2) {
+                    checkoutTwoArgsCommand(args[1], args[2]);
+                } else {
+                    checkoutOneArgCommand(args[1]);
+                }
+            }
         } else if (command.equals("branch")) {
-            branchCommand();
+            branchCommand(args[1]);
         } else if (command.equals("rm-branch")) {
             removeBranchCommand();
         } else if (command.equals("reset")) {
@@ -118,6 +132,24 @@ public class Gitlet {
         return null;
     }
 
+    private static boolean dangerousCommandIsOK() { 
+        System.out.println("Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)");
+ 
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String yesNo = null;
+
+        try {
+            yesNo = br.readLine();
+        } catch (IOException ioe) {
+
+        }
+        boolean saidYes = yesNo.equals("yes");
+        if (!saidYes) {
+            System.out.println("Did not type 'yes', so aborting.");
+        }
+        return saidYes;
+    }
+
     /**  Command Execution Methods  */
 
     private static void initializeCommand() {
@@ -137,11 +169,11 @@ public class Gitlet {
         File addedFile = new File(filePath);
         if (addedFile.exists()) {
             Stage currentStage = getStageFromFilePath();
-            BranchMap currentBranchSet = getBranchSetFromFilePath();
-            Branch currentBranch = currentBranchSet.currentBranch();
+            BranchMap currentBranchMap = getBranchSetFromFilePath();
+            Branch currentBranch = currentBranchMap.currentBranch();
 
-            if (currentBranch.fileHasBeenCommitted(filePath)) {
-                String previousPath = currentBranch.getSnapshotPath(filePath);
+            if (currentBranch.head().fileHasBeenCommitted(filePath)) {
+                String previousPath = currentBranch.head().getSnapshotPath(filePath);
                 if (Arrays.equals(getByteCodeFromFile(filePath), getByteCodeFromFile(previousPath))) { // THIS IS FAULTY AF
                     System.out.println("File has not been modified since the last commit.");
                 } else {
@@ -162,25 +194,37 @@ public class Gitlet {
 
     private static void commitCommand(String commitMessage) {
         Stage currentStage = getStageFromFilePath();
-        BranchMap currentBranchSet = getBranchSetFromFilePath();
-        Branch currentBranch = currentBranchSet.currentBranch();
-        Commit currentHead = currentBranch.head();
+        if (currentStage.stagedFiles().isEmpty() && currentStage.markedForRemoval().isEmpty()) {
+            System.out.println("No changes added to the commit.");
+        } else {
+            BranchMap currentBranchMap = getBranchSetFromFilePath();
 
-        int commitID = currentBranch.size();
-        Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentHead, currentStage);
-        currentBranch.addNewCommit(newlyCreatedCommit, currentStage, SNAPSHOT_DIRECTORY_PATH);
-        
-        writeToBranchSetFile(currentBranchSet);
-        writeToStageFile(new Stage());
+            int commitID = currentBranchMap.totalNumberCommits();
+            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranchMap.currentBranch().head(), currentStage, SNAPSHOT_DIRECTORY_PATH);
+            currentBranchMap.addCommitToMapOfBranches(newlyCreatedCommit);
+
+            writeToBranchSetFile(currentBranchMap);
+            writeToStageFile(new Stage());
+        }
     }
 
-    private static void removeCommand() {
-
+    private static void removeCommand(String filePath) {
+        Stage currentStage = getStageFromFilePath();
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentStage.isOnStage(filePath)) {
+            currentStage.removeFromStage(filePath);
+            writeToStageFile(currentStage);
+        } else if (currentBranchMap.currentBranch().head().filePathIsTracked(filePath)) {
+            currentStage.markForRemoval(filePath);
+            writeToStageFile(currentStage);
+        } else {
+            System.out.println("No reason to remove the file.");
+        }
     }
 
     private static void logCommand() {
-        BranchMap currentBranchSet = getBranchSetFromFilePath();
-        Commit pointer = currentBranchSet.currentBranch().head();
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        Commit pointer = currentBranchMap.currentBranch().head();
         while (pointer != null) {
             System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
             pointer = pointer.parent();
@@ -188,8 +232,8 @@ public class Gitlet {
     }
 
     private static void globalLogCommand() {
-        BranchMap currentBranchSet = getBranchSetFromFilePath();
-        printCommitAndChildren(currentBranchSet.currentBranch().initialCommit());
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        printCommitAndChildren(currentBranchMap.currentBranch().initialCommit());
     }
 
     private static void printCommitAndChildren(Commit pointer) {
@@ -203,16 +247,16 @@ public class Gitlet {
 
     private static void findCommand(String message) {
         // Can't find messages that are "stringed together" in Terminal
-        BranchMap currentBranchSet = getBranchSetFromFilePath();
-        currentBranchSet.currentBranch().printCommitsWithMessage(message);
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        currentBranchMap.printCommitsWithMessage(message);
     }
 
     private static void statusCommand() {
         Stage currentStage = getStageFromFilePath();
-        BranchMap currentBranchSet = getBranchSetFromFilePath();
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
         System.out.println("=== Branches ===");
-        String currentBranchName = currentBranchSet.currentBranch().name();
-        for (String branchName: currentBranchSet.keySet()) {
+        String currentBranchName = currentBranchMap.currentBranch().name();
+        for (String branchName: currentBranchMap.keySet()) {
             if (branchName == currentBranchName) {
                 System.out.print("*");
             }
@@ -231,12 +275,50 @@ public class Gitlet {
         System.out.println();
     }
 
-    private static void checkoutCommand() {
+    private static void checkoutOneArgCommand(String fileOrBranch) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        Branch currentBranch = currentBranchMap.currentBranch();        
+        if (currentBranch.head().filePathIsTracked(fileOrBranch)) {
+            String fileSnapshotPath = currentBranch.head().getSnapshotPath(fileOrBranch);
+            try {
+                byte[] fileBytes = Files.readAllBytes(Paths.get(fileSnapshotPath));
+                Files.write(Paths.get(fileOrBranch), fileBytes, StandardOpenOption.CREATE);
+            } catch (IOException ex) {
 
+            }
+        } else if (fileOrBranch.equals(currentBranch.name())) {
+            System.out.println("No need to checkout the current branch.");
+        } else if (currentBranchMap.containsKey(fileOrBranch)) {
+            currentBranchMap.setCurrentBranch(fileOrBranch);
+        } else {
+            System.out.println("File does not exist in the most recent commit, or no such branch exists.");
+        }
+    }    
+
+    private static void checkoutTwoArgsCommand(String commitID, String fileName) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentBranchMap.commitIDExists(commitID)) {
+            Commit commitToCheck = currentBranchMap.commitForID(commitID);
+            if (commitToCheck.fileHasBeenCommitted(fileName)) {
+                String fileSnapshotPath = commitToCheck.getSnapshotPath(fileName);
+                try {
+                    byte[] fileBytes = Files.readAllBytes(Paths.get(fileSnapshotPath));
+                    Files.write(Paths.get(fileName), fileBytes, StandardOpenOption.CREATE);
+                } catch (IOException ex) {
+
+                }
+            } else {
+                System.out.println("File does not exist in that commit.");
+            }
+        } else {
+            System.out.println("No commit with that id exists.");
+        }
     }
 
-    private static void branchCommand() {
-
+    private static void branchCommand(String branchName) {
+        Stage currentStage = getStageFromFilePath();
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        Branch newlyCreatedBranch = new Branch(currentBranchMap.currentBranch(), branchName);
     }
 
     private static void removeBranchCommand() {

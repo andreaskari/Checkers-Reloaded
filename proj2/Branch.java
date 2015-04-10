@@ -1,10 +1,14 @@
 import java.util.HashMap;
 import java.util.HashSet;
 import java.io.Serializable;
+import java.io.IOException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class Branch implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String FILE_SNAPSHOT_DIRECTORY_PATH = ".gitlet/Snapshots/";
 
     private String branchName;
     private Commit branchInitialCommit;
@@ -18,7 +22,7 @@ public class Branch implements Serializable {
         branchInitialCommit = new Commit(0, "initial commit");
         branchHead = branchInitialCommit;
         branchSize = 1;
-        trackedFilePaths = new HashMap<String, Integer>();
+        trackedFilePaths = new HashMap<String, String>();
         messagesToCommits = new HashMap<String, HashSet<Integer>>();
     }
 
@@ -51,10 +55,31 @@ public class Branch implements Serializable {
         return branchSize;
     }
 
-    public void addNewCommit(Commit newCommit) {
+    public void addNewCommit(Commit newCommit, Stage currentStage, String snapshot_directory_path) {
         branchSize += 1;
         branchHead = newCommit;
         addCommitToMap(newCommit);
+
+        String commitSnapshotDirectory = snapshot_directory_path + newCommit.id() + "/";
+        File commitSnapshotFile = new File(commitSnapshotDirectory);
+        commitSnapshotFile.mkdir();
+        for (String filePath: currentStage.stagedFiles()) {
+            String fileSnapshotPath = commitSnapshotFile + "/" + filePath;
+            System.out.println(fileSnapshotPath);
+            File snapshotFile = new File(fileSnapshotPath);
+            snapshotFile.getParentFile().mkdirs();
+            try {
+                byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
+                Files.write(Paths.get(fileSnapshotPath), fileBytes, StandardOpenOption.CREATE);
+            } catch (IOException ex) {
+                System.out.println(ex); // NEEDS TO BE REMOVED LATER
+            }
+            trackedFilePaths.put(filePath, fileSnapshotPath);
+        }
+        for (String filePath: currentStage.markedForRemoval()) {
+            trackedFilePaths.remove(filePath);
+        }
+        System.out.println(trackedFilePaths);
     }
 
     private void addCommitToMap(Commit newCommit) {
@@ -80,20 +105,19 @@ public class Branch implements Serializable {
         }
     }
 
-    public boolean fileHasBeenCommitted(String fileName) {
-        return trackedFilePaths.containsKey(fileName);
+    public boolean fileHasBeenCommitted(String filePath) {
+        return trackedFilePaths.containsKey(filePath);
     }
 
-    public String getSnapshotPath(String fileName) {
-        String rawPath = trackedFilePaths.get(fileName) + "/" + fileName;
-        return FILE_SNAPSHOT_DIRECTORY_PATH + rawPath;
+    public String getSnapshotPath(String filePath) {
+        return (String) trackedFilePaths.get(filePath);
     }
 
-    public HashMap<String, Integer> trackedFilePaths() {
-        return trackedFilePaths;
+    public HashMap<String, String> trackedFilePaths() {
+        return (HashMap<String, String>) trackedFilePaths;
     }
 
     public HashMap<String, HashSet<Commit>> messagesToCommits() {
-        return messagesToCommits;
+        return (HashMap<String, HashSet<Commit>>) messagesToCommits;
     }
 }

@@ -232,8 +232,4 @@ public class GitletPublicTest {
         }
         return messages;
     }
-
-    public static void main(String[] args) {
-        jh61b.junit.textui.runClasses(GitletPublicTest.class);
-    }
 }

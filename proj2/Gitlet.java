@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.io.File;
 import java.io.InputStream;
 import java.io.ObjectInput;
@@ -10,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Gitlet {
     private static final String GITLET_DIRECTORY_PATH = ".gitlet/";
@@ -106,6 +109,15 @@ public class Gitlet {
         return (BranchMap) getObjectFromFile(BRANCHMAP_FILE_PATH);
     }
 
+    private static byte[] getByteCodeFromFile(String filePath) {
+        try {
+            return Files.readAllBytes(Paths.get(filePath));
+        } catch (IOException ex) {
+
+        }
+        return null;
+    }
+
     /**  Command Execution Methods  */
 
     private static void initializeCommand() {
@@ -128,13 +140,9 @@ public class Gitlet {
             BranchMap currentBranchSet = getBranchSetFromFilePath();
             Branch currentBranch = currentBranchSet.currentBranch();
 
-            // filePath may need previous processing for directories
-
-
             if (currentBranch.fileHasBeenCommitted(filePath)) {
                 String previousPath = currentBranch.getSnapshotPath(filePath);
-                File previousFile = new File(previousPath);
-                if (previousFile.equals(addedFile)) {
+                if (Arrays.equals(getByteCodeFromFile(filePath), getByteCodeFromFile(previousPath))) { // THIS IS FAULTY AF
                     System.out.println("File has not been modified since the last commit.");
                 } else {
                     if (currentStage.isMarkedForRemoval(filePath)) {
@@ -160,7 +168,7 @@ public class Gitlet {
 
         int commitID = currentBranch.size();
         Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentHead, currentStage);
-        currentBranch.addNewCommit(newlyCreatedCommit);
+        currentBranch.addNewCommit(newlyCreatedCommit, currentStage, SNAPSHOT_DIRECTORY_PATH);
         
         writeToBranchSetFile(currentBranchSet);
         writeToStageFile(new Stage());

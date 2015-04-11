@@ -1,3 +1,4 @@
+import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Date;
@@ -98,5 +99,9 @@ public class Commit implements Serializable {
 
     public boolean filePathIsTracked(String filePath) {
         return committedFilesToPaths.containsKey(filePath);
+    }
+
+    public Set<String> trackedFilePaths() {
+        return ((HashMap<String, String>) committedFilesToPaths).keySet();
     }
 }

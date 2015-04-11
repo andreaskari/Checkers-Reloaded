@@ -157,6 +157,81 @@ public class GitletCodeTests {
 
         gitlet("checkout", "3", wugFileName);
         assertEquals(thirdWugText, getText(wugFileName));
+
+        // checkout branch functionallity necessary
+        // - checkout branch
+        // - checkout commits from other branches
+    }
+
+    @Test
+    public void testCheckoutBranchesChange() {
+        String firstWugText = "This is a wug.1";
+        String flowerWugText = "This is a flower wug.\nFlowers.2";
+        String masterWugText = "This is a master new wug.\nLike no way\nMaaster3";  
+        String secondWugText = "Basic ass wug.4";
+
+        String flowerText = "I am a flower.";
+        String masterText = "I am the king\nMaster";
+
+        String wugFileName = TESTING_DIR + "wug.txt";
+        String flowerFileName = TESTING_DIR + "flower.txt";
+        String masterFileName = TESTING_DIR + "master.txt";
+
+        String commitMessage1 = "First";
+        String commitMessage2 = "SecondFlower";
+        String commitMessage3 = "ThirdMaster";
+        String commitMessage4 = "FourthMaster";
+
+        gitlet("init");
+        createFile(wugFileName, firstWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage1);
+        assertEquals(firstWugText, getText(wugFileName));
+
+        gitlet("branch", "flower");
+        gitlet("checkout", "flower");
+        assertEquals(firstWugText, getText(wugFileName));
+
+        writeFile(wugFileName, flowerWugText);
+        createFile(flowerFileName, flowerText);
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+        gitlet("commit", commitMessage2);
+        assertEquals(flowerWugText, getText(wugFileName));
+        assertEquals(flowerText, getText(flowerFileName));
+
+        gitlet("checkout", "master");
+        assertEquals(firstWugText, getText(wugFileName));
+        assertTrue(!(new File(flowerFileName)).exists());
+        assertTrue((new File(wugFileName)).exists());
+
+        writeFile(wugFileName, masterWugText);
+        createFile(masterFileName, masterText);
+        gitlet("add", wugFileName);
+        gitlet("add", masterFileName);
+        System.out.println(gitlet("commit", commitMessage3));
+        assertEquals(masterWugText, getText(wugFileName));
+        assertEquals(masterText, getText(masterFileName));
+
+        gitlet("checkout", "flower");
+        assertEquals(flowerWugText, getText(wugFileName));
+        assertTrue((new File(flowerFileName)).exists());
+        assertTrue(!(new File(masterFileName)).exists());
+        assertTrue((new File(wugFileName)).exists());
+
+        gitlet("checkout", "master");
+        assertEquals(masterWugText, getText(wugFileName));
+        assertTrue(!(new File(flowerFileName)).exists());
+        assertTrue((new File(masterFileName)).exists());
+        assertTrue((new File(wugFileName)).exists());
+
+        writeFile(wugFileName, secondWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage4);
+        assertEquals(secondWugText, getText(wugFileName));
+
+        gitlet("checkout", "2", wugFileName);
+        assertEquals(flowerWugText, getText(wugFileName));
     }
 
     /**

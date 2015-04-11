@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Set;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardCopyOption;
 
 public class Gitlet {
@@ -92,8 +92,8 @@ public class Gitlet {
         writeToObjectFile(newStage, STAGE_FILE_PATH);
     }
 
-    private static void writeToBranchSetFile(BranchMap newBranchSet) {
-        writeToObjectFile(newBranchSet, BRANCHMAP_FILE_PATH);
+    private static void writeToBranchMapFile(BranchMap newBranchMap) {
+        writeToObjectFile(newBranchMap, BRANCHMAP_FILE_PATH);
     }
 
     private static Object getObjectFromFile(String filePath) {
@@ -137,7 +137,7 @@ public class Gitlet {
         try {
             FileOutputStream copier = new FileOutputStream(destPath);
             try {
-                copier.write(Files.readAllBytes(Paths.get(sourcePath)));
+                copier.write(getByteCodeFromFile(sourcePath));
             } finally {
                 copier.close();
             }
@@ -145,6 +145,15 @@ public class Gitlet {
             System.out.println("FAILS: " + ex); // NEEDS TO BE REMOVED
         }
     }
+
+    // private static void createFileFromSourceToDestination(String sourcePath, String destPath) {
+    //     try {
+    //         byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
+    //         Files.write(Paths.get(destPath), fileBytes, StandardOpenOption.CREATE);
+    //     } catch (IOException ex) {
+
+    //     }
+    // }
 
     private static boolean dangerousCommandIsOK() { 
         System.out.println("Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)");
@@ -173,7 +182,7 @@ public class Gitlet {
             gitletDirectory.mkdir();
             snapshotDirectory.mkdir();
             writeToStageFile(new Stage());
-            writeToBranchSetFile(new BranchMap());
+            writeToBranchMapFile(new BranchMap());
         } else {
             System.out.println("A gitlet version control system already exists in the current directory.");
         }
@@ -217,7 +226,7 @@ public class Gitlet {
             Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranchMap.currentBranch().head(), currentStage, SNAPSHOT_DIRECTORY_PATH);
             currentBranchMap.addCommitToMapOfBranches(newlyCreatedCommit);
 
-            writeToBranchSetFile(currentBranchMap);
+            writeToBranchMapFile(currentBranchMap);
             writeToStageFile(new Stage());
         }
     }
@@ -298,7 +307,34 @@ public class Gitlet {
         } else if (fileOrBranch.equals(currentBranch.name())) {
             System.out.println("No need to checkout the current branch.");
         } else if (currentBranchMap.containsKey(fileOrBranch)) {
+            Commit currentHead = currentBranchMap.currentBranch().head();
+            Commit headToSwitchTo = currentBranchMap.get(fileOrBranch).head();
+            System.out.println(currentBranchMap.currentBranch() == currentBranchMap.get(fileOrBranch));
+            System.out.println(currentHead == headToSwitchTo);
+
+            Set<String> currentFilesInDirectory = currentHead.trackedFilePaths();
+            Set<String> filesToPlaceInDirectory = headToSwitchTo.trackedFilePaths();
+            System.out.println("In: " + filesToPlaceInDirectory + "\nOut: " + currentFilesInDirectory);
+            for (String fileInDirectory: currentFilesInDirectory) {
+                if (filesToPlaceInDirectory.contains(fileInDirectory)) {
+                    String fileSnapshotPath = headToSwitchTo.getSnapshotPath(fileInDirectory);
+                    copyContentsFromSourceToDestination(fileSnapshotPath, fileInDirectory);
+                } else {
+                    try {
+                        Files.delete(Paths.get(fileInDirectory));
+                    } catch (IOException ex) {
+                        System.out.println("WTF"); // TO BE DELETED
+                    }
+                }
+            }
             currentBranchMap.setCurrentBranch(fileOrBranch);
+            for (String fileToPossiblyRemove: filesToPlaceInDirectory) {
+                if (!currentFilesInDirectory.contains(fileToPossiblyRemove)) {
+                    String fileSnapshotPath = headToSwitchTo.getSnapshotPath(fileToPossiblyRemove);
+                    copyContentsFromSourceToDestination(fileSnapshotPath, fileToPossiblyRemove);
+                }
+            }
+            writeToBranchMapFile(currentBranchMap);
         } else {
             System.out.println("File does not exist in the most recent commit, or no such branch exists.");
         }
@@ -320,9 +356,10 @@ public class Gitlet {
     }
 
     private static void branchCommand(String branchName) {
-        Stage currentStage = getStageFromFilePath();
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         Branch newlyCreatedBranch = new Branch(currentBranchMap.currentBranch(), branchName);
+        currentBranchMap.put(branchName, newlyCreatedBranch);
+        writeToBranchMapFile(currentBranchMap);
     }
 
     private static void removeBranchCommand() {

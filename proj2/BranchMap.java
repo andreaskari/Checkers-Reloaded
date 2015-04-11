@@ -35,7 +35,7 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
     public void addCommitToMapOfBranches(Commit newCommit) {
         totalNumberCommits += 1;
         currentBranch.setHead(newCommit);
-        idsToCommits.put(newCommit.id(), newCommit);
+        idsToCommits.put("" + newCommit.id(), newCommit);
 
         // Adds to messagesToCommits map
         String message = newCommit.message();
@@ -45,11 +45,13 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
         } else {
             HashSet<Integer> commitSet = new HashSet<Integer>();
             commitSet.add(newCommit.id());
-            messagesToCommits.put(message,  commitSet);
+            messagesToCommits.put(message, commitSet);
         }
+        System.out.println(idsToCommits); // NEEDS TO BE REMOVED
     }
 
     public boolean commitIDExists(String commitID) {
+        System.out.println(idsToCommits.containsKey(commitID));
         return idsToCommits.containsKey(commitID); 
     }
 

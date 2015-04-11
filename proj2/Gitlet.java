@@ -17,6 +17,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.StandardCopyOption;
 
 public class Gitlet {
     private static final String GITLET_DIRECTORY_PATH = ".gitlet/";
@@ -130,6 +131,19 @@ public class Gitlet {
 
         }
         return null;
+    }
+
+    private static void copyContentsFromSourceToDestination(String sourcePath, String destPath) {
+        try {
+            FileOutputStream copier = new FileOutputStream(destPath);
+            try {
+                copier.write(Files.readAllBytes(Paths.get(sourcePath)));
+            } finally {
+                copier.close();
+            }
+        } catch (IOException ex) {
+            System.out.println("FAILS: " + ex); // NEEDS TO BE REMOVED
+        }
     }
 
     private static boolean dangerousCommandIsOK() { 
@@ -280,12 +294,7 @@ public class Gitlet {
         Branch currentBranch = currentBranchMap.currentBranch();        
         if (currentBranch.head().filePathIsTracked(fileOrBranch)) {
             String fileSnapshotPath = currentBranch.head().getSnapshotPath(fileOrBranch);
-            try {
-                byte[] fileBytes = Files.readAllBytes(Paths.get(fileSnapshotPath));
-                Files.write(Paths.get(fileOrBranch), fileBytes, StandardOpenOption.CREATE);
-            } catch (IOException ex) {
-
-            }
+            copyContentsFromSourceToDestination(fileSnapshotPath, fileOrBranch);
         } else if (fileOrBranch.equals(currentBranch.name())) {
             System.out.println("No need to checkout the current branch.");
         } else if (currentBranchMap.containsKey(fileOrBranch)) {
@@ -301,12 +310,7 @@ public class Gitlet {
             Commit commitToCheck = currentBranchMap.commitForID(commitID);
             if (commitToCheck.fileHasBeenCommitted(fileName)) {
                 String fileSnapshotPath = commitToCheck.getSnapshotPath(fileName);
-                try {
-                    byte[] fileBytes = Files.readAllBytes(Paths.get(fileSnapshotPath));
-                    Files.write(Paths.get(fileName), fileBytes, StandardOpenOption.CREATE);
-                } catch (IOException ex) {
-
-                }
+                copyContentsFromSourceToDestination(fileSnapshotPath, fileName);
             } else {
                 System.out.println("File does not exist in that commit.");
             }

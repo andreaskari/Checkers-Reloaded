@@ -58,7 +58,7 @@ public class Gitlet {
         } else if (command.equals("branch")) {
             branchCommand(args[1]);
         } else if (command.equals("rm-branch")) {
-            removeBranchCommand();
+            removeBranchCommand(args[1]);
         } else if (command.equals("reset")) {
             resetCommand();
         } else if (command.equals("merge")) {
@@ -305,15 +305,13 @@ public class Gitlet {
             copyContentsFromSourceToDestination(fileSnapshotPath, fileOrBranch);
         } else if (fileOrBranch.equals(currentBranch.name())) {
             System.out.println("No need to checkout the current branch.");
-        } else if (currentBranchMap.containsKey(fileOrBranch) && !currentBranchMap.get(fileOrBranch).isActive()) {
+        } else if (currentBranchMap.containsKey(fileOrBranch) && currentBranchMap.get(fileOrBranch).isActive()) {
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit headToSwitchTo = currentBranchMap.get(fileOrBranch).head();
-            System.out.println(currentBranchMap.currentBranch() == currentBranchMap.get(fileOrBranch));
-            System.out.println(currentHead == headToSwitchTo);
 
             Set<String> currentFilesInDirectory = currentHead.trackedFilePaths();
             Set<String> filesToPlaceInDirectory = headToSwitchTo.trackedFilePaths();
-            System.out.println("In: " + filesToPlaceInDirectory + "\nOut: " + currentFilesInDirectory);
+            // System.out.println("In: " + filesToPlaceInDirectory + "\nOut: " + currentFilesInDirectory);
             for (String fileInDirectory: currentFilesInDirectory) {
                 if (filesToPlaceInDirectory.contains(fileInDirectory)) {
                     String fileSnapshotPath = headToSwitchTo.getSnapshotPath(fileInDirectory);
@@ -322,7 +320,7 @@ public class Gitlet {
                     try {
                         Files.delete(Paths.get(fileInDirectory));
                     } catch (IOException ex) {
-                        System.out.println("WTF"); // TO BE DELETED
+
                     }
                 }
             }
@@ -356,7 +354,7 @@ public class Gitlet {
 
     private static void branchCommand(String branchName) {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
-        if (currentBranchMap.containsKey(branchName) && !currentBranchMap.get(branchName).isActive()) {
+        if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
             System.out.println("A branch with that name already exists.");
         } else {
             Branch newlyCreatedBranch = new Branch(currentBranchMap.currentBranch(), branchName);
@@ -369,8 +367,9 @@ public class Gitlet {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         if (currentBranchMap.currentBranch().name().equals(branchName)) {
             System.out.println("Cannot remove the current branch.");
-        } else if (currentBranchMap.containsKey(branchName) && !currentBranchMap.get(branchName).isActive()) {
+        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
             currentBranchMap.get(branchName).deactivate();
+            writeToBranchMapFile(currentBranchMap);
         } else {
             System.out.println("A branch with that name does not exist.");
         }

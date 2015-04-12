@@ -569,7 +569,111 @@ public class GitletCodeTests {
 
     @Test
     public void testRemoveBranch() {
-        
+        String dangerousWarning = "Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)\n";
+        String empty = "";
+
+        String fileOrBranchDoesntExistWarning = "File does not exist in the most recent commit, or no such branch exists.\n";
+        String cantRemoveCurrentBranchWarning = "Cannot remove the current branch.\n";
+        String nonExistentBranchToRemoveWarning = "A branch with that name does not exist.\n";
+
+        String firstWugText = "This is a wug.1";
+        String flowerWugText = "This is a flower wug.\nFlowers.2";
+        String masterWugText = "This is a master new wug.\nLike no way\nMaaster3";  
+        String secondWugText = "Basic ass wug.4";
+
+        String flowerText = "I am a flower.";
+        String masterText = "I am the king\nMaster";
+
+        String wugFileName = TESTING_DIR + "wug.txt";
+        String flowerFileName = TESTING_DIR + "flower.txt";
+        String masterFileName = TESTING_DIR + "master.txt";
+
+        String commitMessage1 = "First";
+        String commitMessage2 = "SecondFlower";
+        String commitMessage3 = "ThirdMaster";
+        String commitMessage4 = "FourthMaster";
+
+        gitlet("init");
+        createFile(wugFileName, firstWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage1);
+        assertEquals(firstWugText, getText(wugFileName));
+
+        gitlet("branch", "flower");
+        gitlet("checkout", "flower");
+        assertEquals(firstWugText, getText(wugFileName));
+
+        writeFile(wugFileName, flowerWugText);
+        createFile(flowerFileName, flowerText);
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+        gitlet("commit", commitMessage2);
+        assertEquals(flowerWugText, getText(wugFileName));
+        assertEquals(flowerText, getText(flowerFileName));
+
+        gitlet("checkout", "master");
+        assertEquals(firstWugText, getText(wugFileName));
+        assertTrue(!(new File(flowerFileName)).exists());
+        assertTrue((new File(wugFileName)).exists());
+
+        writeFile(wugFileName, masterWugText);
+        createFile(masterFileName, masterText);
+        gitlet("add", wugFileName);
+        gitlet("add", masterFileName);
+        gitlet("commit", commitMessage3);
+        assertEquals(masterWugText, getText(wugFileName));
+        assertEquals(masterText, getText(masterFileName));
+
+        gitlet("checkout", "flower");
+        assertEquals(flowerWugText, getText(wugFileName));
+        assertTrue((new File(flowerFileName)).exists());
+        assertTrue(!(new File(masterFileName)).exists());
+        assertTrue((new File(wugFileName)).exists());
+
+        gitlet("checkout", "master");
+        assertEquals(masterWugText, getText(wugFileName));
+        assertTrue(!(new File(flowerFileName)).exists());
+        assertTrue((new File(masterFileName)).exists());
+        assertTrue((new File(wugFileName)).exists());
+
+        String receivedWarning = gitlet("rm-branch", "nonExistentBranch");
+        assertEquals(nonExistentBranchToRemoveWarning, receivedWarning);
+
+        receivedWarning = gitlet("rm-branch", "flower");
+        assertEquals(empty, receivedWarning);
+
+        receivedWarning = gitlet("rm-branch", "flower");
+        assertEquals(nonExistentBranchToRemoveWarning, receivedWarning);
+
+        receivedWarning = gitlet("checkout", "flower");
+        assertEquals(dangerousWarning + fileOrBranchDoesntExistWarning, receivedWarning);
+
+        writeFile(wugFileName, secondWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage4);
+        assertEquals(secondWugText, getText(wugFileName));
+
+        gitlet("checkout", "2", wugFileName);
+        assertEquals(flowerWugText, getText(wugFileName));
+
+        String masterLogContent = gitlet("log");
+
+        receivedWarning = gitlet("branch", "flower");
+        assertEquals(empty, receivedWarning);
+
+        receivedWarning = gitlet("checkout", "flower");
+        assertEquals(dangerousWarning, receivedWarning);
+
+        String flowerLogContent = gitlet("log");
+        assertEquals(masterLogContent, flowerLogContent);
+
+        writeFile(wugFileName, secondWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage4);
+        assertEquals(secondWugText, getText(wugFileName));
+
+        gitlet("checkout", "2", wugFileName);
+        assertEquals(flowerWugText, getText(wugFileName));
     }
 
     /**

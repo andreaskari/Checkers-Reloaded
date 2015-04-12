@@ -6,6 +6,7 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
     private static final long serialVersionUID = -45447344955473426L;
 
     private int totalNumberCommits;
+    private Commit startingCommit;
     private Branch currentBranch;
     private HashMap idsToCommits;
     private HashMap messagesToCommits;
@@ -15,6 +16,7 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
         totalNumberCommits = 1;
         Branch master = new Branch();
         currentBranch = master;
+        startingCommit = currentBranch.initialCommit();
         put("master", master);
         idsToCommits = new HashMap<String, Commit>();
         messagesToCommits = new HashMap<String, HashSet<Integer>>();
@@ -22,6 +24,10 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
 
     public int totalNumberCommits() {
         return totalNumberCommits;
+    }
+
+    public Commit startingCommit() {
+        return startingCommit;
     }
 
     public Branch currentBranch() {

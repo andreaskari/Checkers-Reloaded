@@ -256,7 +256,7 @@ public class Gitlet {
 
     private static void globalLogCommand() {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
-        printCommitAndChildren(currentBranchMap.currentBranch().initialCommit());
+        printCommitAndChildren(currentBranchMap.startingCommit());
     }
 
     private static void printCommitAndChildren(Commit pointer) {
@@ -269,7 +269,6 @@ public class Gitlet {
     }
 
     private static void findCommand(String message) {
-        // Can't find messages that are "stringed together" in Terminal
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         currentBranchMap.printCommitsWithMessage(message);
     }
@@ -306,7 +305,7 @@ public class Gitlet {
             copyContentsFromSourceToDestination(fileSnapshotPath, fileOrBranch);
         } else if (fileOrBranch.equals(currentBranch.name())) {
             System.out.println("No need to checkout the current branch.");
-        } else if (currentBranchMap.containsKey(fileOrBranch)) {
+        } else if (currentBranchMap.containsKey(fileOrBranch) && !currentBranchMap.get(fileOrBranch).isActive()) {
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit headToSwitchTo = currentBranchMap.get(fileOrBranch).head();
             System.out.println(currentBranchMap.currentBranch() == currentBranchMap.get(fileOrBranch));
@@ -357,13 +356,24 @@ public class Gitlet {
 
     private static void branchCommand(String branchName) {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
-        Branch newlyCreatedBranch = new Branch(currentBranchMap.currentBranch(), branchName);
-        currentBranchMap.put(branchName, newlyCreatedBranch);
-        writeToBranchMapFile(currentBranchMap);
+        if (currentBranchMap.containsKey(branchName) && !currentBranchMap.get(branchName).isActive()) {
+            System.out.println("A branch with that name already exists.");
+        } else {
+            Branch newlyCreatedBranch = new Branch(currentBranchMap.currentBranch(), branchName);
+            currentBranchMap.put(branchName, newlyCreatedBranch);
+            writeToBranchMapFile(currentBranchMap);
+        }
     }
 
-    private static void removeBranchCommand() {
-
+    private static void removeBranchCommand(String branchName) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentBranchMap.currentBranch().name().equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+        } else if (currentBranchMap.containsKey(branchName) && !currentBranchMap.get(branchName).isActive()) {
+            currentBranchMap.get(branchName).deactivate();
+        } else {
+            System.out.println("A branch with that name does not exist.");
+        }
     }
 
     private static void resetCommand() {

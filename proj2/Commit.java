@@ -15,34 +15,37 @@ public class Commit implements Serializable {
     private int commitID;
     private String commitMessage;
     private String commitDateString;
+    private String commitBranchCreated;
     private Commit commitParent;
-    private HashSet removedFiles;
     private HashSet commitChildren;
     private HashMap committedFilesToPaths;
 
-    public Commit(int newID, String newMessage) {
+    public Commit(int newID, String newMessage, String branchCreated) {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
+        commitBranchCreated = branchCreated;
         commitParent = null;
         commitChildren = new HashSet();
-        removedFiles = null;    
         committedFilesToPaths = new HashMap<String, String>();
     }
 
-    public Commit(int newID, String newMessage, Commit parent, Stage currentStage, String snapshot_directory_path) {
+    public Commit(int newID, String newMessage, Commit parent, String branchCreated, Stage currentStage, String snapshot_directory_path) {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
+        commitBranchCreated = branchCreated;
         commitParent = parent;
         commitChildren = new HashSet();
-        removedFiles = currentStage.markedForRemoval();
         commitParent.addChild(this);
         committedFilesToPaths = new HashMap<String, String>();
 
         String commitSnapshotDirectory = snapshot_directory_path + newID + "/";
         File commitSnapshotFile = new File(commitSnapshotDirectory);
         commitSnapshotFile.mkdir();
+        for (String oldFilePath: parent.committedFilesToPathsMap().keySet()) {
+            committedFilesToPaths.put(oldFilePath, parent.getSnapshotPath(oldFilePath));
+        }
         for (String filePath: currentStage.stagedFiles()) {
             String fileSnapshotPath = commitSnapshotFile + "/" + filePath;
             File snapshotFile = new File(fileSnapshotPath);
@@ -59,6 +62,15 @@ public class Commit implements Serializable {
             committedFilesToPaths.remove(filePath);
         }
         System.out.println(committedFilesToPaths); // NEEDS TO BE REMOVED LATER
+    }
+
+    public Commit(Commit otherCommit, int newID) {
+        commitID = newID;
+        commitMessage = otherCommit.message();
+        commitDateString = otherCommit.date();
+        commitParent = otherCommit.parent();
+        commitChildren = otherCommit.children();
+        committedFilesToPaths = otherCommit.committedFilesToPathsMap();
     }
 
     public int id() {
@@ -89,6 +101,10 @@ public class Commit implements Serializable {
         return commitDateString;
     }
 
+    public String birthingBranch() {
+        return commitBranchCreated;
+    }
+
     public boolean fileHasBeenCommitted(String filePath) {
         return committedFilesToPaths.containsKey(filePath);
     }
@@ -103,5 +119,9 @@ public class Commit implements Serializable {
 
     public Set<String> trackedFilePaths() {
         return ((HashMap<String, String>) committedFilesToPaths).keySet();
+    }
+
+    public HashMap<String, String> committedFilesToPathsMap() {
+        return (HashMap<String, String>) committedFilesToPaths;
     }
 }

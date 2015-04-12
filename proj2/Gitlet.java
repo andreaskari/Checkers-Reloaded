@@ -60,13 +60,21 @@ public class Gitlet {
         } else if (command.equals("rm-branch")) {
             removeBranchCommand(args[1]);
         } else if (command.equals("reset")) {
-            resetCommand();
+            if (dangerousCommandIsOK()) {
+                resetCommand(args[1]);
+            }
         } else if (command.equals("merge")) {
-            mergeCommand();
+            if (dangerousCommandIsOK()) {
+                mergeCommand(args[1]);
+            }
         } else if (command.equals("rebase")) {
-            rebaseCommand();
+            if (dangerousCommandIsOK()) {
+                rebaseCommand(args[1]);
+            }
         } else if (command.equals("i-rebase")) {
-            interactiveRebaseCommand();
+            if (dangerousCommandIsOK()) {
+                interactiveRebaseCommand(args[1]);
+            }
         }
     }
 
@@ -133,6 +141,10 @@ public class Gitlet {
         return null;
     }
 
+    private static boolean fileContentsEquals(String firstFilePath, String secondFilePath) {
+        return Arrays.equals(getByteCodeFromFile(firstFilePath), getByteCodeFromFile(secondFilePath));
+    }
+
     private static void copyContentsFromSourceToDestination(String sourcePath, String destPath) {
         try {
             FileOutputStream copier = new FileOutputStream(destPath);
@@ -142,18 +154,20 @@ public class Gitlet {
                 copier.close();
             }
         } catch (IOException ex) {
-            System.out.println("FAILS: " + ex); // NEEDS TO BE REMOVED
+
         }
     }
 
-    // private static void createFileFromSourceToDestination(String sourcePath, String destPath) {
-    //     try {
-    //         byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
-    //         Files.write(Paths.get(destPath), fileBytes, StandardOpenOption.CREATE);
-    //     } catch (IOException ex) {
-
-    //     }
-    // }
+    private static void copyAllFilesFromCommit(Commit switchingCommit, Commit currentCommit) {
+        Set<String> currentFilesInDirectory = currentCommit.trackedFilePaths();
+        Set<String> filesToPlaceInDirectory = switchingCommit.trackedFilePaths();
+        for (String fileInDirectory: currentFilesInDirectory) {
+            if (filesToPlaceInDirectory.contains(fileInDirectory)) {
+                String fileSnapshotPath = switchingCommit.getSnapshotPath(fileInDirectory);
+                copyContentsFromSourceToDestination(fileSnapshotPath, fileInDirectory);
+            }
+        }
+    }
 
     private static boolean dangerousCommandIsOK() { 
         System.out.println("Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)");
@@ -171,6 +185,15 @@ public class Gitlet {
             System.out.println("Did not type 'yes', so aborting.");
         }
         return saidYes;
+    }
+
+    private static Commit getSplitPointFromBranches(Branch firstBranch, Branch secondBranch) {
+        Commit first = firstBranch.getSplitPoint(secondBranch.name());
+        Commit second = secondBranch.getSplitPoint(firstBranch.name());
+        if (first == null) {
+            return second;
+        }
+        return first;
     }
 
     /**  Command Execution Methods  */
@@ -197,7 +220,7 @@ public class Gitlet {
 
             if (currentBranch.head().fileHasBeenCommitted(filePath)) {
                 String previousPath = currentBranch.head().getSnapshotPath(filePath);
-                if (Arrays.equals(getByteCodeFromFile(filePath), getByteCodeFromFile(previousPath))) { // THIS IS FAULTY AF
+                if (fileContentsEquals(filePath, previousPath)) {
                     System.out.println("File has not been modified since the last commit.");
                 } else {
                     if (currentStage.isMarkedForRemoval(filePath)) {
@@ -221,9 +244,16 @@ public class Gitlet {
             System.out.println("No changes added to the commit.");
         } else {
             BranchMap currentBranchMap = getBranchSetFromFilePath();
+            Branch currentBranch = currentBranchMap.currentBranch();
 
             int commitID = currentBranchMap.totalNumberCommits();
-            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranchMap.currentBranch().head(), currentStage, SNAPSHOT_DIRECTORY_PATH);
+            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranch.head(), currentBranch.name(), currentStage, SNAPSHOT_DIRECTORY_PATH);
+
+            Branch parentBranch = currentBranchMap.get(currentBranch.head().birthingBranch());
+            if (!parentBranch.name().equals(currentBranch.name())) {
+                parentBranch.addPossibleSplitPoint(currentBranch.name(), currentBranch.head());
+            }
+
             currentBranchMap.addCommitToMapOfBranches(newlyCreatedCommit);
 
             writeToBranchMapFile(currentBranchMap);
@@ -308,29 +338,8 @@ public class Gitlet {
         } else if (currentBranchMap.containsKey(fileOrBranch) && currentBranchMap.get(fileOrBranch).isActive()) {
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit headToSwitchTo = currentBranchMap.get(fileOrBranch).head();
-
-            Set<String> currentFilesInDirectory = currentHead.trackedFilePaths();
-            Set<String> filesToPlaceInDirectory = headToSwitchTo.trackedFilePaths();
-            // System.out.println("In: " + filesToPlaceInDirectory + "\nOut: " + currentFilesInDirectory);
-            for (String fileInDirectory: currentFilesInDirectory) {
-                if (filesToPlaceInDirectory.contains(fileInDirectory)) {
-                    String fileSnapshotPath = headToSwitchTo.getSnapshotPath(fileInDirectory);
-                    copyContentsFromSourceToDestination(fileSnapshotPath, fileInDirectory);
-                } else {
-                    try {
-                        Files.delete(Paths.get(fileInDirectory));
-                    } catch (IOException ex) {
-
-                    }
-                }
-            }
+            copyAllFilesFromCommit(headToSwitchTo, currentHead);
             currentBranchMap.setCurrentBranch(fileOrBranch);
-            for (String fileToPossiblyRemove: filesToPlaceInDirectory) {
-                if (!currentFilesInDirectory.contains(fileToPossiblyRemove)) {
-                    String fileSnapshotPath = headToSwitchTo.getSnapshotPath(fileToPossiblyRemove);
-                    copyContentsFromSourceToDestination(fileSnapshotPath, fileToPossiblyRemove);
-                }
-            }
             writeToBranchMapFile(currentBranchMap);
         } else {
             System.out.println("File does not exist in the most recent commit, or no such branch exists.");
@@ -375,19 +384,55 @@ public class Gitlet {
         }
     }
 
-    private static void resetCommand() {
+    private static void resetCommand(String commitID) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentBranchMap.commitIDExists(commitID)) {
+            Commit currentHead = currentBranchMap.currentBranch().head();
+            Commit headToSwitchTo = currentBranchMap.commitForID(commitID);
+            copyAllFilesFromCommit(headToSwitchTo, currentHead);
+            currentBranchMap.currentBranch().setHead(headToSwitchTo);
+            writeToBranchMapFile(currentBranchMap);
+        } else {
+            System.out.println("No commit with that id exists.");
+        }
+    }
+
+    private static void mergeCommand(String branchName) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentBranchMap.currentBranch().name().equals(branchName)) {
+            System.out.println("Cannot merge a branch with itself.");
+        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+            Commit currentHead = currentBranchMap.currentBranch().head();
+            Commit branchHead = currentBranchMap.get(branchName).head();
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName));
+
+            Set<String> splitPointFiles = splitPoint.trackedFilePaths();
+            for (String fileInSplit: splitPointFiles) {
+                String currentHeadFileSnapshotPath = currentHead.getSnapshotPath(fileInSplit);
+                String branchHeadFileSnapshotPath = branchHead.getSnapshotPath(fileInSplit);
+                String splitHeadFileSnapshotPath = splitPoint.getSnapshotPath(fileInSplit);
+
+                boolean currentFileModified = !fileContentsEquals(currentHeadFileSnapshotPath, splitHeadFileSnapshotPath);
+                boolean branchFileModified = !fileContentsEquals(branchHeadFileSnapshotPath, splitHeadFileSnapshotPath);
+
+                if (currentFileModified && branchFileModified) {
+                    String conflictedFilePath = fileInSplit + ".conflicted";
+                    copyContentsFromSourceToDestination(branchHeadFileSnapshotPath, conflictedFilePath);
+                } else if (branchFileModified) {
+                    copyContentsFromSourceToDestination(branchHeadFileSnapshotPath, fileInSplit);
+                }
+            }
+            writeToBranchMapFile(currentBranchMap);
+        } else {
+            System.out.println("A branch with that name does not exist.");
+        }
+    }
+
+    private static void rebaseCommand(String branchName) {
 
     }
 
-    private static void mergeCommand() {
-
-    }
-
-    private static void rebaseCommand() {
-
-    }
-
-    private static void interactiveRebaseCommand() {
+    private static void interactiveRebaseCommand(String branchName) {
 
     }
 }

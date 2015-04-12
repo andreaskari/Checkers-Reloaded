@@ -10,12 +10,15 @@ public class Branch implements Serializable {
     private Commit branchInitialCommit;
     private Commit branchHead;
     private int branchSize;
+    private HashMap splitPoints;
 
     public Branch() {
         active = true;
         branchName = "master";
-        branchInitialCommit = new Commit(0, "initial commit");
+        branchInitialCommit = new Commit(0, "initial commit", "master");
         branchHead = branchInitialCommit;
+        splitPoints = new HashMap<String, Commit>();
+        splitPoints.put("master", branchInitialCommit);
     }
 
     public Branch(Branch offShoot, String name) {
@@ -23,6 +26,7 @@ public class Branch implements Serializable {
         branchName = name;
         branchInitialCommit = offShoot.head();
         branchHead = offShoot.head();
+        splitPoints = new HashMap<String, Commit>();
     }
 
     public String name() {
@@ -47,5 +51,13 @@ public class Branch implements Serializable {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void addPossibleSplitPoint(String branchName, Commit splitPoint) {
+        splitPoints.put(branchName, splitPoint);
+    }
+
+    public Commit getSplitPoint(String branchName) {
+        return (Commit) splitPoints.get(branchName);
     }
 }

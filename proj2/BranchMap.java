@@ -38,9 +38,9 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
         currentBranch = get(branchName);
     }
 
+    @SuppressWarnings("unchecked")
     public void addCommitToMapOfBranches(Commit newCommit) {
         totalNumberCommits += 1;
-        currentBranch.setHead(newCommit);
         idsToCommits.put("" + newCommit.id(), newCommit);
 
         // Adds to messagesToCommits map
@@ -63,6 +63,7 @@ public class BranchMap extends HashMap<String, Branch> implements Serializable {
         return (Commit) idsToCommits.get(commitID);
     }
 
+    @SuppressWarnings("unchecked")
     public void printCommitsWithMessage(String message) {
         if (messagesToCommits.containsKey(message)) {
             HashSet<Integer> commitSet = (HashSet<Integer>) messagesToCommits.get(message);

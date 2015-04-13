@@ -15,28 +15,26 @@ public class Commit implements Serializable {
     private int commitID;
     private String commitMessage;
     private String commitDateString;
-    private String commitBranchCreated;
     private Commit commitParent;
     private HashSet commitChildren;
     private HashMap committedFilesToPaths;
 
-    public Commit(int newID, String newMessage, String branchCreated) {
+    public Commit(int newID, String newMessage) {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
-        commitBranchCreated = branchCreated;
         commitParent = null;
         commitChildren = new HashSet();
         committedFilesToPaths = new HashMap<String, String>();
     }
 
-    public Commit(int newID, String newMessage, Commit parent, String branchCreated, Stage currentStage, String snapshot_directory_path) {
+    @SuppressWarnings("unchecked")
+    public Commit(int newID, String newMessage, Commit parent, Stage currentStage, String snapshot_directory_path) {
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
-        commitBranchCreated = branchCreated;
         commitParent = parent;
-        commitChildren = new HashSet();
+        commitChildren = new HashSet<Commit>();
         commitParent.addChild(this);
         committedFilesToPaths = new HashMap<String, String>();
 
@@ -64,13 +62,17 @@ public class Commit implements Serializable {
         System.out.println(committedFilesToPaths); // NEEDS TO BE REMOVED LATER
     }
 
-    public Commit(Commit otherCommit, int newID) {
-        commitID = newID;
+    @SuppressWarnings("unchecked")
+    public Commit(Commit otherCommit, Commit parent, Commit child) {
+        commitID = otherCommit.id();
         commitMessage = otherCommit.message();
         commitDateString = otherCommit.date();
-        commitParent = otherCommit.parent();
-        commitChildren = otherCommit.children();
-        committedFilesToPaths = otherCommit.committedFilesToPathsMap();
+        commitParent = parent;
+        commitChildren = new HashSet<Commit>();
+        if (child != null) {
+            commitChildren.add(child);
+        }
+        committedFilesToPaths = new HashMap<String, String>(otherCommit.committedFilesToPathsMap());
     }
 
     public int id() {
@@ -81,6 +83,11 @@ public class Commit implements Serializable {
         return commitMessage;
     }
 
+    public void setMessage(String message) {
+        commitMessage = message;
+    }
+
+    @SuppressWarnings("unchecked")
     public void addChild(Commit child) {
         commitChildren.add(child);
     }
@@ -89,6 +96,7 @@ public class Commit implements Serializable {
         return commitChildren.isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     public HashSet<Commit> children() {
         return (HashSet<Commit>) commitChildren;
     }
@@ -97,12 +105,12 @@ public class Commit implements Serializable {
         return commitParent;
     }
 
-    public String date() {
-        return commitDateString;
+    public void setParent(Commit parent) {
+        commitParent = parent;
     }
 
-    public String birthingBranch() {
-        return commitBranchCreated;
+    public String date() {
+        return commitDateString;
     }
 
     public boolean fileHasBeenCommitted(String filePath) {
@@ -117,10 +125,12 @@ public class Commit implements Serializable {
         return committedFilesToPaths.containsKey(filePath);
     }
 
+    @SuppressWarnings("unchecked")
     public Set<String> trackedFilePaths() {
         return ((HashMap<String, String>) committedFilesToPaths).keySet();
     }
 
+    @SuppressWarnings("unchecked")
     public HashMap<String, String> committedFilesToPathsMap() {
         return (HashMap<String, String>) committedFilesToPaths;
     }

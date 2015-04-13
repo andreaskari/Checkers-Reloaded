@@ -16,6 +16,7 @@ public class Stage implements Serializable {
         return stagedFiles.contains(path);
     }
 
+    @SuppressWarnings("unchecked")
     public void addToStage(String path) {
         stagedFiles.add(path);
     }
@@ -24,6 +25,7 @@ public class Stage implements Serializable {
         stagedFiles.remove(path);
     }
 
+    @SuppressWarnings("unchecked")
     public HashSet<String> stagedFiles() {
         return (HashSet<String>) stagedFiles;
     }
@@ -32,6 +34,7 @@ public class Stage implements Serializable {
         return markedForRemoval.contains(path);
     }
 
+    @SuppressWarnings("unchecked")
     public void markForRemoval(String path) {
         markedForRemoval.add(path);
     }
@@ -40,6 +43,7 @@ public class Stage implements Serializable {
         markedForRemoval.remove(path);
     }
 
+    @SuppressWarnings("unchecked")
     public HashSet<String> markedForRemoval() {
         return (HashSet<String>) markedForRemoval;
     }

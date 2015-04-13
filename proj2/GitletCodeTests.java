@@ -417,7 +417,7 @@ public class GitletCodeTests {
         assertArrayEquals(new String[] { commitMessage3, commitMessage1, initialCommit }, extractCommitMessages(logContent));
 
         logContent = gitlet("global-log");
-        assertArrayEquals(new String[] { commitMessage2, commitMessage3, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+        assertArrayEquals(new String[] { commitMessage3, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
 
         gitlet("checkout", "flower");
         assertEquals(flowerWugText, getText(wugFileName));
@@ -426,7 +426,7 @@ public class GitletCodeTests {
         assertArrayEquals(new String[] { commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
 
         logContent = gitlet("global-log");
-        assertArrayEquals(new String[] { commitMessage3, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+        assertArrayEquals(new String[] { commitMessage2, commitMessage3, commitMessage1, initialCommit }, extractCommitMessages(logContent));
     }
 
     @Test
@@ -808,7 +808,7 @@ public class GitletCodeTests {
         writeFile(masterFileName, secondMasterText);
         gitlet("add", wugFileName);
         gitlet("add", flowerFileName);
-        gitlet("commit", commitMessage2);
+        gitlet("commit", commitMessage3);
         assertEquals(fourthWugText, getText(wugFileName));
         assertEquals(firstFlowerText, getText(flowerFileName));
         assertEquals(secondMasterText, getText(masterFileName));
@@ -820,7 +820,6 @@ public class GitletCodeTests {
         assertEquals(dangerousWarning + sameBranchWarning, receivedWarning);
 
         receivedWarning = gitlet("merge", "flower");
-        System.out.println(receivedWarning);
         assertEquals(dangerousWarning, receivedWarning);
 
         assertEquals(fourthWugText, getText(wugFileName));
@@ -828,8 +827,207 @@ public class GitletCodeTests {
         assertEquals(secondMasterText, getText(masterFileName));
         assertTrue((new File(wugFileName + ".conflicted")).exists());
         assertEquals(thirdWugText, getText(wugFileName + ".conflicted"));
+    }
 
-        // test merge on branch and master if master has no commits since split
+    @Test
+    public void testMergeCase2() {
+        String dangerousWarning = "Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)\n";
+
+        String nonexistentBranchWarning = "A branch with that name does not exist.\n";
+        String sameBranchWarning = "Cannot merge a branch with itself.\n";
+
+        String firstWugText = "This is a wug.1";
+        String secondWugText = "This is a flower wug.\nFlowers.2";
+        String thirdWugText = "This is a master new wug.\nLike no way\nMaaster3";  
+        String fourthWugText = "Basic ass wug.4";
+
+        String firstFlowerText = "I am a flower.";
+        String secondFlowerText = "I am a new flower.";
+        String thirdFlowerText = "I am a stupid boring ass freaking flower.\nJK I love flowers.";
+        String fourthFlowerText = "Back to the stupid flower.";
+
+        String wugFileName = TESTING_DIR + "wug.txt";
+        String flowerFileName = TESTING_DIR + "flower.txt";
+
+        String commitMessage1 = "First";
+        String commitMessage2 = "Second";
+        String commitMessage3 = "Third";
+        String commitMessage4 = "Fourth";
+
+        gitlet("init");
+
+        createFile(wugFileName, firstWugText);
+        createFile(flowerFileName, firstFlowerText);
+
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+        gitlet("commit", commitMessage1);
+        assertEquals(firstWugText, getText(wugFileName));
+        assertEquals(firstFlowerText, getText(flowerFileName));
+
+        gitlet("branch", "flower");
+        gitlet("checkout", "flower");
+        assertEquals(firstWugText, getText(wugFileName));
+        assertEquals(firstFlowerText, getText(flowerFileName));
+
+        writeFile(wugFileName, secondWugText);
+        writeFile(flowerFileName, secondFlowerText);
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+        gitlet("commit", commitMessage2);
+        assertEquals(secondWugText, getText(wugFileName));
+        assertEquals(secondFlowerText, getText(flowerFileName));
+
+        String receivedWarning = gitlet("merge", "nonExistentBranch");
+        assertEquals(dangerousWarning + nonexistentBranchWarning, receivedWarning);
+
+        receivedWarning = gitlet("merge", "flower");
+        assertEquals(dangerousWarning + sameBranchWarning, receivedWarning);
+
+        gitlet("checkout", "master");
+
+        receivedWarning = gitlet("merge", "flower");
+        assertEquals(dangerousWarning, receivedWarning);
+
+        assertEquals(secondWugText, getText(wugFileName));
+        assertEquals(secondFlowerText, getText(flowerFileName));
+
+        gitlet("checkout", "flower");
+
+        writeFile(wugFileName, thirdWugText);
+        writeFile(flowerFileName, thirdFlowerText);
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+        gitlet("commit", commitMessage3);
+        assertEquals(thirdWugText, getText(wugFileName));
+        assertEquals(thirdFlowerText, getText(flowerFileName));
+
+        writeFile(wugFileName, fourthWugText);
+        writeFile(flowerFileName, fourthFlowerText);
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+        gitlet("commit", commitMessage4);
+        assertEquals(fourthWugText, getText(wugFileName));
+        assertEquals(fourthFlowerText, getText(flowerFileName));
+
+        gitlet("checkout", "master");
+        assertEquals(firstWugText, getText(wugFileName));
+
+        receivedWarning = gitlet("merge", "nonExistentBranch");
+        assertEquals(dangerousWarning + nonexistentBranchWarning, receivedWarning);
+
+        receivedWarning = gitlet("merge", "master");
+        assertEquals(dangerousWarning + sameBranchWarning, receivedWarning);
+
+        receivedWarning = gitlet("merge", "flower");
+        assertEquals(dangerousWarning, receivedWarning);
+
+        assertEquals(fourthWugText, getText(wugFileName));
+        assertEquals(fourthFlowerText, getText(flowerFileName));
+    }
+
+    @Test
+    public void testRebase() {
+        String dangerousWarning = "Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)\n";
+
+        String nonexistentBranchWarning = "A branch with that name does not exist.\n";
+        String sameBranchWarning = "Cannot rebase a branch onto itself.\n";
+        String alreadyRebasedWarning = "Already up-to-date.\n";
+
+        String wugFileName = TESTING_DIR + "wug.txt";
+
+        String initialCommit = "initial commit";
+        String firstWugText = "This is a wg";
+        String secondWugText = "This is a wug";
+        String thirdWugText = "This is a wug."; 
+        String fourthWugText = "This is a wug..";
+        String fifthWugText = "This is a wug!";
+        String sixthWugText = "This is a wug!!";
+        String seventhWugText = "This is a wug??";
+
+        String commitMessage1 = "First";
+        String commitMessage2 = "Second";
+        String commitMessage3 = "Third";
+        String commitMessage4 = "Fourth";
+        String commitMessage5 = "Fifth";
+        String commitMessage6 = "Sixth";
+        String commitMessage7 = "Seventh";
+
+        gitlet("init");
+
+        createFile(wugFileName, firstWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage1);
+        assertEquals(firstWugText, getText(wugFileName));
+
+        writeFile(wugFileName, secondWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage2);
+        assertEquals(secondWugText, getText(wugFileName));
+
+        gitlet("branch", "branch1");
+
+        writeFile(wugFileName, thirdWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage3);
+        assertEquals(thirdWugText, getText(wugFileName));
+
+        writeFile(wugFileName, fourthWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage4);
+        assertEquals(fourthWugText, getText(wugFileName));
+
+        gitlet("checkout", "branch1");
+
+        writeFile(wugFileName, fifthWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage5);
+        assertEquals(fifthWugText, getText(wugFileName));
+
+        gitlet("branch", "branch2");
+
+        writeFile(wugFileName, sixthWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage6);
+        assertEquals(sixthWugText, getText(wugFileName));
+
+        gitlet("checkout", "branch2");
+
+        writeFile(wugFileName, seventhWugText);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage7);
+        assertEquals(seventhWugText, getText(wugFileName));
+
+        gitlet("checkout", "master");
+        assertEquals(fourthWugText, getText(wugFileName));
+
+        String receivedWarning = gitlet("rebase", "nonExistentBranch");
+        assertEquals(dangerousWarning + nonexistentBranchWarning, receivedWarning);
+
+        receivedWarning = gitlet("rebase", "master");
+        assertEquals(dangerousWarning + sameBranchWarning, receivedWarning);
+
+        receivedWarning = gitlet("rebase", "branch1");
+        assertEquals(dangerousWarning, receivedWarning);
+        assertEquals(fourthWugText, getText(wugFileName));
+
+        String logContent = gitlet("log");
+        assertArrayEquals(new String[] { commitMessage4, commitMessage3, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+
+        gitlet("checkout", "branch1");
+        assertEquals(sixthWugText, getText(wugFileName));
+
+        logContent = gitlet("log");
+        assertArrayEquals(new String[] { commitMessage6, commitMessage5, commitMessage4, commitMessage3, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+
+        receivedWarning = gitlet("rebase", "master");
+        assertEquals(dangerousWarning + alreadyRebasedWarning, receivedWarning);
+
+        gitlet("checkout", "branch2");
+        assertEquals(seventhWugText, getText(wugFileName));
+
+        logContent = gitlet("log");
+        assertArrayEquals(new String[] { commitMessage7, commitMessage5, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
     }
 
     /**
@@ -872,6 +1070,25 @@ public class GitletCodeTests {
              * Restores System.out and System.in (So you can print normally and
              * take user input normally again).
              */
+            System.setOut(originalOut);
+            System.setIn(originalIn);
+        }
+        return printingResults.toString();
+    }
+
+    private static String gitletForInteractiveRebase(String response, String... args) {
+        PrintStream originalOut = System.out;
+        InputStream originalIn = System.in;
+        ByteArrayOutputStream printingResults = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(printingResults));
+
+            InputStream is = new ByteArrayInputStream(response.getBytes());
+            System.setIn(is);
+
+            Gitlet.main(args);
+
+        } finally {
             System.setOut(originalOut);
             System.setIn(originalIn);
         }

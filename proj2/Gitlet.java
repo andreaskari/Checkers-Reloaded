@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.io.File;
 import java.io.InputStream;
@@ -187,13 +188,21 @@ public class Gitlet {
         return saidYes;
     }
 
-    private static Commit getSplitPointFromBranches(Branch firstBranch, Branch secondBranch) {
-        Commit first = firstBranch.getSplitPoint(secondBranch.name());
-        Commit second = secondBranch.getSplitPoint(firstBranch.name());
-        if (first == null) {
-            return second;
+    private static Commit getSplitPointFromBranches(Branch firstBranch, Branch secondBranch, Commit startingCommit) {
+        HashSet<Integer> commitIDs = new HashSet<Integer>();
+        Commit firstPointer = firstBranch.head();
+        Commit secondPointer = secondBranch.head();
+        while (firstPointer != startingCommit) {
+            commitIDs.add((Integer) firstPointer.id());
+            firstPointer = firstPointer.parent();
         }
-        return first;
+        while (secondPointer != startingCommit) {
+            if (commitIDs.contains((Integer) secondPointer.id())) {
+                return secondPointer;
+            }
+            secondPointer = secondPointer.parent();
+        }
+        return null;
     }
 
     /**  Command Execution Methods  */
@@ -247,14 +256,10 @@ public class Gitlet {
             Branch currentBranch = currentBranchMap.currentBranch();
 
             int commitID = currentBranchMap.totalNumberCommits();
-            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranch.head(), currentBranch.name(), currentStage, SNAPSHOT_DIRECTORY_PATH);
-
-            Branch parentBranch = currentBranchMap.get(currentBranch.head().birthingBranch());
-            if (!parentBranch.name().equals(currentBranch.name())) {
-                parentBranch.addPossibleSplitPoint(currentBranch.name(), currentBranch.head());
-            }
+            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranch.head(), currentStage, SNAPSHOT_DIRECTORY_PATH);
 
             currentBranchMap.addCommitToMapOfBranches(newlyCreatedCommit);
+            currentBranch.setHead(newlyCreatedCommit);
 
             writeToBranchMapFile(currentBranchMap);
             writeToStageFile(new Stage());
@@ -404,7 +409,7 @@ public class Gitlet {
         } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit branchHead = currentBranchMap.get(branchName).head();
-            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName));
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName), currentBranchMap.startingCommit());
 
             Set<String> splitPointFiles = splitPoint.trackedFilePaths();
             for (String fileInSplit: splitPointFiles) {
@@ -429,10 +434,124 @@ public class Gitlet {
     }
 
     private static void rebaseCommand(String branchName) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentBranchMap.currentBranch().name().equals(branchName)) {
+            System.out.println("Cannot rebase a branch onto itself.");
+        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+            Commit currentHead = currentBranchMap.currentBranch().head();
+            Commit branchHead = currentBranchMap.get(branchName).head();
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName), currentBranchMap.startingCommit());
 
+            Commit historyPointer = currentHead;
+            while (historyPointer != null) {
+                if (historyPointer == branchHead) {
+                    System.out.println("Already up-to-date.");
+                    return;
+                }
+                historyPointer = historyPointer.parent();
+            }
+
+            boolean setHead = false;
+            Commit branchPointer = branchHead;
+            Commit rebaseChain = null;
+            Commit previousChild = null;
+            while (branchPointer != splitPoint) {
+                Commit parent = null;
+                if (branchPointer.parent() == splitPoint) {
+                    parent = currentHead;
+                }
+                rebaseChain = new Commit(branchPointer, parent, rebaseChain);
+                if (rebaseChain != null && previousChild != null) {
+                    previousChild.setParent(rebaseChain);
+                }
+                previousChild = rebaseChain;
+                if (!setHead) {
+                    currentBranchMap.get(branchName).setHead(rebaseChain);
+                    setHead = true;
+                }
+                currentBranchMap.addCommitToMapOfBranches(rebaseChain);
+                branchPointer = branchPointer.parent();
+            }
+            currentHead.addChild(rebaseChain);
+            writeToBranchMapFile(currentBranchMap);
+        } else {
+            System.out.println("A branch with that name does not exist.");
+        }
     }
 
     private static void interactiveRebaseCommand(String branchName) {
+        BranchMap currentBranchMap = getBranchSetFromFilePath();
+        if (currentBranchMap.currentBranch().name().equals(branchName)) {
+            System.out.println("Cannot rebase a branch onto itself.");
+        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+            Commit currentHead = currentBranchMap.currentBranch().head();
+            Commit branchHead = currentBranchMap.get(branchName).head();
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName), currentBranchMap.startingCommit());
 
+            Commit historyPointer = currentHead;
+            while (historyPointer != null) {
+                if (historyPointer == branchHead) {
+                    System.out.println("Already up-to-date.");
+                    return;
+                }
+                historyPointer = historyPointer.parent();
+            }
+
+            BufferedReader responseReader = new BufferedReader(new InputStreamReader(System.in));
+
+            boolean setHead = false;
+            Commit branchPointer = branchHead;
+            Commit rebaseChain = null;
+            Commit previousChild = null;
+            while (branchPointer != splitPoint) {
+                Commit parent = null;
+                if (branchPointer.parent() == splitPoint) {
+                    parent = currentHead;
+                }
+
+                String response = "";
+
+                while (!response.equals("c") && !response.equals("s") &&!response.equals("m")) {
+                    System.out.println("Would you like to (c)ontinue, (s)kip this commit, or change this commit's (m)essage?");
+                    try {
+                        response = responseReader.readLine();
+                    } catch (IOException ioe) {
+
+                    }
+                }
+
+                boolean addCommit = true;
+                String newMessage = null;
+                if (response.equals("s")) {
+                    addCommit = false;
+                } else if (response.equals("m")) {
+                    System.out.println("Please enter a new message for this commit.");
+                    try {
+                        newMessage = responseReader.readLine();
+                    } catch (IOException ioe) {
+
+                    }
+                } 
+
+                if (addCommit) {
+                    rebaseChain = new Commit(branchPointer, parent, rebaseChain);
+                    if (rebaseChain != null && previousChild != null) {
+                        previousChild.setParent(rebaseChain);
+                    }
+                    previousChild = rebaseChain;
+                    if (!setHead) {
+                        currentBranchMap.get(branchName).setHead(rebaseChain);
+                        setHead = true;
+                    }
+                    currentBranchMap.addCommitToMapOfBranches(rebaseChain);
+                }
+                branchPointer = branchPointer.parent();
+            }
+            rebaseChain.setParent(currentHead);
+            currentHead.addChild(rebaseChain);
+            writeToBranchMapFile(currentBranchMap);
+        } else {
+            System.out.println("A branch with that name does not exist.");
+        }
     }
 }

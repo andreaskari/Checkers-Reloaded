@@ -3,6 +3,7 @@ import java.util.HashSet;
 import java.io.Serializable;
 
 public class Branch implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private boolean active;
@@ -10,15 +11,13 @@ public class Branch implements Serializable {
     private Commit branchInitialCommit;
     private Commit branchHead;
     private int branchSize;
-    private HashMap splitPoints;
 
+    @SuppressWarnings("unchecked")
     public Branch() {
         active = true;
         branchName = "master";
-        branchInitialCommit = new Commit(0, "initial commit", "master");
+        branchInitialCommit = new Commit(0, "initial commit");
         branchHead = branchInitialCommit;
-        splitPoints = new HashMap<String, Commit>();
-        splitPoints.put("master", branchInitialCommit);
     }
 
     public Branch(Branch offShoot, String name) {
@@ -26,7 +25,6 @@ public class Branch implements Serializable {
         branchName = name;
         branchInitialCommit = offShoot.head();
         branchHead = offShoot.head();
-        splitPoints = new HashMap<String, Commit>();
     }
 
     public String name() {
@@ -51,13 +49,5 @@ public class Branch implements Serializable {
 
     public boolean isActive() {
         return active;
-    }
-
-    public void addPossibleSplitPoint(String branchName, Commit splitPoint) {
-        splitPoints.put(branchName, splitPoint);
-    }
-
-    public Commit getSplitPoint(String branchName) {
-        return (Commit) splitPoints.get(branchName);
     }
 }

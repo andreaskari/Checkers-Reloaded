@@ -284,9 +284,13 @@ public class Gitlet {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         Commit pointer = currentBranchMap.currentBranch().head();
         while (pointer != null) {
-            System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
+            printLogInfo(pointer);
             pointer = pointer.parent();
         }
+    }
+
+    private static void printLogInfo(Commit pointer) {
+        System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
     }
 
     private static void globalLogCommand() {
@@ -299,7 +303,7 @@ public class Gitlet {
             for (Commit child: pointer.children()) {
                 printCommitAndChildren(child);
             }            
-            System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
+            printLogInfo(pointer);        
         }
     }
 
@@ -505,9 +509,8 @@ public class Gitlet {
             Commit previousChild = null;
             while (branchPointer != splitPoint) {
                 Commit parent = null;
-                if (branchPointer.parent() == splitPoint) {
-                    parent = currentHead;
-                }
+                System.out.println("Currently replaying:");
+                printLogInfo(branchPointer);
 
                 String response = "";
 
@@ -543,12 +546,17 @@ public class Gitlet {
                         currentBranchMap.get(branchName).setHead(rebaseChain);
                         setHead = true;
                     }
+                    if (newMessage != null) {
+                        rebaseChain.setMessage(newMessage);
+                    }
                     currentBranchMap.addCommitToMapOfBranches(rebaseChain);
                 }
                 branchPointer = branchPointer.parent();
             }
-            rebaseChain.setParent(currentHead);
-            currentHead.addChild(rebaseChain);
+            if (rebaseChain != null) {
+                rebaseChain.setParent(currentHead);
+                currentHead.addChild(rebaseChain);
+            }
             writeToBranchMapFile(currentBranchMap);
         } else {
             System.out.println("A branch with that name does not exist.");

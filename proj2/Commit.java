@@ -29,7 +29,9 @@ public class Commit implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public Commit(int newID, String newMessage, Commit parent, Stage currentStage, String snapshot_directory_path) {
+    public Commit(int newID, String newMessage, Commit parent, Stage currentStage, 
+        String snapShotDirectoryPath) {
+
         commitID = newID;
         commitMessage = newMessage;
         commitDateString = (new Date()).toString();
@@ -38,7 +40,7 @@ public class Commit implements Serializable {
         commitParent.addChild(this);
         committedFilesToPaths = new HashMap<String, String>();
 
-        String commitSnapshotDirectory = snapshot_directory_path + newID + "/";
+        String commitSnapshotDirectory = snapShotDirectoryPath + newID + "/";
         File commitSnapshotFile = new File(commitSnapshotDirectory);
         commitSnapshotFile.mkdir();
         for (String oldFilePath: parent.committedFilesToPathsMap().keySet()) {
@@ -52,27 +54,26 @@ public class Commit implements Serializable {
                 byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
                 Files.write(Paths.get(fileSnapshotPath), fileBytes, StandardOpenOption.CREATE);
             } catch (IOException ex) {
-
+                System.out.println("CAUGHT: " + ex);
             }
             committedFilesToPaths.put(filePath, fileSnapshotPath);
         }
         for (String filePath: currentStage.markedForRemoval()) {
             committedFilesToPaths.remove(filePath);
         }
-        System.out.println(committedFilesToPaths); // NEEDS TO BE REMOVED LATER
     }
 
     @SuppressWarnings("unchecked")
-    public Commit(Commit otherCommit, Commit parent, Commit child) {
-        commitID = otherCommit.id();
-        commitMessage = otherCommit.message();
-        commitDateString = otherCommit.date();
+    public Commit(Commit other, Commit parent, Commit child) {
+        commitID = other.id();
+        commitMessage = other.message();
+        commitDateString = other.date();
         commitParent = parent;
         commitChildren = new HashSet<Commit>();
         if (child != null) {
             commitChildren.add(child);
         }
-        committedFilesToPaths = new HashMap<String, String>(otherCommit.committedFilesToPathsMap());
+        committedFilesToPaths = new HashMap<String, String>(other.committedFilesToPathsMap());
     }
 
     public int id() {

@@ -417,7 +417,7 @@ public class GitletCodeTests {
         assertArrayEquals(new String[] { commitMessage3, commitMessage1, initialCommit }, extractCommitMessages(logContent));
 
         logContent = gitlet("global-log");
-        assertArrayEquals(new String[] { commitMessage3, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+        assertArrayEquals(new String[] { commitMessage2, commitMessage3, commitMessage1, initialCommit }, extractCommitMessages(logContent));
 
         gitlet("checkout", "flower");
         assertEquals(flowerWugText, getText(wugFileName));
@@ -426,7 +426,7 @@ public class GitletCodeTests {
         assertArrayEquals(new String[] { commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
 
         logContent = gitlet("global-log");
-        assertArrayEquals(new String[] { commitMessage2, commitMessage3, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+        assertArrayEquals(new String[] { commitMessage3, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
     }
 
     @Test
@@ -1112,6 +1112,7 @@ public class GitletCodeTests {
         assertEquals(dangerousWarning + sameBranchWarning, receivedWarning);
 
         receivedWarning = gitletForInteractiveRebase(new String[] {"c", "c"}, "i-rebase", "branch1");
+        System.out.println(receivedWarning);
         assertEquals(fourthWugText, getText(wugFileName));
 
         String logContent = gitlet("log");
@@ -1131,6 +1132,11 @@ public class GitletCodeTests {
 
         logContent = gitlet("log");
         assertArrayEquals(new String[] { commitMessage7, commitMessage5, commitMessage2, commitMessage1, initialCommit }, extractCommitMessages(logContent));
+    }
+
+    @Test
+    public void testUserManualDeletionOfSnapshots() {
+        
     }
 
     /**
@@ -1179,21 +1185,18 @@ public class GitletCodeTests {
         return printingResults.toString();
     }
 
-    private static String gitletForInteractiveRebase(String[] inputsStrings, String... args) {
+    private static String gitletForInteractiveRebase(String[] inputStrings, String... args) {
         PrintStream originalOut = System.out;
         InputStream originalIn = System.in;
         ByteArrayOutputStream printingResults = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(printingResults));
 
-            String answer = "yes";
-            InputStream is = new ByteArrayInputStream(answer.getBytes());
-            System.setIn(is);
-
-            for (String input: inputsStrings) {
-                is = new ByteArrayInputStream(input.getBytes());
-                System.setIn(is);
+            String answer = "yes" + System.getProperty("line.separator");
+            for (String input: inputStrings) {
+                answer += input + System.getProperty("line.separator");
             }
+            System.setIn(new ByteArrayInputStream(answer.getBytes()));
 
             Gitlet.main(args);
 

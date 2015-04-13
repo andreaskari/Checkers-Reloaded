@@ -1,5 +1,3 @@
-import java.util.HashMap;
-import java.util.HashSet;
 import java.io.Serializable;
 
 public class Branch implements Serializable {

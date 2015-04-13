@@ -15,10 +15,8 @@ import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 public class Gitlet {
     private static final String GITLET_DIRECTORY_PATH = ".gitlet/";
@@ -88,12 +86,11 @@ public class Gitlet {
             ObjectOutput output = new ObjectOutputStream(buffer);
             try {
                 output.writeObject(newObject);
-            }
-            finally {
+            } finally {
                 output.close();
             }
         } catch (IOException ex) {
-            
+            System.out.println("CAUGHT: " + ex);
         }
     }
 
@@ -110,17 +107,16 @@ public class Gitlet {
         try {
             InputStream file = new FileInputStream(filePath);
             InputStream buffer = new BufferedInputStream(file);
-            ObjectInput input = new ObjectInputStream (buffer);
+            ObjectInput input = new ObjectInputStream(buffer);
             try {
                 obj = input.readObject();
-            }
-            finally {
+            } finally {
                 input.close();
             }
         } catch (ClassNotFoundException ex) {
-            System.out.println(ex);
-        } catch(IOException ex){
-            System.out.println(ex);
+            System.out.println("CAUGHT: " + ex);
+        } catch (IOException ex) {
+            System.out.println("CAUGHT: " + ex);            
         }
         return obj;
     }
@@ -137,16 +133,17 @@ public class Gitlet {
         try {
             return Files.readAllBytes(Paths.get(filePath));
         } catch (IOException ex) {
-
+            System.out.println("CAUGHT: " + ex);
         }
         return null;
     }
 
     private static boolean fileContentsEquals(String firstFilePath, String secondFilePath) {
-        return Arrays.equals(getByteCodeFromFile(firstFilePath), getByteCodeFromFile(secondFilePath));
+        return Arrays.equals(getByteCodeFromFile(firstFilePath), 
+            getByteCodeFromFile(secondFilePath));
     }
 
-    private static void copyContentsFromSourceToDestination(String sourcePath, String destPath) {
+    private static void copyContentsFromSourceToDest(String sourcePath, String destPath) {
         try {
             FileOutputStream copier = new FileOutputStream(destPath);
             try {
@@ -155,7 +152,7 @@ public class Gitlet {
                 copier.close();
             }
         } catch (IOException ex) {
-
+            System.out.println("CAUGHT: " + ex);
         }
     }
 
@@ -165,21 +162,23 @@ public class Gitlet {
         for (String fileInDirectory: currentFilesInDirectory) {
             if (filesToPlaceInDirectory.contains(fileInDirectory)) {
                 String fileSnapshotPath = switchingCommit.getSnapshotPath(fileInDirectory);
-                copyContentsFromSourceToDestination(fileSnapshotPath, fileInDirectory);
+                copyContentsFromSourceToDest(fileSnapshotPath, fileInDirectory);
             }
         }
     }
 
     private static boolean dangerousCommandIsOK() { 
-        System.out.println("Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)");
+        System.out.println("Warning: The command you entered may alter the files in your working"
+            + "directory. Uncommitted changes may be lost. Are you sure you want to continue?"
+            + " (yes/no)");
  
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String yesNo = null;
 
         try {
             yesNo = br.readLine();
-        } catch (IOException ioe) {
-
+        } catch (IOException ex) {
+            System.out.println("CAUGHT: " + ex);
         }
         boolean saidYes = yesNo.equals("yes");
         if (!saidYes) {
@@ -188,7 +187,8 @@ public class Gitlet {
         return saidYes;
     }
 
-    private static Commit getSplitPointFromBranches(Branch firstBranch, Branch secondBranch, Commit startingCommit) {
+    private static Commit getSplitPointFromBranches(Branch firstBranch, Branch secondBranch, 
+            Commit startingCommit) {
         HashSet<Integer> commitIDs = new HashSet<Integer>();
         Commit firstPointer = firstBranch.head();
         Commit secondPointer = secondBranch.head();
@@ -216,7 +216,8 @@ public class Gitlet {
             writeToStageFile(new Stage());
             writeToBranchMapFile(new BranchMap());
         } else {
-            System.out.println("A gitlet version control system already exists in the current directory.");
+            System.out.println("A gitlet version control system already exists "
+                + "in the current directory.");
         }
     }
 
@@ -256,7 +257,8 @@ public class Gitlet {
             Branch currentBranch = currentBranchMap.currentBranch();
 
             int commitID = currentBranchMap.totalNumberCommits();
-            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranch.head(), currentStage, SNAPSHOT_DIRECTORY_PATH);
+            Commit newlyCreatedCommit = new Commit(commitID, commitMessage, currentBranch.head(), 
+                currentStage, SNAPSHOT_DIRECTORY_PATH);
 
             currentBranchMap.addCommitToMapOfBranches(newlyCreatedCommit);
             currentBranch.setHead(newlyCreatedCommit);
@@ -290,7 +292,8 @@ public class Gitlet {
     }
 
     private static void printLogInfo(Commit pointer) {
-        System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() + "\n" + pointer.message() + "\n");
+        System.out.println("====\nCommit " + pointer.id() + ".\n" + pointer.date() 
+            + "\n" + pointer.message() + "\n");
     }
 
     private static void globalLogCommand() {
@@ -341,17 +344,20 @@ public class Gitlet {
         Branch currentBranch = currentBranchMap.currentBranch();        
         if (currentBranch.head().filePathIsTracked(fileOrBranch)) {
             String fileSnapshotPath = currentBranch.head().getSnapshotPath(fileOrBranch);
-            copyContentsFromSourceToDestination(fileSnapshotPath, fileOrBranch);
+            copyContentsFromSourceToDest(fileSnapshotPath, fileOrBranch);
         } else if (fileOrBranch.equals(currentBranch.name())) {
             System.out.println("No need to checkout the current branch.");
-        } else if (currentBranchMap.containsKey(fileOrBranch) && currentBranchMap.get(fileOrBranch).isActive()) {
+        } else if (currentBranchMap.containsKey(fileOrBranch) 
+            && currentBranchMap.get(fileOrBranch).isActive()) {
+
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit headToSwitchTo = currentBranchMap.get(fileOrBranch).head();
             copyAllFilesFromCommit(headToSwitchTo, currentHead);
             currentBranchMap.setCurrentBranch(fileOrBranch);
             writeToBranchMapFile(currentBranchMap);
         } else {
-            System.out.println("File does not exist in the most recent commit, or no such branch exists.");
+            System.out.println("File does not exist in the most recent commit,"
+                + " or no such branch exists.");
         }
     }    
 
@@ -361,7 +367,7 @@ public class Gitlet {
             Commit commitToCheck = currentBranchMap.commitForID(commitID);
             if (commitToCheck.fileHasBeenCommitted(fileName)) {
                 String fileSnapshotPath = commitToCheck.getSnapshotPath(fileName);
-                copyContentsFromSourceToDestination(fileSnapshotPath, fileName);
+                copyContentsFromSourceToDest(fileSnapshotPath, fileName);
             } else {
                 System.out.println("File does not exist in that commit.");
             }
@@ -372,7 +378,9 @@ public class Gitlet {
 
     private static void branchCommand(String branchName) {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
-        if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+        if (currentBranchMap.containsKey(branchName) 
+            && currentBranchMap.get(branchName).isActive()) {
+
             System.out.println("A branch with that name already exists.");
         } else {
             Branch newlyCreatedBranch = new Branch(currentBranchMap.currentBranch(), branchName);
@@ -385,7 +393,9 @@ public class Gitlet {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         if (currentBranchMap.currentBranch().name().equals(branchName)) {
             System.out.println("Cannot remove the current branch.");
-        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+        } else if (currentBranchMap.containsKey(branchName) 
+            && currentBranchMap.get(branchName).isActive()) {
+
             currentBranchMap.get(branchName).deactivate();
             writeToBranchMapFile(currentBranchMap);
         } else {
@@ -410,10 +420,13 @@ public class Gitlet {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         if (currentBranchMap.currentBranch().name().equals(branchName)) {
             System.out.println("Cannot merge a branch with itself.");
-        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+        } else if (currentBranchMap.containsKey(branchName) 
+            && currentBranchMap.get(branchName).isActive()) {
+
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit branchHead = currentBranchMap.get(branchName).head();
-            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName), currentBranchMap.startingCommit());
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), 
+                currentBranchMap.get(branchName), currentBranchMap.startingCommit());
 
             Set<String> splitPointFiles = splitPoint.trackedFilePaths();
             for (String fileInSplit: splitPointFiles) {
@@ -421,14 +434,16 @@ public class Gitlet {
                 String branchHeadFileSnapshotPath = branchHead.getSnapshotPath(fileInSplit);
                 String splitHeadFileSnapshotPath = splitPoint.getSnapshotPath(fileInSplit);
 
-                boolean currentFileModified = !fileContentsEquals(currentHeadFileSnapshotPath, splitHeadFileSnapshotPath);
-                boolean branchFileModified = !fileContentsEquals(branchHeadFileSnapshotPath, splitHeadFileSnapshotPath);
+                boolean currentFileModified = !fileContentsEquals(currentHeadFileSnapshotPath, 
+                    splitHeadFileSnapshotPath);
+                boolean branchFileModified = !fileContentsEquals(branchHeadFileSnapshotPath, 
+                    splitHeadFileSnapshotPath);
 
                 if (currentFileModified && branchFileModified) {
                     String conflictedFilePath = fileInSplit + ".conflicted";
-                    copyContentsFromSourceToDestination(branchHeadFileSnapshotPath, conflictedFilePath);
+                    copyContentsFromSourceToDest(branchHeadFileSnapshotPath, conflictedFilePath);
                 } else if (branchFileModified) {
-                    copyContentsFromSourceToDestination(branchHeadFileSnapshotPath, fileInSplit);
+                    copyContentsFromSourceToDest(branchHeadFileSnapshotPath, fileInSplit);
                 }
             }
             writeToBranchMapFile(currentBranchMap);
@@ -441,10 +456,13 @@ public class Gitlet {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         if (currentBranchMap.currentBranch().name().equals(branchName)) {
             System.out.println("Cannot rebase a branch onto itself.");
-        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+        } else if (currentBranchMap.containsKey(branchName) 
+            && currentBranchMap.get(branchName).isActive()) {
+
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit branchHead = currentBranchMap.get(branchName).head();
-            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName), currentBranchMap.startingCommit());
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), 
+                currentBranchMap.get(branchName), currentBranchMap.startingCommit());
 
             Commit historyPointer = currentHead;
             while (historyPointer != null) {
@@ -487,10 +505,13 @@ public class Gitlet {
         BranchMap currentBranchMap = getBranchSetFromFilePath();
         if (currentBranchMap.currentBranch().name().equals(branchName)) {
             System.out.println("Cannot rebase a branch onto itself.");
-        } else if (currentBranchMap.containsKey(branchName) && currentBranchMap.get(branchName).isActive()) {
+        } else if (currentBranchMap.containsKey(branchName) 
+            && currentBranchMap.get(branchName).isActive()) {
+
             Commit currentHead = currentBranchMap.currentBranch().head();
             Commit branchHead = currentBranchMap.get(branchName).head();
-            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), currentBranchMap.get(branchName), currentBranchMap.startingCommit());
+            Commit splitPoint = getSplitPointFromBranches(currentBranchMap.currentBranch(), 
+                currentBranchMap.get(branchName), currentBranchMap.startingCommit());
 
             Commit historyPointer = currentHead;
             while (historyPointer != null) {
@@ -502,24 +523,22 @@ public class Gitlet {
             }
 
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(System.in));
-
             boolean setHead = false;
             Commit branchPointer = branchHead;
             Commit rebaseChain = null;
             Commit previousChild = null;
             while (branchPointer != splitPoint) {
-                Commit parent = null;
                 System.out.println("Currently replaying:");
                 printLogInfo(branchPointer);
 
                 String response = "";
-
-                while (!response.equals("c") && !response.equals("s") &&!response.equals("m")) {
-                    System.out.println("Would you like to (c)ontinue, (s)kip this commit, or change this commit's (m)essage?");
+                while (!response.equals("c") && !response.equals("s") && !response.equals("m")) {
+                    System.out.println("Would you like to (c)ontinue, (s)kip this commit,"
+                        + " or change this commit's (m)essage?");
                     try {
                         response = responseReader.readLine();
-                    } catch (IOException ioe) {
-
+                    } catch (IOException ex) {
+                        System.out.println("CAUGHT: " + ex);
                     }
                 }
 
@@ -531,13 +550,13 @@ public class Gitlet {
                     System.out.println("Please enter a new message for this commit.");
                     try {
                         newMessage = responseReader.readLine();
-                    } catch (IOException ioe) {
-
+                    } catch (IOException ex) {
+                        System.out.println("CAUGHT: " + ex);
                     }
-                } 
+                }
 
                 if (addCommit) {
-                    rebaseChain = new Commit(branchPointer, parent, rebaseChain);
+                    rebaseChain = new Commit(branchPointer, null, rebaseChain);
                     if (rebaseChain != null && previousChild != null) {
                         previousChild.setParent(rebaseChain);
                     }

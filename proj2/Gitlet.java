@@ -169,7 +169,7 @@ public class Gitlet {
 
     private static boolean dangerousCommandIsOK() { 
         System.out.println("Warning: The command you entered may alter the files in your working"
-            + "directory. Uncommitted changes may be lost. Are you sure you want to continue?"
+            + " directory. Uncommitted changes may be lost. Are you sure you want to continue?"
             + " (yes/no)");
  
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -321,10 +321,12 @@ public class Gitlet {
         System.out.println("=== Branches ===");
         String currentBranchName = currentBranchMap.currentBranch().name();
         for (String branchName: currentBranchMap.keySet()) {
-            if (branchName == currentBranchName) {
-                System.out.print("*");
+            if (currentBranchMap.get(branchName).isActive()) {
+                if (branchName == currentBranchName) {
+                    System.out.print("*");
+                }
+                System.out.println(branchName);
             }
-            System.out.println(branchName);
         }
 
         System.out.println("\n=== Staged Files ===");

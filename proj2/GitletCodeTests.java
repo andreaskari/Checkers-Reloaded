@@ -729,6 +729,76 @@ public class GitletCodeTests {
     }
 
     @Test
+    public void testStatus() {
+        String firstWugText = "This is a wug.1";
+        String flowerWugText = "This is a flower wug.\nFlowers.2";
+        String masterWugText = "This is a master new wug.\nLike no way\nMaaster3";  
+        String secondWugText = "Basic ass wug.4";
+
+        String flowerText = "I am a flower.";
+        String masterText = "I am the king\nMaster";
+
+        String wugFileName = TESTING_DIR + "wug.txt";
+        String flowerFileName = TESTING_DIR + "flower.txt";
+        String masterFileName = TESTING_DIR + "master.txt";
+
+        String commitMessage1 = "First";
+        String commitMessage2 = "SecondFlower";
+        String commitMessage3 = "ThirdMaster";
+        String commitMessage4 = "FourthMaster";
+
+        gitlet("init");
+        createFile(wugFileName, firstWugText);
+        gitlet("add", wugFileName);
+
+        String statusOutput = gitlet("status");
+        assertArrayEquals(new String[] {"*master", wugFileName}, extractStatusMessages(statusOutput));
+
+
+        gitlet("commit", commitMessage1);
+        assertEquals(firstWugText, getText(wugFileName));
+
+        statusOutput = gitlet("status");
+        assertArrayEquals(new String[] {"*master"}, extractStatusMessages(statusOutput));
+
+        gitlet("branch", "flower");
+        gitlet("checkout", "flower");
+        assertEquals(firstWugText, getText(wugFileName));
+
+        statusOutput = gitlet("status");
+        assertArrayEquals(new String[] {"master", "*flower"}, extractStatusMessages(statusOutput));
+
+        writeFile(wugFileName, flowerWugText);
+        createFile(flowerFileName, flowerText);
+        gitlet("add", wugFileName);
+        gitlet("add", flowerFileName);
+
+        statusOutput = gitlet("status");
+        assertArrayEquals(new String[] {"master", "*flower", flowerFileName, wugFileName}, extractStatusMessages(statusOutput));
+
+        gitlet("rm", wugFileName);
+        gitlet("rm", flowerFileName);
+
+        statusOutput = gitlet("status");
+        assertArrayEquals(new String[] {"master", "*flower"}, extractStatusMessages(statusOutput));
+
+        gitlet("commit", commitMessage2);
+
+        gitlet("rm", wugFileName);
+        gitlet("rm", flowerFileName);
+
+        statusOutput = gitlet("status");
+        assertArrayEquals(new String[] {"master", "*flower", wugFileName}, extractStatusMessages(statusOutput));
+
+        gitlet("checkout", "master");
+        gitlet("rm-branch", "flower");
+
+        statusOutput = gitlet("status");
+        System.out.println(statusOutput);
+        assertArrayEquals(new String[] {"*master", wugFileName}, extractStatusMessages(statusOutput));
+    }
+
+    @Test
     public void testMerge() {
         String dangerousWarning = "Warning: The command you entered may alter the files in your working directory. Uncommitted changes may be lost. Are you sure you want to continue? (yes/no)\n";
 
@@ -1136,7 +1206,45 @@ public class GitletCodeTests {
 
     @Test
     public void testUserManualDeletionOfSnapshots() {
-        
+        String commitMessage1 = "initial commit";
+        String commitMessage2 = "added wug";
+        String commitMessage3 = "this should work";
+        String commitMessage4 = "this should work as well";
+
+        String wugFileName = TESTING_DIR + "wug.txt";
+        String wugText = "This is a wug.";
+        String wugText2 = "This is a wug.";
+
+        String snapshot1Path = ".gitlet/Snapshots/1/" + wugFileName;
+        String snapshot2Path = ".gitlet/Snapshots/2/" + wugFileName;
+
+        gitlet("init");
+
+        createFile(wugFileName, wugText);
+        gitlet("add", wugFileName);
+
+        gitlet("commit", commitMessage2);
+
+        File snapshot1 = new File(snapshot1Path);
+        assertTrue(snapshot1.exists());
+        snapshot1.delete();
+        assertTrue(!snapshot1.exists());
+
+        gitlet("branch", "b1");
+
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage3);
+
+        File snapshot2 = new File(snapshot2Path);
+        assertTrue(snapshot2.exists());
+        snapshot2.delete();
+        assertTrue(!snapshot2.exists());
+
+        gitlet("branch", "master");
+
+        writeFile(wugFileName, wugText2);
+        gitlet("add", wugFileName);
+        gitlet("commit", commitMessage3);
     }
 
     /**
@@ -1280,6 +1388,22 @@ public class GitletCodeTests {
             // System.out.println(logChunks[i + 1]);
             String[] logLines = logChunks[i + 1].split(LINE_SEPARATOR);
             messages[i] = logLines[3];
+        }
+        return messages;
+    }
+
+    private static String[] extractStatusMessages(String statusOutput) {
+        String[] statusChunks = statusOutput.split(LINE_SEPARATOR);
+        String[] messages = new String[statusChunks.length - 5];
+        for (int i = 0, j = 0; i < messages.length; j++) {
+            if (!statusChunks[j].equals("") 
+                && !statusChunks[j].equals("=== Branches ===") 
+                && !statusChunks[j].equals("=== Staged Files ===") 
+                && !statusChunks[j].equals("=== Files Marked for Removal ===")) {
+
+                messages[i] = statusChunks[j];
+                i++;
+            }
         }
         return messages;
     }

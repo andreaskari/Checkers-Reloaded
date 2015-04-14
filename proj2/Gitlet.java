@@ -570,6 +570,7 @@ public class Gitlet {
                     if (newMessage != null) {
                         rebaseChain.setMessage(newMessage);
                     }
+                    printLogInfo(rebaseChain);
                     currentBranchMap.addCommitToMapOfBranches(rebaseChain);
                 }
                 branchPointer = branchPointer.parent();

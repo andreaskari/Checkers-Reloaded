@@ -556,7 +556,6 @@ public class Gitlet {
                         System.out.println("CAUGHT: " + ex);
                     }
                 }
-
                 if (addCommit) {
                     rebaseChain = new Commit(branchPointer, null, rebaseChain);
                     if (rebaseChain != null && previousChild != null) {

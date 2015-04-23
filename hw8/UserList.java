@@ -194,19 +194,22 @@ public class UserList {
     **/
     public void mergeSort(String sortFeature){
         CatenableQueue<CatenableQueue<User>> queueOfQueue = makeQueueOfQueues();
-        CatenableQueue<CatenableQueue<User>> mergedQueueOfQueue = new CatenableQueue<CatenableQueue<User>>();
-        while (mergedQueueOfQueue.size() != 1) {
-            while (queueOfQueue.size() > 1) {
-                mergedQueueOfQueue.enqueue(mergeTwoQueues(sortFeature, queueOfQueue.dequeue(), queueOfQueue.dequeue()));
-                if (queueOfQueue.size() == 1) {
-                    mergedQueueOfQueue.enqueue(queueOfQueue.dequeue());
-                }
-            }
-            CatenableQueue<CatenableQueue<User>> temp = queueOfQueue;
-            queueOfQueue = mergedQueueOfQueue;
-            mergedQueueOfQueue = temp;
+        // CatenableQueue<CatenableQueue<User>> mergedQueueOfQueue = new CatenableQueue<CatenableQueue<User>>();
+        // while (mergedQueueOfQueue.size() != 1) {
+        //     while (queueOfQueue.size() > 1) {
+        //         mergedQueueOfQueue.enqueue(mergeTwoQueues(sortFeature, queueOfQueue.dequeue(), queueOfQueue.dequeue()));
+        //         if (queueOfQueue.size() == 1) {
+        //             mergedQueueOfQueue.enqueue(queueOfQueue.dequeue());
+        //         }
+        //     }
+        //     CatenableQueue<CatenableQueue<User>> temp = queueOfQueue;
+        //     queueOfQueue = mergedQueueOfQueue;
+        //     mergedQueueOfQueue = temp;
+        // }
+        while (queueOfQueue.size() != 1) {
+            queueOfQueue.enqueue(mergeTwoQueues(sortFeature, queueOfQueue.dequeue(), queueOfQueue.dequeue()));
         }
-        userQueue = mergedQueueOfQueue.dequeue();
+        userQueue = queueOfQueue.dequeue();
     }
 
     /**

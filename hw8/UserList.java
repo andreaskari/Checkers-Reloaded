@@ -161,34 +161,28 @@ public class UserList {
     *       sorted from smallest to largest by their sortFeature.
     **/
     public static CatenableQueue<User> mergeTwoQueues(String sortFeature, CatenableQueue<User> q1, CatenableQueue<User> q2){
-        if (q1.size() > 0 && q2.size() > 0) {
-            CatenableQueue<User> merged = new CatenableQueue<User>();
-            while (q1.size() > 0 && q2.size() > 0) {
-                int comparison = 0;
-                if (sortFeature.equals(BY_ID)) {
-                    comparison = q1.front().compareById(q2.front());
-                } else {
-                    comparison = q1.front().compareByPagesPrinted(q2.front());
-                }
-
-                if (comparison <= 0) {
-                    merged.enqueue(q1.dequeue());
-                } else {
-                    merged.enqueue(q2.dequeue());
-                }
-            }
-
-            if (q1.size() > 0) {
-                merged.append(q1);
+        CatenableQueue<User> merged = new CatenableQueue<User>();
+        while (q1.size() > 0 && q2.size() > 0) {
+            int comparison = 0;
+            if (sortFeature.equals(BY_ID)) {
+                comparison = q1.front().compareById(q2.front());
             } else {
-                merged.append(q2);
+                comparison = q1.front().compareByPagesPrinted(q2.front());
             }
-            return merged;
 
-        } else if (q1.size() > 0) {
-            return q1;
-        } 
-        return q2;
+            if (comparison <= 0) {
+                merged.enqueue(q1.dequeue());
+            } else {
+                merged.enqueue(q2.dequeue());
+            }
+        }
+
+        if (q1.size() > 0) {
+            merged.append(q1);
+        } else {
+            merged.append(q2);
+        }
+        return merged;
     }
 
     /**

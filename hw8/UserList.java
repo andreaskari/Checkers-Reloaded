@@ -5,6 +5,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class UserList {
+    private final static String BY_ID = "id";
+    private final static String BY_PAGES_PRINTED = "pages";
 
     private CatenableQueue<User> userQueue;
     private int size;
@@ -70,7 +72,25 @@ public class UserList {
     **/ 
     public static void partition(String sortFeature, CatenableQueue<User> qUnsorted, int pivot, 
         CatenableQueue<User> qLess, CatenableQueue<User> qEqual, CatenableQueue<User> qGreater){
-        //Replace with solution.
+        User pivotUser = qUnsorted.nth(pivot);
+
+        while (qUnsorted.front() != null) {
+            User front = qUnsorted.dequeue();
+            int comparison = 0;
+            if (sortFeature.equals(BY_ID)) {
+                comparison = front.compareById(pivotUser);
+            } else {
+                comparison = front.compareByPagesPrinted(pivotUser);
+            }
+
+            if (comparison < 0) {
+                qLess.enqueue(front);
+            } else if (comparison > 0) {
+                qGreater.enqueue(front);
+            } else {
+                qEqual.enqueue(front);
+            }
+        }
     }
 
     /**
@@ -80,8 +100,21 @@ public class UserList {
     *       printed, sortFeatures equals "pages".
     *   @param q is an unsorted CatenableQueue containing User items.
     **/
-    public static void quickSort(String sortFeature, CatenableQueue<User> q){ 
-        //Replace with solution.
+    public static void quickSort(String sortFeature, CatenableQueue<User> q){
+        if (q.size() > 1) {
+            CatenableQueue<User> qLess = new CatenableQueue<User>();
+            CatenableQueue<User> qEqual = new CatenableQueue<User>();
+            CatenableQueue<User> qGreater = new CatenableQueue<User>();
+
+            partition(sortFeature, q, 1, qLess, qEqual, qGreater);
+
+            quickSort(sortFeature, qLess);
+            quickSort(sortFeature, qGreater);
+
+            q.append(qLess);
+            q.append(qEqual);
+            q.append(qGreater);
+        }
     }
 
     /**
@@ -101,8 +134,13 @@ public class UserList {
     *    contains one User from userQueue.
     **/
     public CatenableQueue<CatenableQueue<User>> makeQueueOfQueues(){
-        //Replace with solution.
-        return null;
+        CatenableQueue<CatenableQueue<User>> queueOfQueue = new CatenableQueue<CatenableQueue<User>>();
+        while (userQueue.front() != null) {
+            CatenableQueue<User> q = new CatenableQueue<User>();
+            q.enqueue(userQueue.dequeue());
+            queueOfQueue.enqueue(q);
+        }
+        return queueOfQueue;
     }
 
     /**
@@ -118,8 +156,44 @@ public class UserList {
     *       sorted from smallest to largest by their sortFeature.
     **/
     public static CatenableQueue<User> mergeTwoQueues(String sortFeature, CatenableQueue<User> q1, CatenableQueue<User> q2){
-        //Replace with solution.
-        return null;
+        CatenableQueue<User> merged = new CatenableQueue<User>();
+        if (q1.size() > 0 && q2.size() > 0) {
+            User q1pointer = q1.dequeue();
+            User q2pointer = q2.dequeue();
+            while (q1pointer != null && q2pointer != null) {
+                int comparison = 0;
+                if (sortFeature.equals(BY_ID)) {
+                    comparison = q1pointer.compareById(q2pointer);
+                } else {
+                    comparison = q1pointer.compareByPagesPrinted(q2pointer);
+                }
+
+                if (comparison <= 0) {
+                    merged.enqueue(q1pointer);
+                    q1pointer = q1.dequeue();
+                } else {
+                    merged.enqueue(q2pointer);
+                    q2pointer = q2.dequeue();
+                }
+            }
+
+            if (q1pointer != null) {
+                merged.enqueue(q1pointer);
+            } else {
+                merged.enqueue(q2pointer);
+            }
+
+            if (q1.size() > 0) {
+                merged.append(q1);
+            } else {
+                merged.append(q2);
+            }
+            return merged;
+
+        } else if (q1.size() > 0) {
+            return q1;
+        } 
+        return q2;
     }
 
     /**
@@ -130,7 +204,20 @@ public class UserList {
     *       printed, sortFeatures equals "pages".
     **/
     public void mergeSort(String sortFeature){
-        //Replace with solution.
+        CatenableQueue<CatenableQueue<User>> queueOfQueue = makeQueueOfQueues();
+        CatenableQueue<CatenableQueue<User>> mergedQueueOfQueue = new CatenableQueue<CatenableQueue<User>>();
+        while (mergedQueueOfQueue.size() != 1) {
+            while (queueOfQueue.size() > 1) {
+                mergedQueueOfQueue.enqueue(mergeTwoQueues(sortFeature, queueOfQueue.dequeue(), queueOfQueue.dequeue()));
+                if (queueOfQueue.size() == 1) {
+                    mergedQueueOfQueue.enqueue(queueOfQueue.dequeue());
+                }
+            }
+            CatenableQueue<CatenableQueue<User>> temp = queueOfQueue;
+            queueOfQueue = mergedQueueOfQueue;
+            mergedQueueOfQueue = temp;
+        }
+        userQueue = mergedQueueOfQueue.dequeue();
     }
 
     /**
@@ -138,7 +225,8 @@ public class UserList {
     *   If two Users have printed the same number of pages, the User with the smaller user ID is first.
     **/
     public void sortByBothFeatures(){
-        //Replace with solution. Don't overthink this one!
+        mergeSort(BY_ID);
+        mergeSort(BY_PAGES_PRINTED);
     }
 
 
@@ -183,6 +271,38 @@ public class UserList {
     }
 
     @Test
+    public void goodQuickSortTest() {
+        UserList list = new UserList();
+        list.add(new User(2, 12));
+        list.add(new User(0, 10));
+        list.add(new User(1, 11));
+        list.add(new User(5, 1));
+        list.add(new User(7, 4));
+        list.add(new User(9, 8));
+        list.add(new User(11, 7));
+        list.add(new User(57, 3));
+
+        list.quickSort("id");
+
+        String sorted =
+         "[ User ID: 0, Pages Printed: 10,\n  User ID: 1, Pages Printed: 11,\n  " 
+         + "User ID: 2, Pages Printed: 12,\n  User ID: 5, Pages Printed: 1,\n  "
+         + "User ID: 7, Pages Printed: 4,\n  User ID: 9, Pages Printed: 8,\n  "
+         + "User ID: 11, Pages Printed: 7,\n  User ID: 57, Pages Printed: 3 ]";
+
+        assertEquals(sorted, list.toString());
+
+        sorted =
+         "[ User ID: 5, Pages Printed: 1,\n  User ID: 57, Pages Printed: 3,\n  " 
+         + "User ID: 7, Pages Printed: 4,\n  User ID: 11, Pages Printed: 7,\n  "
+         + "User ID: 9, Pages Printed: 8,\n  User ID: 0, Pages Printed: 10,\n  "
+         + "User ID: 1, Pages Printed: 11,\n  User ID: 2, Pages Printed: 12 ]";
+
+        list.quickSort("pages");
+        assertEquals(sorted, list.toString());
+    }
+
+    @Test
     public void naiveMakeQueuesTest(){
         UserList list = new UserList();
 
@@ -221,6 +341,35 @@ public class UserList {
     }
 
     @Test
+    public void goodMergeQueuesTest(){
+        CatenableQueue<User> q1 = new CatenableQueue<User>();
+        CatenableQueue<User> q2 = new CatenableQueue<User>();
+        q1.enqueue(new User(0, 20));
+        q2.enqueue(new User(3, 10));
+        q1.enqueue(new User(2, 21));
+        q2.enqueue(new User(5, 11));
+
+        CatenableQueue<User> merged = mergeTwoQueues("pages", q1, q2);
+        String mergeByPages = 
+        "[ User ID: 3, Pages Printed: 10,\n  User ID: 5, Pages Printed: 11,\n  "
+        + "User ID: 0, Pages Printed: 20,\n  User ID: 2, Pages Printed: 21 ]";
+        assertEquals(mergeByPages, merged.toString());        
+
+        q1 = new CatenableQueue<User>();
+        q2 = new CatenableQueue<User>();
+        q1.enqueue(new User(0, 20));
+        q2.enqueue(new User(3, 10));
+        q1.enqueue(new User(2, 21));
+        q2.enqueue(new User(5, 11));
+
+        merged = mergeTwoQueues("id", q1, q2);
+        String mergeById = 
+        "[ User ID: 0, Pages Printed: 20,\n  User ID: 2, Pages Printed: 21,\n  "
+        + "User ID: 3, Pages Printed: 10,\n  User ID: 5, Pages Printed: 11 ]";
+        assertEquals(mergeById, merged.toString());        
+    }
+
+    @Test
     public void naiveMergeSortTest() {
         UserList list = new UserList();
         list.add(new User(2, 12));
@@ -239,6 +388,38 @@ public class UserList {
     }
 
     @Test
+    public void goodMergeSortTest() {
+        UserList list = new UserList();
+        list.add(new User(2, 12));
+        list.add(new User(0, 10));
+        list.add(new User(1, 11));
+        list.add(new User(5, 1));
+        list.add(new User(7, 4));
+        list.add(new User(9, 8));
+        list.add(new User(11, 7));
+        list.add(new User(57, 3));
+
+        list.mergeSort("id");
+
+        String sorted =
+         "[ User ID: 0, Pages Printed: 10,\n  User ID: 1, Pages Printed: 11,\n  " 
+         + "User ID: 2, Pages Printed: 12,\n  User ID: 5, Pages Printed: 1,\n  "
+         + "User ID: 7, Pages Printed: 4,\n  User ID: 9, Pages Printed: 8,\n  "
+         + "User ID: 11, Pages Printed: 7,\n  User ID: 57, Pages Printed: 3 ]";
+
+        assertEquals(sorted, list.toString());
+
+        sorted =
+         "[ User ID: 5, Pages Printed: 1,\n  User ID: 57, Pages Printed: 3,\n  " 
+         + "User ID: 7, Pages Printed: 4,\n  User ID: 11, Pages Printed: 7,\n  "
+         + "User ID: 9, Pages Printed: 8,\n  User ID: 0, Pages Printed: 10,\n  "
+         + "User ID: 1, Pages Printed: 11,\n  User ID: 2, Pages Printed: 12 ]";
+
+        list.mergeSort("pages");
+        assertEquals(sorted, list.toString());
+    }
+
+    @Test
     public void naiveSortByBothTest() {
         UserList list = new UserList();
         list.add(new User(2, 12));
@@ -253,12 +434,35 @@ public class UserList {
         assertEquals(sorted, list.toString());
     }
 
+    @Test
+    public void goodSortByBothTest() {
+        UserList list = new UserList();
+        list.add(new User(2, 12));
+        list.add(new User(0, 10));
+        list.add(new User(1, 12));
+        list.add(new User(5, 1));
+        list.add(new User(7, 4));
+        list.add(new User(9, 4));
+        list.add(new User(11, 7));
+        list.add(new User(57, 3));
+
+        list.sortByBothFeatures();
+
+        String sorted =
+         "[ User ID: 5, Pages Printed: 1,\n  User ID: 57, Pages Printed: 3,\n  " 
+         + "User ID: 7, Pages Printed: 4,\n  User ID: 9, Pages Printed: 4,\n  "
+         + "User ID: 11, Pages Printed: 7,\n  User ID: 0, Pages Printed: 10,\n  "
+         + "User ID: 1, Pages Printed: 12,\n  User ID: 2, Pages Printed: 12 ]";
+
+        assertEquals(sorted, list.toString());
+    }
+
     public static void main(String [] args) {
         // Naive right-idea tests. Just because these tests pass does NOT mean
         // your code is bug-free!
 
         // Uncomment the following line when ready
-        // jh61b.junit.textui.runClasses(UserList.class);
+        jh61b.junit.textui.runClasses(UserList.class);
     }
 
 }

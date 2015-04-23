@@ -72,15 +72,14 @@ public class UserList {
     **/ 
     public static void partition(String sortFeature, CatenableQueue<User> qUnsorted, int pivot, 
         CatenableQueue<User> qLess, CatenableQueue<User> qEqual, CatenableQueue<User> qGreater){
-        User pivotUser = qUnsorted.nth(pivot);
 
         while (qUnsorted.front() != null) {
             User front = qUnsorted.dequeue();
             int comparison = 0;
             if (sortFeature.equals(BY_ID)) {
-                comparison = front.compareById(pivotUser);
+                comparison = front.getId() - pivot;
             } else {
-                comparison = front.compareByPagesPrinted(pivotUser);
+                comparison = front.getPagesPrinted() - pivot;
             }
 
             if (comparison < 0) {
@@ -106,7 +105,13 @@ public class UserList {
             CatenableQueue<User> qEqual = new CatenableQueue<User>();
             CatenableQueue<User> qGreater = new CatenableQueue<User>();
 
-            partition(sortFeature, q, 1, qLess, qEqual, qGreater);
+            int index = 0;
+            if (sortFeature.equals(BY_ID)) {
+                index = q.front().getId();
+            } else {
+                index = q.front().getPagesPrinted();
+            }
+            partition(sortFeature, q, index, qLess, qEqual, qGreater);
 
             quickSort(sortFeature, qLess);
             quickSort(sortFeature, qGreater);
@@ -337,7 +342,9 @@ public class UserList {
         merged = mergeTwoQueues("id", q1, q2);
         String mergeById = 
         "[ User ID: 0, Pages Printed: 20,\n  User ID: 1, Pages Printed: 10 ]";
-        assertEquals(mergeById, merged.toString());        
+        assertEquals(mergeById, merged.toString());       
+        assertEquals(0, q1.size());
+        assertEquals(0, q2.size()); 
     }
 
     @Test
@@ -366,7 +373,9 @@ public class UserList {
         String mergeById = 
         "[ User ID: 0, Pages Printed: 20,\n  User ID: 2, Pages Printed: 21,\n  "
         + "User ID: 3, Pages Printed: 10,\n  User ID: 5, Pages Printed: 11 ]";
-        assertEquals(mergeById, merged.toString());        
+        assertEquals(mergeById, merged.toString());      
+        assertEquals(0, q1.size());
+        assertEquals(0, q2.size());
     }
 
     @Test

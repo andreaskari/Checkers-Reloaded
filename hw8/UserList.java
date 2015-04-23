@@ -206,7 +206,8 @@ public class UserList {
         //     queueOfQueue = mergedQueueOfQueue;
         //     mergedQueueOfQueue = temp;
         // }
-        while (queueOfQueue.size() != 1) {
+        // mergedQueueOfQueue = queueOfQueue.dequeue();
+        while (queueOfQueue.size() != 1 && queueOfQueue.size() != 0) {
             queueOfQueue.enqueue(mergeTwoQueues(sortFeature, queueOfQueue.dequeue(), queueOfQueue.dequeue()));
         }
         userQueue = queueOfQueue.dequeue();

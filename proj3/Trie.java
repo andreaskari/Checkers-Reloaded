@@ -17,7 +17,7 @@ public class Trie {
                 return false;
             }
         }
-        return pointer.isTerm() == isFullWord;
+        return pointer.isTerm() == isFullWord || pointer.isTerm();
     }
 
     public void insert(String s) {

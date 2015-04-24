@@ -21,6 +21,20 @@ public class TrieTest {
     }
 
     @Test
+    public void testFind() {
+        Trie t = new Trie();
+        t.insert("josh");
+        t.insert("joshhugs");
+        t.insert("joshhubs");
+        assertTrue(t.find("josh", true));
+        assertTrue(t.find("josh", false));
+        assertTrue(!t.find("joshshrugs", false));
+        assertTrue(t.find("jos", false));
+        assertTrue(t.find("joshhugs", true));
+        assertTrue(t.find("joshhubs", true));
+    }
+
+    @Test
     public void testInsert() {
         Trie t = new Trie();
         boolean threwException = false;

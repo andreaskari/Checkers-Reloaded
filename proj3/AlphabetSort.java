@@ -6,7 +6,7 @@ public class AlphabetSort {
         Scanner stdin = new Scanner(System.in);
 
         String alphabet = stdin.nextLine();
-        HashMap<Character, Integer> alphabetMap = 
+        HashMap<Character, Integer> alphabetMap = new HashMap<Character, Integer>();
 
         Trie tree = new Trie();
         while (stdin.hasNextLine()) {

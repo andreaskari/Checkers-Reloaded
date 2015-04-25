@@ -22,7 +22,18 @@ public class AlphabetSort {
 
         Trie tree = new Trie(alphabetMap);
         while (stdin.hasNextLine()) {
-            tree.insert(stdin.nextLine());
+            String word = stdin.nextLine();
+            boolean containsKeysInAlphabet = true;
+            for (int i = 0; i < word.length(); i++) {
+                char letter = word.charAt(i);
+                if (!alphabetMap.containsKey((Character) letter)) {
+                    containsKeysInAlphabet = false;
+                    break;
+                }
+            }
+            if (containsKeysInAlphabet) {
+                tree.insert(word);
+            }
         }
 
         printAllWordsAlphabetically(tree.rootNode(), "");

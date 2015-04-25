@@ -39,7 +39,6 @@ public class Trie {
         if (s == null || s.length() == 0) {
             throw new IllegalArgumentException();
         }
-
         int stringSize = s.length();
         Node pointer = starter;
         for (int i = 0; i < stringSize; i++) {

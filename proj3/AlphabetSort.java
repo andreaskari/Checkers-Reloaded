@@ -2,7 +2,18 @@ import java.util.Scanner;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
+/**
+ * AlphabetSort takes in an alphabet and words from stdin
+ * prints them out to stdout in linear time with respect to
+ * max word length and number of words inputted.
+ * @author Andre Askarinam
+ */
 public class AlphabetSort {
+    /**
+     * Takes in data from stdin, inputs words into Trie if appropriate, 
+     * manually goes through Trie's nodes and prints words in sorted order.
+     * @param args unused.
+     */
     public static void main(String[] args) {
         Scanner stdin = new Scanner(System.in);
 
@@ -11,7 +22,9 @@ public class AlphabetSort {
         }
 
         String alphabet = stdin.nextLine();
-        HashMap<Character, Integer> alphabetMap = new HashMap<Character, Integer>(alphabet.length());
+        HashMap<Character, Integer> alphabetMap = 
+            new HashMap<Character, Integer>(alphabet.length());
+
         for (int i = 0; i < alphabet.length(); i++) {
             Character letter = (Character) alphabet.charAt(i);
             if (alphabetMap.containsKey(letter)) {
@@ -39,6 +52,12 @@ public class AlphabetSort {
         printAllWordsAlphabetically(tree.rootNode(), "");
     }
 
+    /** 
+     * Manually goes through Trie's nodes and prints words in sorted order.
+     * @param pointer Node is checked and then recursively has children checked.
+     * @param incompleteWord String is a helper parameter that stores the word 
+     * compiled while traversing through the nodes.
+     */
     private static void printAllWordsAlphabetically(Node pointer, String incompleteWord) {
         if (pointer.isTerm()) {
             System.out.println(incompleteWord);

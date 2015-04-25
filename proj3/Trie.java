@@ -11,18 +11,31 @@ public class Trie {
     private int size;
     private HashMap<Character, Integer> alphabetMap;
 
+    /**
+     * Initializes required data structures from parallel arrays.
+     */
     public Trie() {
         starter = new Node();
         size = 0;
         alphabetMap = null;
     }
 
+    /**
+     * Initializes required data structures from parallel arrays.
+     * @param alph HashMap of of Characters and their Integer weight.
+     */
     public Trie(HashMap<Character, Integer> alph) {
         starter = new Node(alph);
         size = 0;
         alphabetMap = alph;
     }
 
+    /**
+     * Checks necessary nodes linearly to see if word s exists.
+     * @param s String that we are looking for.
+     * @param isFullWord boolean that denotes whether s is a complete word.
+     * @return boolean whether the word is there and is a full word.
+     */
     public boolean find(String s, boolean isFullWord) {
         Node pointer = starter;
         for (int i = 0; i < s.length(); i++) {
@@ -35,6 +48,10 @@ public class Trie {
         return pointer.isTerm() == isFullWord || pointer.isTerm();
     }
 
+    /**
+     * Inserts s into nodes of the Trie.
+     * @param s String that we inserting.
+     */
     public void insert(String s) {
         if (s == null || s.length() == 0) {
             throw new IllegalArgumentException();
@@ -52,6 +69,10 @@ public class Trie {
         size++;
     }
 
+    /**
+     * Returns the starting root node of the Trie.
+     * @return root Node.
+     */
     public Node rootNode() {
         return starter;
     }

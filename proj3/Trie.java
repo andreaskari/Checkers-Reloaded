@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 /**
  * Prefix-Trie. Supports linear time find() and insert(). 
  * Should support determining whether a word is a full word in the 
@@ -5,8 +7,21 @@
  * @author Andre Askarinam
  */
 public class Trie {
-    private Node starter = new Node();
-    private int size = 0;
+    private Node starter;
+    private int size;
+    private HashMap<Character, Integer> alphabetMap;
+
+    public Trie() {
+        starter = new Node();
+        size = 0;
+        alphabetMap = null;
+    }
+
+    public Trie(HashMap<Character, Integer> alph) {
+        starter = new Node(alph);
+        size = 0;
+        alphabetMap = alph;
+    }
 
     public boolean find(String s, boolean isFullWord) {
         Node pointer = starter;
@@ -31,10 +46,14 @@ public class Trie {
             char value = s.charAt(i);
             Node next = pointer.getChild(value);
             if (next == null) {
-                pointer.addChild(new Node(value, i == stringSize - 1));
+                pointer.addChild(new Node(value, i == stringSize - 1, alphabetMap));
             }
             pointer = pointer.getChild(value);
         }
         size++;
+    }
+
+    public Node rootNode() {
+        return starter;
     }
 }

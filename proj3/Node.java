@@ -2,18 +2,17 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class Node {
-    private static final int ROOT_NODE_CAPACITY = 256;
-    private static final int INITIAL_CAPACITY = 128;
+    private static final int NODE_CAPACITY = 256;
 
-    private char value;
+    private char letter;
     private boolean isTerm;
     private HashMap<Character, Node> children;
     private PriorityQueue<Character> keySet;
 
     public Node() {
-        value = ' ';
+        letter = ' ';
         isTerm = false;
-        children = new HashMap<Character, Node>(ROOT_NODE_CAPACITY);
+        children = new HashMap<Character, Node>(NODE_CAPACITY);
     }
 
     public Node(HashMap<Character, Integer> alphabetMap) {
@@ -21,18 +20,18 @@ public class Node {
         if (alphabetMap == null) {
             keySet = null;
         } else {
-            keySet = new PriorityQueue<Character>(INITIAL_CAPACITY, new AlphabetComparator(alphabetMap));
+            keySet = new PriorityQueue<Character>(NODE_CAPACITY, new AlphabetComparator(alphabetMap));
         }
     }
 
-    public Node(char v, boolean it, HashMap<Character, Integer> alphabetMap) {
+    public Node(char l, boolean it, HashMap<Character, Integer> alphabetMap) {
         this(alphabetMap);
-        value = v;
+        letter = l;
         isTerm = it;
     }
 
-    public char value() {
-        return value;
+    public char letter() {
+        return letter;
     }
 
     public boolean isTerm() {
@@ -45,13 +44,13 @@ public class Node {
 
     public void addChild(Node child) {
         if (keySet != null) {
-            keySet.add((Character) child.value());
+            keySet.add((Character) child.letter());
         }
-        children.put((Character) child.value(), child);
+        children.put((Character) child.letter(), child);
     }
 
-    public Node getChild(char value) {
-        return children.get((Character) value);
+    public Node getChild(char letter) {
+        return children.get((Character) letter);
     }
 
     public boolean hasChildren() {

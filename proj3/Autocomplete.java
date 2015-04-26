@@ -1,22 +1,32 @@
+import java.util.LinkedList;
+
 /**
  * Implements autocomplete on prefixes for a given dictionary of terms and weights.
  * @author Andre Askarinam
  */
 public class Autocomplete {
+    private WeightedTrie trie;
+
     /**
      * Initializes required data structures from parallel arrays.
      * @param terms Array of terms.
      * @param weights Array of weights.
      */
     public Autocomplete(String[] terms, double[] weights) {
+        trie = new WeightedTrie();
+        for (int i = 0; i < terms.length; i++) {
+            trie.insert(terms[i], (Double) weights[i]);
+        }
+        trie.prioritizeWeightedTrie();
     }
 
     /**
      * Find the weight of a given term. If it is not in the dictionary, return 0.0
-     * @param term
+     * @param term String
      * @return
      */
     public double weightOf(String term) {
+        return trie.getWeightOf(term);
     }
 
     /**

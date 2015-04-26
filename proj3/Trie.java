@@ -7,7 +7,7 @@ import java.util.HashMap;
  * @author Andre Askarinam
  */
 public class Trie {
-    private Node starter;
+    private Node root;
     private int size;
     private HashMap<Character, Integer> alphabetMap;
 
@@ -15,7 +15,7 @@ public class Trie {
      * Initializes required data structures from parallel arrays.
      */
     public Trie() {
-        starter = new Node();
+        root = new Node();
         size = 0;
         alphabetMap = null;
     }
@@ -25,7 +25,7 @@ public class Trie {
      * @param alph HashMap of of Characters and their Integer weight.
      */
     public Trie(HashMap<Character, Integer> alph) {
-        starter = new Node(alph);
+        root = new Node(alph);
         size = 0;
         alphabetMap = alph;
     }
@@ -37,10 +37,10 @@ public class Trie {
      * @return boolean whether the word is there and is a full word.
      */
     public boolean find(String s, boolean isFullWord) {
-        Node pointer = starter;
+        Node pointer = root;
         for (int i = 0; i < s.length(); i++) {
-            char value = s.charAt(i);
-            pointer = pointer.getChild(value);
+            char letter = s.charAt(i);
+            pointer = pointer.getChild(letter);
             if (pointer == null) {
                 return false;
             }
@@ -57,16 +57,17 @@ public class Trie {
             throw new IllegalArgumentException();
         }
         int stringSize = s.length();
-        Node pointer = starter;
+        Node pointer = root;
         for (int i = 0; i < stringSize; i++) {
-            char value = s.charAt(i);
-            Node next = pointer.getChild(value);
+            char letter = s.charAt(i);
+            Node next = pointer.getChild(letter);
             if (next == null) {
-                pointer.addChild(new Node(value, i == stringSize - 1, alphabetMap));
+                pointer.addChild(new Node(letter, i == stringSize - 1, alphabetMap));
             }
-            pointer = pointer.getChild(value);
+            pointer = pointer.getChild(letter);
         }
-        size++;
+        pointer.setAsTerm();
+        size += 1;
     }
 
     /**
@@ -74,6 +75,6 @@ public class Trie {
      * @return root Node.
      */
     public Node rootNode() {
-        return starter;
+        return root;
     }
 }

@@ -44,7 +44,7 @@ public class MazeDepthFirstPaths extends MazeExplorer {
                 dfs(w);
                 if (targetFound) {
                     return;
-                }                
+                }
             }
         }
     }

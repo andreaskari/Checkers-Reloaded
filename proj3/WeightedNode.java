@@ -37,16 +37,16 @@ public class WeightedNode implements Comparable {
         value = v;
     }
 
-    public double value() {
-        return value.doubleValue();
+    public Double value() {
+        return value;
     }
 
     public void setMax(Double m) {
         max = m;
     }
 
-    public double max() {
-        return max.doubleValue();
+    public Double max() {
+        return max;
     }
 
     public void setMiddleChild(WeightedNode child) {
@@ -82,6 +82,9 @@ public class WeightedNode implements Comparable {
 
     public int compareTo(Object o) {
         if (o instanceof WeightedNode) {
+            if (max == ((WeightedNode) o).max()) {
+                return (int) (10 * (value - ((WeightedNode) o).value()));
+            }
             return (int) (10 * (max - ((WeightedNode) o).max()));
         }
         return 0;

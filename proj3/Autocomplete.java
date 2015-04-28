@@ -14,10 +14,20 @@ public class Autocomplete {
      */
     public Autocomplete(String[] terms, double[] weights) {
         trie = new WeightedTrie();
+        if (terms.length != weights.length) {
+            throw new IllegalArgumentException();
+        }
         for (int i = 0; i < terms.length; i++) {
+            if (weights[i] < 0) {
+                throw new IllegalArgumentException();
+            }
+            if (trie.getWeightOfWord(terms[i]) == 0.0) {
+                throw new IllegalArgumentException();
+            }
             trie.insert(terms[i], (Double) weights[i]);
         }
         trie.prioritizeWeightedTrie();
+        System.out.println("Done");
     }
 
     /**
@@ -26,7 +36,7 @@ public class Autocomplete {
      * @return
      */
     public double weightOf(String term) {
-        return trie.getWeightOf(term);
+        return trie.getWeightOfWord(term);
     }
 
     /**
@@ -35,6 +45,7 @@ public class Autocomplete {
      * @return Best (highest weight) matching string in the dictionary.
      */
     public String topMatch(String prefix) {
+        return trie.getTopWeightsOfPartialWords(prefix, 1).get(0);
     }
 
     /**
@@ -45,6 +56,10 @@ public class Autocomplete {
      * @return
      */
     public Iterable<String> topMatches(String prefix, int k) {
+        if (k <= 0) {
+            throw new IllegalArgumentException();
+        }
+        return trie.getTopWeightsOfPartialWords(prefix, k);
     }
 
     /**

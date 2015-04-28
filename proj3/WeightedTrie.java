@@ -1,4 +1,7 @@
+import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Arrays;
 
 public class WeightedTrie {
     private WeightedNode root;
@@ -25,7 +28,7 @@ public class WeightedTrie {
         WeightedNode pointer = root;
         for (int i = 0; i < stringSize; i++) {
             char letter = str.charAt(i);
-            if (pointer.max() < val) {
+            if (pointer.max() == null || pointer.max() < val) {
                 pointer.setMax(val);
             }
             WeightedNode next = pointer.getChild(letter);
@@ -57,22 +60,108 @@ public class WeightedTrie {
         return pointer.value();
     }
 
-    public Iterable<String> getTopWeightsOfPartialWords(String partialStr, int num) {
-        ArrayList<String> words = new ArrayList<String>(num);
+    public ArrayList<String> getTopWeightsOfPartialWords(String partialStr, int numRequested) {
+        ArrayList<String> words = new ArrayList<String>(numRequested);
         WeightedNode pointer = root;
-        for (int i = 0; i < partialStr.size(); i++) {
+        for (int i = 0; i < partialStr.length(); i++) {
             char letter = partialStr.charAt(i);
             pointer = pointer.getChild(letter);
             if (pointer == null) {
                 return words;
             }
         }
-        for (int i = 0; i < num; i++) {
-            // How to traverse and 
+        PriorityQueue<StringAndValue> aboveNextTop = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
+        if (pointer.value() == pointer.max()) {
+            words.add(partialStr);
+            numRequested -= 1;
+        }
+
+        int numChildren = pointer.getSortedChildren().size();
+        if (numChildren > 0) {
+            WeightedNode[] sortedPQ = pointer.getSortedChildren().toArray(new WeightedNode[numChildren]);
+            Arrays.sort(sortedPQ);
+            for (int i = sortedPQ.length - 1; numRequested > 0 && i >= 0; i--) {
+                WeightedNode child = sortedPQ[i];
+
+                addDownBranch(child, partialStr, aboveNextTop, words, child.max(), numRequested - 1);
+                numRequested -= 1;
+
+                double minWeight = 0.0;
+                if (i != 0) {
+                    WeightedNode next = sortedPQ[i-1];
+                    minWeight = next.max();
+                }
+                while (aboveNextTop.size() > 0 && numRequested > 0 && (double) aboveNextTop.peek().value() >= minWeight) {
+                    words.add(aboveNextTop.poll().word());
+                    numRequested -= 1;
+                }
+            }
+        }
+        return words;
+    }
+
+    private void addDownBranch(WeightedNode pointer, String partialStr, 
+            PriorityQueue<StringAndValue> pq, ArrayList<String> words, double maxValue, int numRequested) {
+
+        while (pointer.getSortedChildren().size() == 1) {
+            partialStr += pointer.letter();
+            if (pointer.value() != null && pointer.value() == maxValue) {
+                words.add(partialStr);
+            } else if (pointer.value() != null) {
+                pq.add(new StringAndValue(partialStr, pointer.value()));
+            }
+            WeightedNode next = pointer.getSortedChildren().peek();
+            pointer = next;
+        }
+        partialStr += pointer.letter();
+        if (pointer.value() != null && pointer.value() == maxValue) {
+            words.add(partialStr);
+        } else if (pointer.value() != null) {
+            pq.add(new StringAndValue(partialStr, pointer.value()));
+        }
+        if (pointer.hasChildren()) {
+            WeightedNode[] sortedPQ = pointer.getSortedChildren().toArray(new WeightedNode[pointer.getSortedChildren().size()]);
+            Arrays.sort(sortedPQ);
+            for (int i = 0; i < sortedPQ.length; i++) {
+                WeightedNode child = sortedPQ[i];
+                addDownBranch(child, partialStr, pq, words, maxValue, numRequested);
+            }
         }
     }
 
     public WeightedNode rootNode() {
         return root;
+    }
+
+    private class StringAndValue implements Comparable {
+        private Double value;
+        private String word;
+
+        public StringAndValue(String w, Double v) {
+            value = v;
+            word = w;
+        }
+
+        public Double value() {
+            return value;
+        }
+
+        public String word() {
+            return word;
+        }
+
+        public int compareTo(Object o) {
+            return (int) (10 * (value - ((StringAndValue) o).value()));
+        }
+    }
+
+    private class SVComparator implements Comparator<StringAndValue> {
+        public int compare(StringAndValue o1, StringAndValue o2) {
+            return -1 * o1.compareTo(o2);
+        }
+
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
     }
 }

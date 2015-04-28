@@ -21,7 +21,7 @@ public class Autocomplete {
             if (weights[i] < 0) {
                 throw new IllegalArgumentException();
             }
-            if (trie.getWeightOfWord(terms[i]) == 0.0) {
+            if (trie.find(terms[i])) {
                 throw new IllegalArgumentException();
             }
             trie.insert(terms[i], (Double) weights[i]);

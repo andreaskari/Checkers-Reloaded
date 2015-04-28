@@ -48,6 +48,18 @@ public class WeightedTrie {
         size += 1;
     }
 
+    public boolean find(String s) {
+        WeightedNode pointer = root;
+        for (int i = 0; i < s.length(); i++) {
+            char letter = s.charAt(i);
+            pointer = pointer.getChild(letter);
+            if (pointer == null) {
+                return false;
+            }
+        }
+        return pointer.value() != null;
+    }
+
     public double getWeightOfWord(String str) {
         WeightedNode pointer = root;
         for (int i = 0; i < str.length(); i++) {

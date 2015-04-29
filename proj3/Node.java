@@ -2,7 +2,8 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class Node {
-    private static final int NODE_CAPACITY = 256;
+    private static final int ROOT_NODE_CAPACITY = 256;
+    private static final int DEEP_NODE_CAPACITY = 16;
 
     private char letter;
     private boolean isTerm;
@@ -12,7 +13,7 @@ public class Node {
     public Node() {
         letter = ' ';
         isTerm = false;
-        children = new HashMap<Character, Node>(NODE_CAPACITY);
+        children = new HashMap<Character, Node>(ROOT_NODE_CAPACITY);
     }
 
     public Node(HashMap<Character, Integer> alphabetMap) {
@@ -20,7 +21,7 @@ public class Node {
         if (alphabetMap == null) {
             keySet = null;
         } else {
-            keySet = new PriorityQueue<Character>(NODE_CAPACITY, new AlphabetComparator(alphabetMap));
+            keySet = new PriorityQueue<Character>(DEEP_NODE_CAPACITY, new AlphabetComparator(alphabetMap));
         }
     }
 

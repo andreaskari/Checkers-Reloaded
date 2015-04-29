@@ -18,6 +18,7 @@ public class Autocomplete {
             throw new IllegalArgumentException();
         }
         for (int i = 0; i < terms.length; i++) {
+            // System.out.println(terms[i] + " " + weights[i]);
             if (weights[i] < 0) {
                 throw new IllegalArgumentException();
             }
@@ -26,14 +27,15 @@ public class Autocomplete {
             }
             trie.insert(terms[i], (Double) weights[i]);
         }
+        // System.out.println("Inputted");
         trie.prioritizeWeightedTrie();
-        System.out.println("Done");
+        // System.out.println("Done");
     }
 
     /**
      * Find the weight of a given term. If it is not in the dictionary, return 0.0
-     * @param term String
-     * @return
+     * @param term String to check weight of.
+     * @return weight of the inputted term.
      */
     public double weightOf(String term) {
         return trie.getWeightOfWord(term);
@@ -51,9 +53,9 @@ public class Autocomplete {
     /**
      * Returns the top k matching terms (in descending order of weight) as an iterable.
      * If there are less than k matches, return all the matching terms.
-     * @param prefix
-     * @param k
-     * @return
+     * @param prefix String that is part or full word
+     * @param k number of matches
+     * @return Iterable of Strings of highest weight words that start with prefix 
      */
     public Iterable<String> topMatches(String prefix, int k) {
         if (k <= 0) {
@@ -99,8 +101,9 @@ public class Autocomplete {
         int k = Integer.parseInt(args[1]);
         while (StdIn.hasNextLine()) {
             String prefix = StdIn.readLine();
-            for (String term : autocomplete.topMatches(prefix, k))
+            for (String term : autocomplete.topMatches(prefix, k)) {
                 StdOut.printf("%14.1f  %s\n", autocomplete.weightOf(term), term);
+            }
         }
     }
 }

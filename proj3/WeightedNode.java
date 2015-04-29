@@ -2,7 +2,8 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class WeightedNode implements Comparable {
-    private static final int NODE_CAPACITY = 256;
+    private static final int ROOT_NODE_CAPACITY = 256;
+    private static final int DEEP_NODE_CAPACITY = 16;
 
     private char letter;
     private Double value;
@@ -17,7 +18,7 @@ public class WeightedNode implements Comparable {
         max = null;
         sortedChildren = null;
         middleNode = null;
-        children = new HashMap<Character, WeightedNode>(NODE_CAPACITY);
+        children = new HashMap<Character, WeightedNode>(ROOT_NODE_CAPACITY);
     }
 
     public WeightedNode(char l, Double v, Double m) {
@@ -26,7 +27,7 @@ public class WeightedNode implements Comparable {
         max = m;
         sortedChildren = null;
         middleNode = null;
-        children = new HashMap<Character, WeightedNode>(NODE_CAPACITY);
+        children = new HashMap<Character, WeightedNode>(DEEP_NODE_CAPACITY);
     }
 
     public char letter() {

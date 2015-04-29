@@ -33,6 +33,10 @@ public class AlphabetSort {
             alphabetMap.put(letter, (Integer) i);
         }
 
+        if (!stdin.hasNextLine()) {
+            throw new IllegalArgumentException();
+        }
+        
         Trie tree = new Trie(alphabetMap);
         while (stdin.hasNextLine()) {
             String word = stdin.nextLine();

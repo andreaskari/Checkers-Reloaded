@@ -82,10 +82,12 @@ public class WeightedTrie {
                 return words;
             }
         }
-        PriorityQueue<StringAndValue> aboveNextTop = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
+        PriorityQueue<StringAndValue> waitListed = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
         if (pointer.value() == pointer.max()) {
             words.add(partialStr);
             numRequested -= 1;
+        } else if (pointer.value() != null) {
+            waitListed.add(new StringAndValue(partialStr, pointer.value()));
         }
 
         int numChildren = pointer.getSortedChildren().size();
@@ -95,7 +97,7 @@ public class WeightedTrie {
             for (int i = sortedPQ.length - 1; numRequested > 0 && i >= 0; i--) {
                 WeightedNode child = sortedPQ[i];
 
-                addDownBranch(child, partialStr, aboveNextTop, words, child.max(), numRequested - 1);
+                addDownBranch(child, partialStr, waitListed, words, child.max(), numRequested - 1);
                 numRequested -= 1;
 
                 double minWeight = 0.0;
@@ -103,8 +105,8 @@ public class WeightedTrie {
                     WeightedNode next = sortedPQ[i-1];
                     minWeight = next.max();
                 }
-                while (aboveNextTop.size() > 0 && numRequested > 0 && (double) aboveNextTop.peek().value() >= minWeight) {
-                    words.add(aboveNextTop.poll().word());
+                while (waitListed.size() > 0 && numRequested > 0 && (double) waitListed.peek().value() >= minWeight) {
+                    words.add(waitListed.poll().word());
                     numRequested -= 1;
                 }
             }

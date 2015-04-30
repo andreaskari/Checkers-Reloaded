@@ -13,7 +13,7 @@ public class Autocomplete {
      * @param weights Array of weights.
      */
     public Autocomplete(String[] terms, double[] weights) {
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
         tst = new WeightedTST();
         if (terms.length != weights.length) {
             throw new IllegalArgumentException();
@@ -29,7 +29,7 @@ public class Autocomplete {
             tst.insert(terms[i], (Double) weights[i]);
         }
         tst.prioritizeTST();
-        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
+        // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 
     /**
@@ -58,11 +58,11 @@ public class Autocomplete {
      * @return Iterable of Strings of highest weight words that start with prefix 
      */
     public Iterable<String> topMatches(String prefix, int k) {
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
         if (k <= 0) {
             throw new IllegalArgumentException();
         }
-        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
+        // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
         return tst.getTopWeightsOfPartialWords(prefix, k);
     }
 

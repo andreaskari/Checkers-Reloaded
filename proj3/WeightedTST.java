@@ -102,7 +102,7 @@ public class WeightedTST {
                 for (int i = sortedPQ.length - 1; numRequested > 0 && i >= 0; i--) {
                     TSTNode child = sortedPQ[i];
 
-                    addDownBranch(child, partialStr, waitListed, words, child.max(), numRequested - 1);
+                    addDownBranch(child, partialStr, waitListed, words, child.max());
                     numRequested -= 1;
 
                     double minWeight = 0.0;
@@ -121,7 +121,7 @@ public class WeightedTST {
     }
 
     private void addDownBranch(TSTNode pointer, String partialStr, 
-            PriorityQueue<StringAndValue> pq, ArrayList<String> words, double maxValue, int numRequested) {
+            PriorityQueue<StringAndValue> pq, ArrayList<String> words, double maxValue) {
 
         if (pointer.value() != null && pointer.value() == maxValue) {
             words.add(partialStr + pointer.letter());
@@ -133,7 +133,7 @@ public class WeightedTST {
             Arrays.sort(sortedPQ);
             for (int i = 0; i < sortedPQ.length; i++) {
                 TSTNode child = sortedPQ[i];
-                addDownBranch(child, partialStr + pointer.letter(), pq, words, maxValue, numRequested);
+                addDownBranch(child, partialStr + pointer.letter(), pq, words, maxValue);
             }
         }
     }

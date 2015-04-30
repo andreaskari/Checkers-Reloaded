@@ -35,12 +35,11 @@ public class WeightedTrie {
             if (next == null) {
                 WeightedNode wNode = null;
                 if (i == stringSize - 1) {
-                    wNode = new WeightedNode(letter, (Double) val, (Double) val);
+                    wNode = new WeightedNode(letter, (Double) val, (Double) val, pointer);
                 } else {
-                    wNode = new WeightedNode(letter, null, (Double) val);
+                    wNode = new WeightedNode(letter, null, (Double) val, pointer);
                 }
                 pointer.addChild(wNode);
-                pointer.setMiddleChild(wNode);
             }
             pointer = pointer.getChild(letter);
         }

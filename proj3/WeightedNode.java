@@ -8,26 +8,29 @@ public class WeightedNode implements Comparable {
     private char letter;
     private Double value;
     private Double max;
-    private WeightedNode middleNode;
+    private WeightedNode parent;
     private HashMap<Character, WeightedNode> children;
     private PriorityQueue<WeightedNode> sortedChildren;
+    // private PriorityQueue<WeightedNode> sortedAdjacent;
 
     public WeightedNode() {
         letter = ' ';
         value = null;
         max = null;
         sortedChildren = null;
-        middleNode = null;
+        parent = null;
         children = new HashMap<Character, WeightedNode>(ROOT_NODE_CAPACITY);
+        // sortedAdjacent = new PriorityQueue<WeightedNode>();
     }
 
-    public WeightedNode(char l, Double v, Double m) {
+    public WeightedNode(char l, Double v, Double m, WeightedNode p) {
         letter = l;
         value = v;
         max = m;
         sortedChildren = null;
-        middleNode = null;
+        parent = p;
         children = new HashMap<Character, WeightedNode>(DEEP_NODE_CAPACITY);
+        // sortedAdjacent = new PriorityQueue<WeightedNode>();
     }
 
     public char letter() {
@@ -50,12 +53,8 @@ public class WeightedNode implements Comparable {
         return max;
     }
 
-    public void setMiddleChild(WeightedNode child) {
-        middleNode = child;
-    }
-
-    public WeightedNode getMiddleChild() {
-        return middleNode;
+    public WeightedNode parent() {
+        return parent;
     }
 
     public void addChild(WeightedNode child) {
@@ -73,13 +72,17 @@ public class WeightedNode implements Comparable {
     public void sortChildren() {
         sortedChildren = new PriorityQueue<WeightedNode>();
         for (WeightedNode child: children.values()) {
-            sortedChildren.add(child);
+            sortedChildren.add(child);   
         }
     }
 
     public PriorityQueue<WeightedNode> getSortedChildren() {
         return sortedChildren;
     }
+
+    // public PriorityQueue<WeightedNode> getSortedAdjacent() {
+    //     return sortedAdjacent;
+    // } 
 
     public int compareTo(Object o) {
         if (o instanceof WeightedNode) {

@@ -1,4 +1,4 @@
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.PriorityQueue;
 
 public class Node {
@@ -7,16 +7,16 @@ public class Node {
 
     private char letter;
     private boolean isTerm;
-    private HashMap<Character, Node> children;
+    private TreeMap<Character, Node> children;
     private PriorityQueue<Character> keySet;
 
     public Node() {
         letter = ' ';
         isTerm = false;
-        children = new HashMap<Character, Node>(ROOT_NODE_CAPACITY);
+        children = new TreeMap<Character, Node>();
     }
 
-    public Node(HashMap<Character, Integer> alphabetMap) {
+    public Node(TreeMap<Character, Integer> alphabetMap) {
         this();
         if (alphabetMap == null) {
             keySet = null;
@@ -25,7 +25,7 @@ public class Node {
         }
     }
 
-    public Node(char l, boolean it, HashMap<Character, Integer> alphabetMap) {
+    public Node(char l, boolean it, TreeMap<Character, Integer> alphabetMap) {
         this(alphabetMap);
         letter = l;
         isTerm = it;

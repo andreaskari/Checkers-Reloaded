@@ -9,10 +9,7 @@ public class TSTNode implements Comparable {
     private Double value, max;
     private TSTNode left, middle, right;
 
-    // private WeightedNode parent;
-    // private HashMap<Character, WeightedNode> children;
     private PriorityQueue<TSTNode> prioritizedChildren;
-    // private PriorityQueue<WeightedNode> sortedAdjacent;
 
     public TSTNode() {
         letter = ' ';
@@ -77,26 +74,24 @@ public class TSTNode implements Comparable {
     public void setPrioritizedChildren() {
         prioritizedChildren = new PriorityQueue<TSTNode>();
         if (middle != null) {
-            prioritizedChildren.add(middle);
-            if (middle.right != null) {
+            // prioritizedChildren.add(middle);
+            if (middle.right() != null) {
                 prioritizedChildren.add(middle.right());
             }
-            if (middle.left != null) {
+            if (middle.left() != null) {
                 prioritizedChildren.add(middle.left());
             }
+            if (middle.middle() != null) {
+                prioritizedChildren.add(middle.middle());
+            }
         }
+        // if (right != null) {
+        //     prioritizedChildren.add(right);
+        // }
+        // if (left() != null) {
+        //     prioritizedChildren.add(left);
+        // }
     }
-
-    // public TSTNode getNextLeftMiddle() {
-    //     TSTNode pointer = this;
-    //     while (pointer != null) {
-    //         pointer = pointer.left();
-    //         if (pointer.middle() != null) {
-    //             return pointer.middle();
-    //         }
-    //     }
-    //     return
-    // }
 
     public PriorityQueue<TSTNode> prioritizedChildren() {
         return prioritizedChildren;

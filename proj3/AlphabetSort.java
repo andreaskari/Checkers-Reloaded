@@ -1,5 +1,5 @@
 import java.util.Scanner;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.PriorityQueue;
 
 /**
@@ -15,6 +15,7 @@ public class AlphabetSort {
      * @param args unused.
      */
     public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
         Scanner stdin = new Scanner(System.in);
 
         if (!stdin.hasNextLine()) {
@@ -22,8 +23,8 @@ public class AlphabetSort {
         }
 
         String alphabet = stdin.nextLine();
-        HashMap<Character, Integer> alphabetMap = 
-            new HashMap<Character, Integer>(alphabet.length());
+        TreeMap<Character, Integer> alphabetMap = 
+            new TreeMap<Character, Integer>();
 
         for (int i = 0; i < alphabet.length(); i++) {
             Character letter = (Character) alphabet.charAt(i);
@@ -54,6 +55,7 @@ public class AlphabetSort {
         }
 
         printAllWordsAlphabetically(tree.rootNode(), "");
+        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 
     /** 

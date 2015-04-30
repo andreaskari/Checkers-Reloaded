@@ -102,7 +102,11 @@ public class WeightedTST {
                 for (int i = sortedPQ.length - 1; numRequested > 0 && i >= 0; i--) {
                     TSTNode child = sortedPQ[i];
 
-                    addDownBranch(child, partialStr, waitListed, words, child.max());
+                    if (pointer.middle() != null && child == pointer.middle().middle()) {
+                        addDownBranch(child, partialStr + pointer.middle().letter(), waitListed, words, pointer.max());
+                    } else {
+                        addDownBranch(child, partialStr, waitListed, words, pointer.max());
+                    }
                     numRequested -= 1;
 
                     double minWeight = 0.0;
@@ -133,7 +137,11 @@ public class WeightedTST {
             Arrays.sort(sortedPQ);
             for (int i = 0; i < sortedPQ.length; i++) {
                 TSTNode child = sortedPQ[i];
-                addDownBranch(child, partialStr + pointer.letter(), pq, words, maxValue);
+                if (pointer.middle() != null && child == pointer.middle().middle()) {
+                    addDownBranch(child, partialStr + pointer.letter() + pointer.middle().letter(), pq, words, maxValue);
+                } else {
+                    addDownBranch(child, partialStr + pointer.letter(), pq, words, maxValue);
+                }
             }
         }
     }

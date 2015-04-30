@@ -1,4 +1,4 @@
-import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Prefix-Trie. Supports linear time find() and insert(). 
@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Trie {
     private Node root;
     private int size;
-    private HashMap<Character, Integer> alphabetMap;
+    private TreeMap<Character, Integer> alphabetMap;
 
     /**
      * Initializes required data structures from parallel arrays.
@@ -22,9 +22,9 @@ public class Trie {
 
     /**
      * Initializes required data structures from parallel arrays.
-     * @param alph HashMap of of Characters and their Integer weight.
+     * @param alph TreeMap of of Characters and their Integer weight.
      */
-    public Trie(HashMap<Character, Integer> alph) {
+    public Trie(TreeMap<Character, Integer> alph) {
         root = new Node(alph);
         size = 0;
         alphabetMap = alph;

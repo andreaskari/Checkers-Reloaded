@@ -1,14 +1,14 @@
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class AlphabetComparator implements Comparator<Character> {
-	private HashMap<Character, Integer> alphabetMap;
+	private TreeMap<Character, Integer> alphabetMap;
 
-	public AlphabetComparator(HashMap<Character, Integer> am) {
+	public AlphabetComparator(TreeMap<Character, Integer> am) {
 		alphabetMap = am;
 	}
 
-	public HashMap<Character, Integer> getMap() {
+	public TreeMap<Character, Integer> getMap() {
 		return alphabetMap;
 	}
 

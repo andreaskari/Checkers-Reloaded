@@ -5,7 +5,7 @@ import java.util.LinkedList;
  * @author Andre Askarinam
  */
 public class Autocomplete {
-    private WeightedTrie trie;
+    private WeightedTST tst;
 
     /**
      * Initializes required data structures from parallel arrays.
@@ -13,23 +13,23 @@ public class Autocomplete {
      * @param weights Array of weights.
      */
     public Autocomplete(String[] terms, double[] weights) {
-        trie = new WeightedTrie();
+        long startTime = System.currentTimeMillis();
+        tst = new WeightedTST();
         if (terms.length != weights.length) {
             throw new IllegalArgumentException();
         }
         for (int i = 0; i < terms.length; i++) {
-            // System.out.println(terms[i] + " " + weights[i]);
             if (weights[i] < 0) {
                 throw new IllegalArgumentException();
             }
-            if (trie.find(terms[i])) {
+            if (tst.contains(terms[i])) {
+                System.out.println(terms[i]);
                 throw new IllegalArgumentException();
             }
-            trie.insert(terms[i], (Double) weights[i]);
+            tst.insert(terms[i], (Double) weights[i]);
         }
-        // System.out.println("Inputted");
-        trie.prioritizeWeightedTrie();
-        // System.out.println("Done");
+        tst.prioritizeTST();
+        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 
     /**
@@ -38,7 +38,7 @@ public class Autocomplete {
      * @return weight of the inputted term.
      */
     public double weightOf(String term) {
-        return trie.getWeightOfWord(term);
+        return tst.getWeightOf(term);
     }
 
     /**
@@ -47,7 +47,7 @@ public class Autocomplete {
      * @return Best (highest weight) matching string in the dictionary.
      */
     public String topMatch(String prefix) {
-        return trie.getTopWeightsOfPartialWords(prefix, 1).get(0);
+        return tst.getTopWeightsOfPartialWords(prefix, 1).get(0);
     }
 
     /**
@@ -58,10 +58,12 @@ public class Autocomplete {
      * @return Iterable of Strings of highest weight words that start with prefix 
      */
     public Iterable<String> topMatches(String prefix, int k) {
+        long startTime = System.currentTimeMillis();
         if (k <= 0) {
             throw new IllegalArgumentException();
         }
-        return trie.getTopWeightsOfPartialWords(prefix, k);
+        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
+        return tst.getTopWeightsOfPartialWords(prefix, k);
     }
 
     /**
@@ -73,6 +75,10 @@ public class Autocomplete {
      * @return Iterable in descending weight order of the matches
      */
     public Iterable<String> spellCheck(String word, int dist, int k) {
+        // LinkedList<String> results = new LinkedList<String>();  
+        // /* YOUR CODE HERE; LEAVE BLANK IF NOT PURSUING BONUS */
+        // return results;
+
         LinkedList<String> results = new LinkedList<String>();  
         /* YOUR CODE HERE; LEAVE BLANK IF NOT PURSUING BONUS */
         return results;

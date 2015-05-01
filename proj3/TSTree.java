@@ -97,7 +97,7 @@ public class TSTree {
             TSTNode pointerMiddle = pointer.middle();
             if (pointerMiddle != null) {
                 if (pointerMiddle.value() == pointer.max()) {
-                    words.add(partialStr);
+                    words.add(partialStr + pointerMiddle.letter());
                 } else if (pointerMiddle.value() != null) {
                     waitListed.add(new StringAndValue(partialStr + pointerMiddle.letter(), pointerMiddle.value()));
                 }

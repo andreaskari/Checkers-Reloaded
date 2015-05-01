@@ -49,7 +49,7 @@ public class Autocomplete {
      */
     public String topMatch(String prefix) {
         ArrayList<String> list = tst.getTopWeightsOfPartialWords(prefix, 1);
-        if (list.size() != 1) {
+        if (list.size() == 0) {
             return null;
         }
         return list.get(0);
@@ -86,7 +86,6 @@ public class Autocomplete {
         // return results;
 
         LinkedList<String> results = new LinkedList<String>();  
-        /* YOUR CODE HERE; LEAVE BLANK IF NOT PURSUING BONUS */
         return results;
     }
     /**

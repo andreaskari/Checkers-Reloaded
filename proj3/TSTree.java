@@ -33,15 +33,18 @@ public class TSTree {
         if (pointer == null) {
             pointer = new TSTNode(letter, (Double) val);
         }
+        if (pointer.max() < val) {
+            pointer.setMax(val);
+        }
         if (letter < pointer.letter()) {
             pointer.setLeft(insertNode(pointer.left(), letters, val, depth));
         } else if (letter > pointer.letter()) {
             pointer.setRight(insertNode(pointer.right(), letters, val, depth));
         } else {
             if (depth + 1 < letters.length) {
-                if (pointer.max() < val) {
-                    pointer.setMax(val);
-                }
+                // if (pointer.max() < val) {
+                //     pointer.setMax(val);
+                // }
                 pointer.setMiddle(insertNode(pointer.middle(), letters, val, depth + 1));
             } else {
                 pointer.setValue(val);

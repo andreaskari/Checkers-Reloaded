@@ -87,45 +87,47 @@ public class TSTree {
 
     public ArrayList<String> getTopWeightsOfPartialWords(String partialStr, int numRequested) {
         ArrayList<String> words = new ArrayList<String>(numRequested);
-        TSTNode pointer = getNodeOfStr(root, partialStr.toCharArray(), 0);
+        PriorityQueue<StringAndValue> waitListed = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
+        TSTNode pointer = root;
+        if (!partialStr.equals("")) {
+            pointer = getNodeOfStr(root, partialStr.toCharArray(), 0);
+            if (pointer != null) {
+                if (pointer.value() == pointer.max()) {
+                    words.add(partialStr);
+                } else if (pointer.value() != null) {
+                    waitListed.add(new StringAndValue(partialStr, pointer.value()));
+                }
+                pointer = pointer.middle();
+            }
+        }
 
         if (pointer != null) {
-            PriorityQueue<StringAndValue> waitListed = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
             if (pointer.value() == pointer.max()) {
-                words.add(partialStr);
+                words.add(partialStr + pointer.letter());
             } else if (pointer.value() != null) {
-                waitListed.add(new StringAndValue(partialStr, pointer.value()));
+                waitListed.add(new StringAndValue(partialStr + pointer.letter(), pointer.value()));
             }
 
-            TSTNode pointerMiddle = pointer.middle();
-            if (pointerMiddle != null) {
-                if (pointerMiddle.value() == pointer.max()) {
-                    words.add(partialStr + pointerMiddle.letter());
-                } else if (pointerMiddle.value() != null) {
-                    waitListed.add(new StringAndValue(partialStr + pointerMiddle.letter(), pointerMiddle.value()));
-                }
+            int numChildren = pointer.prioritizedChildren().size();
+            if (numChildren > 0) {
+                TSTNode[] sortedPQ = pointer.prioritizedChildren().toArray(new TSTNode[numChildren]);
+                Arrays.sort(sortedPQ);
+                for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
+                    TSTNode child = sortedPQ[i];
 
-                int numChildren = pointer.middle().prioritizedChildren().size();
-                if (numChildren > 0) {
-                    TSTNode[] sortedPQ = pointer.middle().prioritizedChildren().toArray(new TSTNode[numChildren]);
-                    Arrays.sort(sortedPQ);
-                    for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
-                        TSTNode child = sortedPQ[i];
+                    if (pointer.middle() != null && child == pointer.middle()) {
+                        addDownBranch(child, partialStr + pointer.letter(), waitListed, words, pointer.max());
+                    } else {
+                        addDownBranch(child, partialStr, waitListed, words, pointer.max());
+                    }
 
-                        if (pointer.middle().middle() != null && child == pointer.middle().middle()) {
-                            addDownBranch(child, partialStr + pointer.middle().letter(), waitListed, words, pointer.max());
-                        } else {
-                            addDownBranch(child, partialStr, waitListed, words, pointer.max());
-                        }
-
-                        double minWeight = 0.0;
-                        if (i != 0) {
-                            TSTNode next = sortedPQ[i-1];
-                            minWeight = next.max();
-                        }
-                        while (waitListed.size() > 0 && words.size() < numRequested && (double) waitListed.peek().value() >= minWeight) {
-                            words.add(waitListed.poll().word());
-                        }
+                    double minWeight = 0.0;
+                    if (i != 0) {
+                        TSTNode next = sortedPQ[i-1];
+                        minWeight = next.max();
+                    }
+                    while (waitListed.size() > 0 && words.size() < numRequested && (double) waitListed.peek().value() >= minWeight) {
+                        words.add(waitListed.poll().word());
                     }
                 }
             }

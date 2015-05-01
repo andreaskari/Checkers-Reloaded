@@ -1,3 +1,6 @@
+## DISCLAIMER: THIS IS NOT MY CODE.
+# Borrowed from Piazza
+
 import string
 import random
 

@@ -5,7 +5,7 @@ import java.util.LinkedList;
  * @author Andre Askarinam
  */
 public class Autocomplete {
-    private WeightedTST tst;
+    private TSTree tst;
 
     /**
      * Initializes required data structures from parallel arrays.
@@ -14,7 +14,7 @@ public class Autocomplete {
      */
     public Autocomplete(String[] terms, double[] weights) {
         long startTime = System.currentTimeMillis();
-        tst = new WeightedTST();
+        tst = new TSTree();
         if (terms.length != weights.length) {
             throw new IllegalArgumentException();
         }
@@ -23,16 +23,15 @@ public class Autocomplete {
                 throw new IllegalArgumentException();
             }
             if (tst.contains(terms[i])) {
-                System.out.println(terms[i]);
                 throw new IllegalArgumentException();
             }
             tst.insert(terms[i], (Double) weights[i]);
         }
         tst.prioritizeTST();
-        System.out.println(tst.contains("Manila, Philippines"));
-        System.out.println(tst.contains("Mumbai, India"));
+        // System.out.println(tst.contains("Manila, Philippines"));
+        // System.out.println(tst.contains("Mumbai, India"));
 
-        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
+        // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 
     /**
@@ -66,7 +65,7 @@ public class Autocomplete {
             throw new IllegalArgumentException();
         }
         Iterable<String> matches = tst.getTopWeightsOfPartialWords(prefix, k);
-        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
+        // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
         return matches;
     }
 

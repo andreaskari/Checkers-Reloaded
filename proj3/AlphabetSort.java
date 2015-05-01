@@ -16,7 +16,6 @@ public class AlphabetSort {
      * @param args unused.
      */
     public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
         Scanner stdin = new Scanner(System.in);
 
         if (!stdin.hasNextLine()) {
@@ -56,7 +55,6 @@ public class AlphabetSort {
         }
 
         printAllWordsAlphabetically(tree.rootNode(), "");
-        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 
     /** 

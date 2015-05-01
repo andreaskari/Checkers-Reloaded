@@ -28,9 +28,7 @@ public class Autocomplete {
             tst.insert(terms[i], (Double) weights[i]);
         }
         tst.prioritizeTST();
-        // System.out.println(tst.contains("Manila, Philippines"));
-        // System.out.println(tst.contains("Mumbai, India"));
-
+        
         // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 

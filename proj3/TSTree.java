@@ -90,33 +90,39 @@ public class TSTree {
             PriorityQueue<StringAndValue> waitListed = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
             if (pointer.value() == pointer.max()) {
                 words.add(partialStr);
-                numRequested -= 1;
             } else if (pointer.value() != null) {
                 waitListed.add(new StringAndValue(partialStr, pointer.value()));
             }
 
-            int numChildren = pointer.prioritizedChildren().size();
+            TSTNode pointerMiddle = pointer.middle();
+            if (pointerMiddle != null) {
+                if (pointerMiddle.value() == pointer.max()) {
+                    words.add(partialStr);
+                } else if (pointerMiddle.value() != null) {
+                    waitListed.add(new StringAndValue(partialStr + pointerMiddle.letter(), pointerMiddle.value()));
+                }
+            }
+
+            int numChildren = pointer.middle().prioritizedChildren().size();
             if (numChildren > 0) {
-                TSTNode[] sortedPQ = pointer.prioritizedChildren().toArray(new TSTNode[numChildren]);
+                TSTNode[] sortedPQ = pointer.middle().prioritizedChildren().toArray(new TSTNode[numChildren]);
                 Arrays.sort(sortedPQ);
-                for (int i = sortedPQ.length - 1; numRequested > 0 && i >= 0; i--) {
+                for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
                     TSTNode child = sortedPQ[i];
 
-                    if (pointer.middle() != null && child == pointer.middle().middle()) {
+                    if (pointer.middle().middle() != null && child == pointer.middle().middle()) {
                         addDownBranch(child, partialStr + pointer.middle().letter(), waitListed, words, pointer.max());
                     } else {
                         addDownBranch(child, partialStr, waitListed, words, pointer.max());
                     }
-                    numRequested -= 1;
 
                     double minWeight = 0.0;
                     if (i != 0) {
                         TSTNode next = sortedPQ[i-1];
                         minWeight = next.max();
                     }
-                    while (waitListed.size() > 0 && numRequested > 0 && (double) waitListed.peek().value() >= minWeight) {
+                    while (waitListed.size() > 0 && words.size() < numRequested && (double) waitListed.peek().value() >= minWeight) {
                         words.add(waitListed.poll().word());
-                        numRequested -= 1;
                     }
                 }
             }
@@ -137,10 +143,10 @@ public class TSTree {
             Arrays.sort(sortedPQ);
             for (int i = 0; i < sortedPQ.length; i++) {
                 TSTNode child = sortedPQ[i];
-                if (pointer.middle() != null && child == pointer.middle().middle()) {
-                    addDownBranch(child, partialStr + pointer.letter() + pointer.middle().letter(), pq, words, maxValue);
-                } else {
+                if (child == pointer.middle()) {
                     addDownBranch(child, partialStr + pointer.letter(), pq, words, maxValue);
+                } else {
+                    addDownBranch(child, partialStr, pq, words, maxValue);
                 }
             }
         }

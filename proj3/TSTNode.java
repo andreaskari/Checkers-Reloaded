@@ -74,15 +74,13 @@ public class TSTNode implements Comparable {
     public void setPrioritizedChildren() {
         prioritizedChildren = new PriorityQueue<TSTNode>();
         if (middle != null) {
-            if (middle.right() != null) {
-                prioritizedChildren.add(middle.right());
-            }
-            if (middle.left() != null) {
-                prioritizedChildren.add(middle.left());
-            }
-            if (middle.middle() != null) {
-                prioritizedChildren.add(middle.middle());
-            }
+            prioritizedChildren.add(middle);
+        }
+        if (left != null) {
+            prioritizedChildren.add(left);
+        }
+        if (right != null) {
+            prioritizedChildren.add(right);
         }
     }
 

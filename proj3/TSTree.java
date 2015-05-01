@@ -101,28 +101,28 @@ public class TSTree {
                 } else if (pointerMiddle.value() != null) {
                     waitListed.add(new StringAndValue(partialStr + pointerMiddle.letter(), pointerMiddle.value()));
                 }
-            }
 
-            int numChildren = pointer.middle().prioritizedChildren().size();
-            if (numChildren > 0) {
-                TSTNode[] sortedPQ = pointer.middle().prioritizedChildren().toArray(new TSTNode[numChildren]);
-                Arrays.sort(sortedPQ);
-                for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
-                    TSTNode child = sortedPQ[i];
+                int numChildren = pointer.middle().prioritizedChildren().size();
+                if (numChildren > 0) {
+                    TSTNode[] sortedPQ = pointer.middle().prioritizedChildren().toArray(new TSTNode[numChildren]);
+                    Arrays.sort(sortedPQ);
+                    for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
+                        TSTNode child = sortedPQ[i];
 
-                    if (pointer.middle().middle() != null && child == pointer.middle().middle()) {
-                        addDownBranch(child, partialStr + pointer.middle().letter(), waitListed, words, pointer.max());
-                    } else {
-                        addDownBranch(child, partialStr, waitListed, words, pointer.max());
-                    }
+                        if (pointer.middle().middle() != null && child == pointer.middle().middle()) {
+                            addDownBranch(child, partialStr + pointer.middle().letter(), waitListed, words, pointer.max());
+                        } else {
+                            addDownBranch(child, partialStr, waitListed, words, pointer.max());
+                        }
 
-                    double minWeight = 0.0;
-                    if (i != 0) {
-                        TSTNode next = sortedPQ[i-1];
-                        minWeight = next.max();
-                    }
-                    while (waitListed.size() > 0 && words.size() < numRequested && (double) waitListed.peek().value() >= minWeight) {
-                        words.add(waitListed.poll().word());
+                        double minWeight = 0.0;
+                        if (i != 0) {
+                            TSTNode next = sortedPQ[i-1];
+                            minWeight = next.max();
+                        }
+                        while (waitListed.size() > 0 && words.size() < numRequested && (double) waitListed.peek().value() >= minWeight) {
+                            words.add(waitListed.poll().word());
+                        }
                     }
                 }
             }

@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * Implements autocomplete on prefixes for a given dictionary of terms and weights.
@@ -47,7 +48,11 @@ public class Autocomplete {
      * @return Best (highest weight) matching string in the dictionary.
      */
     public String topMatch(String prefix) {
-        return tst.getTopWeightsOfPartialWords(prefix, 1).get(0);
+        ArrayList<String> list = tst.getTopWeightsOfPartialWords(prefix, 1);
+        if (list.size() != 1) {
+            return null;
+        }
+        return list.get(0);
     }
 
     /**

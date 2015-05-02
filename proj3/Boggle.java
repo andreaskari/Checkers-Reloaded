@@ -20,24 +20,24 @@ public class Boggle {
 
         for (int i = 0; i < args.length; i += 2) {
             if (args[i].equals("-k")) {
-                numWords = Integer.parseInt(args[i+1]);
+                numWords = Integer.parseInt(args[i + 1]);
                 if (numWords <= 0) {
                     throw new IllegalArgumentException();
                 }
             } else if (args[i].equals("-n")) {
-                width = Integer.parseInt(args[i+1]);
+                width = Integer.parseInt(args[i + 1]);
                 if (width <= 0) {
                     throw new IllegalArgumentException();
                 }
             } else if (args[i].equals("-m")) {
-                height = Integer.parseInt(args[i+1]);
+                height = Integer.parseInt(args[i + 1]);
                 if (height <= 0) {
                     throw new IllegalArgumentException();
                 }
             } else if (args[i].equals("-d")) {
-                pathToDict = args[i+1];
+                pathToDict = args[i + 1];
             } else if (args[i].equals("-r")) {
-                pathToBoard = args[i+1];
+                pathToBoard = args[i + 1];
             }
         }
 

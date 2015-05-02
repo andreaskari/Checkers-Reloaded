@@ -10,28 +10,14 @@ public class TSTree {
         return root;
     }
 
-    public void prioritizeTST() {
-        prioritizeRecursively(root);
-    }
-
-    private void prioritizeRecursively(TSTNode pointer) {
-        if (pointer != null) {
-            pointer.setPrioritizedChildren();
-
-            prioritizeRecursively(pointer.left());
-            prioritizeRecursively(pointer.middle());
-            prioritizeRecursively(pointer.right());
-        }
-    }
-
     public void insert(String str, Double val) {
-        root = insertNode(root, str.toCharArray(), val, 0);
+        root = insertNode(root, str, val, 0);
     }
 
-    private TSTNode insertNode(TSTNode pointer, char[] letters, Double val, int depth) {
-        char letter = letters[depth];
+    private TSTNode insertNode(TSTNode pointer, String letters, Double val, int depth) {
+        char letter = letters.charAt(depth);
         if (pointer == null) {
-            pointer = new TSTNode(letter, (Double) val);
+            pointer = new TSTNode(letter, (Double) val, letters.substring(0, depth + 1));
         }
         if (pointer.max() < val) {
             pointer.setMax(val);
@@ -41,7 +27,7 @@ public class TSTree {
         } else if (letter > pointer.letter()) {
             pointer.setRight(insertNode(pointer.right(), letters, val, depth));
         } else {
-            if (depth + 1 < letters.length) {
+            if (depth + 1 < letters.length()) {
                 pointer.setMiddle(insertNode(pointer.middle(), letters, val, depth + 1));
             } else {
                 pointer.setValue(val);
@@ -80,105 +66,97 @@ public class TSTree {
         }
     }
 
-    public ArrayList<String> getTopWeightsOfPartialWords(String partialStr, int numRequested) {
-        ArrayList<String> words = new ArrayList<String>(numRequested);
-        PriorityQueue<StringAndValue> waitListed = new PriorityQueue<StringAndValue>(numRequested, new SVComparator());
-        TSTNode pointer = root;
-        if (!partialStr.equals("")) {
-            pointer = getNodeOfStr(root, partialStr.toCharArray(), 0);
-            if (pointer != null) {
-                if (pointer.value() == pointer.max()) {
-                    words.add(partialStr);
-                } else if (pointer.value() != null) {
-                    waitListed.add(new StringAndValue(partialStr, pointer.value()));
-                }
-                pointer = pointer.middle();
-            }
+    private void collect(TSTNode pointer, StringBuilder prefix, Queue<String> queue) {
+        if (pointer == null) {
+            return;
         }
+        collect(pointer.left(), prefix, queue);
+        if (pointer.value() != null && pointer.value() != 0.0) {
+            queue.enqueue(prefix.toString() + pointer.letter());
+        }
+        collect(pointer.middle(), prefix.append(pointer.letter()), queue);
+        prefix.deleteCharAt(prefix.length() - 1);
+        collect(pointer.right(), prefix, queue);
+    }
 
+    public Iterable<String> keysWithPrefix(String prefix) {
+        Queue<String> queue = new Queue<String>();
+        TSTNode pointer = getNodeOfStr(root, prefix.toCharArray(), 0);
+        if (pointer == null) {
+            return queue;
+        }
+        if (pointer.value() != null && pointer.value() != 0.0) {
+            queue.enqueue(prefix);
+        }
+        collect (pointer.middle(), new StringBuilder(prefix), queue);
+        return queue;
+    }
+    
+    public ArrayList<String> keysWithPrefix(String prefix, int k) {
+        PriorityQueue<TSTNode> fringe = new PriorityQueue<TSTNode>();
+        PriorityQueue<TSTNode> topRequested = new PriorityQueue<TSTNode>(6, new MinNodeComparator());
+
+        TSTNode pointer = getNodeOfStr(root, prefix.toCharArray(), 0);
+        StringBuilder prefixBuilder = new StringBuilder(prefix);
+        ArrayList<String> strList = new ArrayList<String>();
+
+        if (pointer == null || k == 0) {
+            return strList;
+        }
+        if (pointer.value() != null) {
+            topRequested.add(pointer);
+        }
+        if (!prefix.equals("")) {
+            pointer = pointer.middle();
+        }
         if (pointer != null) {
-            if (pointer.value() == pointer.max()) {
-                words.add(partialStr + pointer.letter());
-            } else if (pointer.value() != null) {
-                waitListed.add(new StringAndValue(partialStr + pointer.letter(), pointer.value()));
+            fringe.add(pointer);
+        }
+        
+        while (!fringe.isEmpty()) {
+            pointer = fringe.poll();
+            if (pointer.left() != null) {
+                fringe.add(pointer.left());
             }
-
-            int numChildren = pointer.prioritizedChildren().length;
-            if (numChildren > 0) {
-                TSTNode[] sortedPQ = pointer.prioritizedChildren();
-                for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
-                    TSTNode child = sortedPQ[i];
-
-                    if (pointer.middle() != null && child == pointer.middle()) {
-                        addDownBranch(child, partialStr + pointer.letter(), waitListed, words, pointer.max());
-                    } else {
-                        addDownBranch(child, partialStr, waitListed, words, pointer.max());
-                    }
-
-                    double minWeight = 0.0;
-                    if (i != 0) {
-                        TSTNode next = sortedPQ[i-1];
-                        minWeight = next.max();
-                    }
-                    while (waitListed.size() > 0 && words.size() < numRequested && (double) waitListed.peek().value() >= minWeight) {
-                        words.add(waitListed.poll().word());
-                    }
+            if (pointer.middle() != null) {
+                fringe.add(pointer.middle());
+            }
+            if (pointer.right() != null) {
+                fringe.add(pointer.right());
+            }
+            
+            prefixBuilder.append(pointer.letter());
+            if (pointer.value() != null) {
+                topRequested.add(pointer);
+                if (topRequested.size() > k) {
+                    topRequested.poll();
+                }
+            }
+            if (topRequested.size() >= k && !fringe.isEmpty()) {
+                double largestMax = fringe.peek().max();
+                double kth = topRequested.peek().value();
+                if (largestMax <= kth) {
+                    break;
                 }
             }
         }
-        return words;
+        
+        Stack<TSTNode> stack = new Stack<TSTNode>();
+        while(!topRequested.isEmpty()) {
+            TSTNode top = topRequested.poll();
+            stack.push(top);
+        }
+        while (!stack.isEmpty()) {
+            TSTNode top = stack.pop();
+            strList.add(top.toString());
+        }
+        return strList;
     }
 
-    private void addDownBranch(TSTNode pointer, String partialStr, 
-            PriorityQueue<StringAndValue> pq, ArrayList<String> words, double maxValue) {
-
-        if (pointer.value() != null && pointer.value() == maxValue) {
-            words.add(partialStr + pointer.letter());
-        } else if (pointer.value() != null) {
-            pq.add(new StringAndValue(partialStr + pointer.letter(), pointer.value()));
-        }
-        if (pointer.hasChildren()) {
-            TSTNode[] sortedPQ = pointer.prioritizedChildren();
-            for (int i = 0; i < sortedPQ.length; i++) {
-                TSTNode child = sortedPQ[i];
-                if (child == pointer.middle()) {
-                    addDownBranch(child, partialStr + pointer.letter(), pq, words, maxValue);
-                } else {
-                    addDownBranch(child, partialStr, pq, words, maxValue);
-                }
-            }
-        }
-    }
-
-    private class StringAndValue implements Comparable {
-        private Double value;
-        private String word;
-
-        public StringAndValue(String w, Double v) {
-            value = v;
-            word = w;
-        }
-
-        public Double value() {
-            return value;
-        }
-
-        public String word() {
-            return word;
-        }
-
-        public int compareTo(Object o) {
-            return (int) (10 * (value - ((StringAndValue) o).value()));
-        }
-    }
-
-    private class SVComparator implements Comparator<StringAndValue> {
-        public int compare(StringAndValue o1, StringAndValue o2) {
-            return -1 * o1.compareTo(o2);
-        }
-
-        public boolean equals(Object obj) {
-            return this == obj;
+    class MinNodeComparator implements Comparator<TSTNode> {
+        @Override
+        public int compare(TSTNode o1, TSTNode o2) {
+            return (int) (o1.value() - o2.value());
         }
     }
 }

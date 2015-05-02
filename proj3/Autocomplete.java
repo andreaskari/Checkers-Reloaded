@@ -28,7 +28,6 @@ public class Autocomplete {
             }
             tst.insert(terms[i], (Double) weights[i]);
         }
-        tst.prioritizeTST();
         
         // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
@@ -48,7 +47,7 @@ public class Autocomplete {
      * @return Best (highest weight) matching string in the dictionary.
      */
     public String topMatch(String prefix) {
-        ArrayList<String> list = tst.getTopWeightsOfPartialWords(prefix, 1);
+        ArrayList<String> list = tst.keysWithPrefix(prefix, 1);
         if (list.size() == 0) {
             return null;
         }
@@ -67,7 +66,7 @@ public class Autocomplete {
         if (k <= 0) {
             throw new IllegalArgumentException();
         }
-        Iterable<String> matches = tst.getTopWeightsOfPartialWords(prefix, k);
+        Iterable<String> matches = tst.keysWithPrefix(prefix, k);
         // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
         return matches;
     }

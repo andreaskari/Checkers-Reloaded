@@ -7,26 +7,30 @@ public class TSTNode implements Comparable {
     private static final int DEEP_NODE_CAPACITY = 16;
 
     private char letter;
+    private String str;
     private Double value, max;
     private TSTNode left, middle, right;
 
-    private TSTNode[] prioritizedChildren;
-
-
     public TSTNode() {
         letter = ' ';
+        str = "";
         value = null;
         max = null;
     }
 
-    public TSTNode(char l, Double m) {
+    public TSTNode(char l, Double m, String s) {
         letter = l;
+        str = s;
         value = null;
         max = m;
     }
 
     public char letter() {
         return letter;
+    }
+
+    public String toString() {
+        return str;
     }
 
     public void setValue(Double v) {
@@ -73,32 +77,10 @@ public class TSTNode implements Comparable {
         return middle != null || right != null || left != null;
     }
 
-    public void setPrioritizedChildren() {
-        ArrayList<TSTNode> children = new ArrayList<TSTNode>(3);
-        if (middle != null) {
-            children.add(middle);
-        }
-        if (left != null) {
-            children.add(left);
-        }
-        if (right != null) {
-            children.add(right);
-        }
-        prioritizedChildren = children.toArray(new TSTNode[children.size()]);
-        Arrays.sort(prioritizedChildren);
-    }
-
-    public TSTNode[] prioritizedChildren() {
-        return prioritizedChildren;
-    }
-
     public int compareTo(Object o) {
         if (o instanceof TSTNode) {
             TSTNode other = (TSTNode) o;
-            if (max == other.max()) {
-                return (int) (10 * (value - other.value()));
-            }
-            return (int) (10 * (max - other.max()));
+            return (int) (10 * (other.max() - max));
         }
         return 0;
     }

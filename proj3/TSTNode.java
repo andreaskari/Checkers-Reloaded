@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TSTNode implements Comparable {
     private static final int ROOT_NODE_CAPACITY = 256;
@@ -9,7 +10,8 @@ public class TSTNode implements Comparable {
     private Double value, max;
     private TSTNode left, middle, right;
 
-    private ArrayList<TSTNode> prioritizedChildren;
+    private TSTNode[] prioritizedChildren;
+
 
     public TSTNode() {
         letter = ' ';
@@ -72,19 +74,21 @@ public class TSTNode implements Comparable {
     }
 
     public void setPrioritizedChildren() {
-        prioritizedChildren = new ArrayList<TSTNode>(3);
+        ArrayList<TSTNode> children = new ArrayList<TSTNode>(3);
         if (middle != null) {
-            prioritizedChildren.add(middle);
+            children.add(middle);
         }
         if (left != null) {
-            prioritizedChildren.add(left);
+            children.add(left);
         }
         if (right != null) {
-            prioritizedChildren.add(right);
+            children.add(right);
         }
+        prioritizedChildren = children.toArray(new TSTNode[children.size()]);
+        Arrays.sort(prioritizedChildren);
     }
 
-    public ArrayList<TSTNode> prioritizedChildren() {
+    public TSTNode[] prioritizedChildren() {
         return prioritizedChildren;
     }
 

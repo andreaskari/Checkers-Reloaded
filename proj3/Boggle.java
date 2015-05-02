@@ -51,17 +51,17 @@ public class Boggle {
         } else {
             stdin = new Scanner(pathToBoard);
         }
-        String allText = stdin.nextLine();
+        String board = stdin.nextLine();
 
-        int boardWidth = allText.length();
+        int boardWidth = board.length();
         while (stdin.hasNextLine()) {
             String newLine = stdin.nextLine();
             if (newLine.length() != boardWidth) {
                 throw new IllegalArgumentException();
             }
-            allText += "\n" + newLine;
+            board += "\n" + newLine;
         }
 
-        System.out.println(allText);
+        System.out.println(board);
     }
 }

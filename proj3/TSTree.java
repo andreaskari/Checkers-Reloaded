@@ -103,10 +103,9 @@ public class TSTree {
                 waitListed.add(new StringAndValue(partialStr + pointer.letter(), pointer.value()));
             }
 
-            int numChildren = pointer.prioritizedChildren().size();
+            int numChildren = pointer.prioritizedChildren().length;
             if (numChildren > 0) {
-                TSTNode[] sortedPQ = pointer.prioritizedChildren().toArray(new TSTNode[numChildren]);
-                Arrays.sort(sortedPQ);
+                TSTNode[] sortedPQ = pointer.prioritizedChildren();
                 for (int i = sortedPQ.length - 1; words.size() < numRequested && i >= 0; i--) {
                     TSTNode child = sortedPQ[i];
 
@@ -139,8 +138,7 @@ public class TSTree {
             pq.add(new StringAndValue(partialStr + pointer.letter(), pointer.value()));
         }
         if (pointer.hasChildren()) {
-            TSTNode[] sortedPQ = pointer.prioritizedChildren().toArray(new TSTNode[pointer.prioritizedChildren().size()]);
-            Arrays.sort(sortedPQ);
+            TSTNode[] sortedPQ = pointer.prioritizedChildren();
             for (int i = 0; i < sortedPQ.length; i++) {
                 TSTNode child = sortedPQ[i];
                 if (child == pointer.middle()) {

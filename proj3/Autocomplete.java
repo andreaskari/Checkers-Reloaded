@@ -80,13 +80,11 @@ public class Autocomplete {
      * @return Iterable in descending weight order of the matches
      */
     public Iterable<String> spellCheck(String word, int dist, int k) {
-        // LinkedList<String> results = new LinkedList<String>();  
-        // /* YOUR CODE HERE; LEAVE BLANK IF NOT PURSUING BONUS */
-        // return results;
-
         LinkedList<String> results = new LinkedList<String>();  
+        /* YOUR CODE HERE; LEAVE BLANK IF NOT PURSUING BONUS */
         return results;
     }
+    
     /**
      * Test client. Reads the data from the file, 
      * then repeatedly reads autocomplete queries from standard input and prints out the top k 

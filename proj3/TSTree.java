@@ -81,7 +81,12 @@ public class TSTree {
 
     public Iterable<String> keysWithPrefix(String prefix) {
         Queue<String> queue = new Queue<String>();
-        TSTNode pointer = getNodeOfStr(root, prefix.toCharArray(), 0);
+
+        TSTNode pointer = root;
+        if (!prefix.equals("")) {
+            pointer = getNodeOfStr(root, prefix.toCharArray(), 0);
+        }
+
         if (pointer == null) {
             return queue;
         }
@@ -96,7 +101,10 @@ public class TSTree {
         PriorityQueue<TSTNode> fringe = new PriorityQueue<TSTNode>();
         PriorityQueue<TSTNode> topRequested = new PriorityQueue<TSTNode>(6, new MinNodeComparator());
 
-        TSTNode pointer = getNodeOfStr(root, prefix.toCharArray(), 0);
+        TSTNode pointer = root;
+        if (!prefix.equals("")) {
+            pointer = getNodeOfStr(root, prefix.toCharArray(), 0);
+        }
         StringBuilder prefixBuilder = new StringBuilder(prefix);
         ArrayList<String> strList = new ArrayList<String>();
 

@@ -30,7 +30,7 @@ public class Autocomplete {
         }
         tst.prioritizeTST();
         
-        System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
+        // System.out.println((double) (System.currentTimeMillis() - startTime) / 1000);
     }
 
     /**

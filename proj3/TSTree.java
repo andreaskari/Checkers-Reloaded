@@ -51,12 +51,10 @@ public class TSTree {
     }
 
     public boolean contains(String str) {
-        // return containsStr(root, str.toCharArray(), 0);
         return getNodeOfStr(root, str.toCharArray(), 0) != null && getNodeOfStr(root, str.toCharArray(), 0).value() != null;
     }
 
     public double getWeightOf(String str) {
-        // return getWeightOfStr(root, str.toCharArray(), 0);
         TSTNode node = getNodeOfStr(root, str.toCharArray(), 0);
         if (node == null || node.value() == null) {
             return 0.0;

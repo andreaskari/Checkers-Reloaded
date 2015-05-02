@@ -42,9 +42,6 @@ public class TSTree {
             pointer.setRight(insertNode(pointer.right(), letters, val, depth));
         } else {
             if (depth + 1 < letters.length) {
-                // if (pointer.max() < val) {
-                //     pointer.setMax(val);
-                // }
                 pointer.setMiddle(insertNode(pointer.middle(), letters, val, depth + 1));
             } else {
                 pointer.setValue(val);

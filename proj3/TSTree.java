@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class TSTree {
     private TSTNode root = null;
 
-    public TSTNode rootNode() {
+    public TSTNode root() {
         return root;
     }
 
@@ -40,6 +40,10 @@ public class TSTree {
         return getNodeOfStr(root, str.toCharArray(), 0) != null && getNodeOfStr(root, str.toCharArray(), 0).value() != null;
     }
 
+    // public boolean containsPrefix(String str) {
+    //     return getNodeOfStr(root, str.toCharArray(), 0) != null;
+    // }
+
     public double getWeightOf(String str) {
         TSTNode node = getNodeOfStr(root, str.toCharArray(), 0);
         if (node == null || node.value() == null) {
@@ -48,7 +52,7 @@ public class TSTree {
         return node.value();
     }
 
-    private TSTNode getNodeOfStr(TSTNode pointer, char[] letters, int depth) {
+    public TSTNode getNodeOfStr(TSTNode pointer, char[] letters, int depth) {
         if (pointer == null) {
             return null;
         } 
@@ -66,7 +70,19 @@ public class TSTree {
         }
     }
 
-    private void collect(TSTNode pointer, StringBuilder prefix, Queue<String> queue) {
+    public TSTNode getNodeOfChar(TSTNode pointer, char letter) {
+        if (pointer == null) {
+            return null;
+        } 
+        if (letter < pointer.letter()) {
+            return getNodeOfChar(pointer.left(), letter);
+        } else if (letter > pointer.letter()) {
+            return getNodeOfChar(pointer.right(), letter);
+        } 
+        return pointer;
+    }
+
+    public void collect(TSTNode pointer, StringBuilder prefix, Queue<String> queue) {
         if (pointer == null) {
             return;
         }
